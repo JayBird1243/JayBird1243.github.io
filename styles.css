@@ -423,21 +423,32 @@ body {
 
 /* Company Logos */
 .company-logos {
-    margin: 40px 0;
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 60px;
     flex-wrap: wrap;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+}
+
+.company-logos:hover .logo-container {
+    opacity: 0.6;
 }
 
 .logo-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     transition: var(--transition);
     opacity: 0;
     transform: translateY(20px);
@@ -448,8 +459,8 @@ body {
 }
 
 .company-logo-svg {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     transition: var(--transition);
 }
 
@@ -458,7 +469,7 @@ body {
 }
 
 .logo-label {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
     font-weight: 500;
     text-align: center;
@@ -473,11 +484,13 @@ body {
     height: 100%;
     z-index: 0;
     pointer-events: none;
-    transition: left 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: left 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
 }
 
 .truck-animation-bg.animate {
     left: 0;
+    opacity: 1;
 }
 
 .road-line {
@@ -513,29 +526,40 @@ body {
 
 .truck-svg {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     height: auto;
-    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
-    animation: truckBounce 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.7));
+    animation: truckBounce 4s ease-in-out infinite;
+    transform-origin: center bottom;
 }
 
-.truck-svg rect, .truck-svg circle {
-    animation: truckGlow 2s ease-in-out infinite alternate;
+.truck-svg path, .truck-svg rect, .truck-svg circle, .truck-svg ellipse {
+    animation: truckGlow 3s ease-in-out infinite alternate;
 }
 
 @keyframes truckBounce {
     0%, 100% {
-        transform: translateY(0) scale(1);
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-8px) scale(1.01) rotate(0.5deg);
     }
     50% {
-        transform: translateY(-10px) scale(1.02);
+        transform: translateY(-15px) scale(1.02) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-8px) scale(1.01) rotate(-0.5deg);
     }
 }
 
 @keyframes truckGlow {
     0% {
-        opacity: 0.3;
-        filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.3));
+        opacity: 0.4;
+        filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4));
+    }
+    50% {
+        opacity: 0.6;
+        filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.7));
     }
     100% {
         opacity: 0.5;
@@ -548,9 +572,13 @@ body {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
+    50% {
+        opacity: 0.8;
+        transform: translateY(-20px) scale(1.2);
+    }
     100% {
         opacity: 0;
-        transform: translateY(-100px) scale(0.5);
+        transform: translateY(-40px) scale(0.5);
     }
 }
 

@@ -79,35 +79,43 @@ function initTruckAnimation() {
     const aboutSection = document.querySelector('.about');
     const truckBg = document.querySelector('.truck-animation-bg');
     
-    if (!aboutSection || !truckBg) return;
+    if (!aboutSection || !truckBg) {
+        console.log('Truck animation elements not found');
+        return;
+    }
+    
+    console.log('Initializing truck animation...');
     
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
+                console.log('About section visible, triggering truck animation');
+                
                 // Add a small delay for dramatic effect
                 setTimeout(() => {
                     truckBg.classList.add('animate');
+                    console.log('Truck animation class added');
                     
                     // Add some extra visual effects
                     createTruckParticles();
                     
                     // Simulate truck sound effect with visual feedback
                     setTimeout(() => {
-                        truckBg.style.filter = 'brightness(1.2)';
+                        truckBg.style.filter = 'brightness(1.3)';
                         setTimeout(() => {
                             truckBg.style.filter = 'brightness(1)';
-                        }, 200);
-                    }, 1000);
+                        }, 300);
+                    }, 1200);
                     
-                }, 300);
+                }, 500);
                 
                 // Stop observing after animation triggers
                 observer.unobserve(entry.target);
             }
         });
     }, {
-        threshold: 0.3,
-        rootMargin: '0px 0px -100px 0px'
+        threshold: 0.2,
+        rootMargin: '0px 0px -50px 0px'
     });
     
     observer.observe(aboutSection);
@@ -118,21 +126,24 @@ function createTruckParticles() {
     const aboutSection = document.querySelector('.about');
     if (!aboutSection) return;
     
-    for (let i = 0; i < 20; i++) {
+    console.log('Creating truck particles...');
+    
+    for (let i = 0; i < 30; i++) {
         setTimeout(() => {
             const particle = document.createElement('div');
             particle.className = 'truck-particle';
             particle.style.cssText = `
                 position: absolute;
-                width: 4px;
-                height: 4px;
-                background: #00d4ff;
+                width: ${Math.random() * 6 + 3}px;
+                height: ${Math.random() * 6 + 3}px;
+                background: ${Math.random() > 0.5 ? '#00d4ff' : '#ffffff'};
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 10;
                 left: ${Math.random() * 100}%;
-                bottom: 20%;
-                animation: particleFloat 3s ease-out forwards;
+                bottom: ${Math.random() * 30 + 10}%;
+                animation: particleFloat ${Math.random() * 2 + 2}s ease-out forwards;
+                box-shadow: 0 0 10px ${Math.random() > 0.5 ? '#00d4ff' : '#ffffff'};
             `;
             
             aboutSection.appendChild(particle);
@@ -142,8 +153,8 @@ function createTruckParticles() {
                 if (particle.parentNode) {
                     particle.parentNode.removeChild(particle);
                 }
-            }, 3000);
-        }, i * 100);
+            }, 4000);
+        }, i * 80);
     }
 }
 
@@ -166,15 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add staggered animation on page load
         setTimeout(() => {
-            logo.style.opacity = '0';
-            logo.style.transform = 'translateY(20px)';
-            logo.style.transition = 'all 0.6s ease-out';
-            
-            setTimeout(() => {
-                logo.style.opacity = '1';
-                logo.style.transform = 'translateY(0)';
-            }, 100);
-        }, index * 200);
+            logo.style.opacity = '1';
+            logo.style.transform = 'translateY(0)';
+            logo.style.transition = 'all 0.8s ease-out';
+        }, index * 300 + 1000);
     });
 });
 

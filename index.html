@@ -114,34 +114,6 @@
                         in the rapidly evolving field of fuel cell technology. I'm dedicated to contributing 
                         to innovative solutions that drive the future of clean energy.
                     </p>
-                    <div class="company-logos">
-                        <div class="logo-container">
-                            <div class="logo-item">
-                                <svg class="company-logo-svg" viewBox="0 0 100 100">
-                                    <!-- Daimler Logo Silhouette -->
-                                    <path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="#666" stroke-width="2"/>
-                                    <text x="50" y="50" text-anchor="middle" fill="#666" font-size="8" font-family="Arial">DAIMLER</text>
-                                </svg>
-                                <span class="logo-label">Daimler Trucks</span>
-                            </div>
-                            <div class="logo-item">
-                                <svg class="company-logo-svg" viewBox="0 0 100 100">
-                                    <!-- Volvo Logo Silhouette -->
-                                    <circle cx="50" cy="50" r="35" fill="none" stroke="#666" stroke-width="2"/>
-                                    <text x="50" y="55" text-anchor="middle" fill="#666" font-size="8" font-family="Arial">VOLVO</text>
-                                </svg>
-                                <span class="logo-label">Volvo Group</span>
-                            </div>
-                            <div class="logo-item">
-                                <svg class="company-logo-svg" viewBox="0 0 100 100">
-                                    <!-- Cellcentric Logo Silhouette -->
-                                    <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" fill="none" stroke="#666" stroke-width="2"/>
-                                    <text x="50" y="55" text-anchor="middle" fill="#666" font-size="6" font-family="Arial">CELLCENTRIC</text>
-                                </svg>
-                                <span class="logo-label">Cellcentric</span>
-                            </div>
-                        </div>
-                    </div>
                     <div class="skills-grid">
                         <div class="skill-category">
                             <h4>Technical Skills</h4>
@@ -179,23 +151,126 @@
                 </div>
             </div>
         </div>
+        <!-- Company Logos Background -->
+        <div class="company-logos">
+            <div class="logo-container">
+                <div class="logo-item">
+                    <svg class="company-logo-svg" viewBox="0 0 100 100">
+                        <!-- Daimler Logo Silhouette -->
+                        <path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="#666" stroke-width="2"/>
+                        <text x="50" y="50" text-anchor="middle" fill="#666" font-size="8" font-family="Arial">DAIMLER</text>
+                    </svg>
+                    <span class="logo-label">Daimler Trucks</span>
+                </div>
+                <div class="logo-item">
+                    <svg class="company-logo-svg" viewBox="0 0 100 100">
+                        <!-- Volvo Logo Silhouette -->
+                        <circle cx="50" cy="50" r="35" fill="none" stroke="#666" stroke-width="2"/>
+                        <text x="50" y="55" text-anchor="middle" fill="#666" font-size="8" font-family="Arial">VOLVO</text>
+                    </svg>
+                    <span class="logo-label">Volvo Group</span>
+                </div>
+                <div class="logo-item">
+                    <svg class="company-logo-svg" viewBox="0 0 100 100">
+                        <!-- Cellcentric Logo Silhouette -->
+                        <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" fill="none" stroke="#666" stroke-width="2"/>
+                        <text x="50" y="55" text-anchor="middle" fill="#666" font-size="6" font-family="Arial">CELLCENTRIC</text>
+                    </svg>
+                    <span class="logo-label">Cellcentric</span>
+                </div>
+            </div>
+        </div>
+        
         <!-- Truck Animation Background -->
         <div class="truck-animation-bg">
             <div class="road-line"></div>
             <div class="truck-silhouette">
-                <svg viewBox="0 0 400 200" class="truck-svg">
-                    <!-- Truck Body -->
-                    <rect x="50" y="120" width="300" height="60" fill="#333" opacity="0.3"/>
+                <svg viewBox="0 0 500 300" class="truck-svg">
+                    <!-- Detailed Truck Silhouette -->
+                    <!-- Main Truck Body -->
+                    <path d="M80 180 L420 180 L420 220 L80 220 Z" fill="#444" opacity="0.4"/>
+                    
                     <!-- Truck Cab -->
-                    <rect x="50" y="100" width="80" height="80" fill="#333" opacity="0.3"/>
+                    <path d="M80 140 L160 140 L160 220 L80 220 Z" fill="#444" opacity="0.4"/>
+                    
+                    <!-- Cab Roof -->
+                    <path d="M85 140 L155 140 L155 120 L85 120 Z" fill="#444" opacity="0.4"/>
+                    
+                    <!-- Front Grill -->
+                    <path d="M80 160 L70 160 L70 200 L80 200 Z" fill="#444" opacity="0.4"/>
+                    
+                    <!-- Front Bumper -->
+                    <path d="M65 170 L75 170 L75 190 L65 190 Z" fill="#444" opacity="0.4"/>
+                    
                     <!-- Wheels -->
-                    <circle cx="120" cy="180" r="25" fill="#333" opacity="0.3"/>
-                    <circle cx="320" cy="180" r="25" fill="#333" opacity="0.3"/>
-                    <!-- Exhaust -->
-                    <rect x="340" y="130" width="10" height="40" fill="#333" opacity="0.3"/>
+                    <circle cx="140" cy="220" r="30" fill="#333" opacity="0.5"/>
+                    <circle cx="360" cy="220" r="30" fill="#333" opacity="0.5"/>
+                    
+                    <!-- Wheel Rims -->
+                    <circle cx="140" cy="220" r="20" fill="#555" opacity="0.3"/>
+                    <circle cx="360" cy="220" r="20" fill="#555" opacity="0.3"/>
+                    
+                    <!-- Wheel Hubs -->
+                    <circle cx="140" cy="220" r="8" fill="#666" opacity="0.4"/>
+                    <circle cx="360" cy="220" r="8" fill="#666" opacity="0.4"/>
+                    
                     <!-- Headlights -->
-                    <circle cx="60" cy="110" r="8" fill="#333" opacity="0.3"/>
-                    <circle cx="80" cy="110" r="8" fill="#333" opacity="0.3"/>
+                    <ellipse cx="75" cy="150" rx="8" ry="12" fill="#666" opacity="0.4"/>
+                    <ellipse cx="95" cy="150" rx="8" ry="12" fill="#666" opacity="0.4"/>
+                    
+                    <!-- Headlight Reflections -->
+                    <ellipse cx="73" cy="148" rx="3" ry="5" fill="#888" opacity="0.6"/>
+                    <ellipse cx="93" cy="148" rx="3" ry="5" fill="#888" opacity="0.6"/>
+                    
+                    <!-- Side Windows -->
+                    <path d="M90 125 L150 125 L150 155 L90 155 Z" fill="#666" opacity="0.3"/>
+                    <path d="M95 130 L145 130 L145 150 L95 150 Z" fill="#888" opacity="0.2"/>
+                    
+                    <!-- Windshield -->
+                    <path d="M160 125 L180 125 L180 155 L160 155 Z" fill="#666" opacity="0.3"/>
+                    <path d="M165 130 L175 130 L175 150 L165 150 Z" fill="#888" opacity="0.2"/>
+                    
+                    <!-- Side Mirrors -->
+                    <ellipse cx="165" cy="135" rx="6" ry="8" fill="#444" opacity="0.4"/>
+                    
+                    <!-- Exhaust Stack -->
+                    <rect x="400" y="160" width="15" height="50" fill="#333" opacity="0.4"/>
+                    <rect x="402" y="155" width="11" height="8" fill="#333" opacity="0.4"/>
+                    
+                    <!-- Exhaust Smoke -->
+                    <ellipse cx="407" cy="150" rx="8" ry="12" fill="#666" opacity="0.2"/>
+                    <ellipse cx="407" cy="140" rx="6" ry="10" fill="#666" opacity="0.15"/>
+                    
+                    <!-- Side Steps -->
+                    <rect x="160" y="200" width="260" height="8" fill="#555" opacity="0.4"/>
+                    
+                    <!-- Fuel Tank -->
+                    <ellipse cx="200" cy="210" rx="25" ry="15" fill="#444" opacity="0.3"/>
+                    <ellipse cx="200" cy="210" rx="20" ry="10" fill="#555" opacity="0.2"/>
+                    
+                    <!-- Air Intake -->
+                    <rect x="180" y="130" width="8" height="40" fill="#444" opacity="0.4"/>
+                    <ellipse cx="184" cy="125" rx="6" ry="8" fill="#444" opacity="0.4"/>
+                    
+                    <!-- Side Panel Details -->
+                    <rect x="200" y="160" width="200" height="20" fill="#555" opacity="0.2"/>
+                    <rect x="220" y="165" width="160" height="10" fill="#666" opacity="0.1"/>
+                    
+                    <!-- License Plate Area -->
+                    <rect x="300" y="200" width="80" height="15" fill="#666" opacity="0.3"/>
+                    <rect x="305" y="205" width="70" height="5" fill="#888" opacity="0.2"/>
+                    
+                    <!-- Tail Lights -->
+                    <rect x="410" y="170" width="8" height="15" fill="#666" opacity="0.4"/>
+                    <rect x="410" y="185" width="8" height="15" fill="#666" opacity="0.4"/>
+                    
+                    <!-- Mud Flaps -->
+                    <path d="M130 220 L140 240 L150 220 Z" fill="#333" opacity="0.4"/>
+                    <path d="M350 220 L360 240 L370 220 Z" fill="#333" opacity="0.4"/>
+                    
+                    <!-- Chrome Trim -->
+                    <rect x="155" y="140" width="5" height="80" fill="#888" opacity="0.3"/>
+                    <rect x="395" y="160" width="5" height="60" fill="#888" opacity="0.3"/>
                 </svg>
             </div>
         </div>
