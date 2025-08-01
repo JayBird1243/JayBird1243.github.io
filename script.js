@@ -74,30 +74,108 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Typing effect for hero title
-function typeWriter(element, text, speed = 100) {
-    let i = 0;
-    element.innerHTML = '';
+// Truck animation for about section
+function initTruckAnimation() {
+    const aboutSection = document.querySelector('.about');
+    const truckBg = document.querySelector('.truck-animation-bg');
     
-    function type() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
-            i++;
-            setTimeout(type, speed);
-        }
-    }
-    type();
+    if (!aboutSection || !truckBg) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add a small delay for dramatic effect
+                setTimeout(() => {
+                    truckBg.classList.add('animate');
+                    
+                    // Add some extra visual effects
+                    createTruckParticles();
+                    
+                    // Simulate truck sound effect with visual feedback
+                    setTimeout(() => {
+                        truckBg.style.filter = 'brightness(1.2)';
+                        setTimeout(() => {
+                            truckBg.style.filter = 'brightness(1)';
+                        }, 200);
+                    }, 1000);
+                    
+                }, 300);
+                
+                // Stop observing after animation triggers
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.3,
+        rootMargin: '0px 0px -100px 0px'
+    });
+    
+    observer.observe(aboutSection);
 }
 
-// Initialize typing effect when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    const titleElement = document.querySelector('.title-line');
-    if (titleElement) {
-        const originalText = titleElement.textContent;
+// Create particle effects for truck animation
+function createTruckParticles() {
+    const aboutSection = document.querySelector('.about');
+    if (!aboutSection) return;
+    
+    for (let i = 0; i < 20; i++) {
         setTimeout(() => {
-            typeWriter(titleElement, originalText, 150);
-        }, 500);
+            const particle = document.createElement('div');
+            particle.className = 'truck-particle';
+            particle.style.cssText = `
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: #00d4ff;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10;
+                left: ${Math.random() * 100}%;
+                bottom: 20%;
+                animation: particleFloat 3s ease-out forwards;
+            `;
+            
+            aboutSection.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 3000);
+        }, i * 100);
     }
+}
+
+// Initialize truck animation when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    initTruckAnimation();
+    
+    // Add interactive effects to company logos
+    const logoItems = document.querySelectorAll('.logo-item');
+    logoItems.forEach((logo, index) => {
+        logo.addEventListener('mouseenter', () => {
+            logo.style.transform = 'translateY(-10px) scale(1.1)';
+            logo.style.filter = 'drop-shadow(0 10px 20px rgba(0, 212, 255, 0.3))';
+        });
+        
+        logo.addEventListener('mouseleave', () => {
+            logo.style.transform = 'translateY(0) scale(1)';
+            logo.style.filter = 'none';
+        });
+        
+        // Add staggered animation on page load
+        setTimeout(() => {
+            logo.style.opacity = '0';
+            logo.style.transform = 'translateY(20px)';
+            logo.style.transition = 'all 0.6s ease-out';
+            
+            setTimeout(() => {
+                logo.style.opacity = '1';
+                logo.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 200);
+    });
 });
 
 // Particle system for background
