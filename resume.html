@@ -3,94 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume - Jack Buhr</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Resume | Jack Buhr</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="index.html" class="logo-text">JB</a>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="index.html" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="resume.html" class="nav-link">Resume</a>
-                </li>
-                <li class="nav-item">
-                    <a href="education.html" class="nav-link">Education</a>
-                </li>
-                <li class="nav-item">
-                    <a href="projects.html" class="nav-link">Projects</a>
-                </li>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="resume.html" class="active">Resume</a></li>
+                <li><a href="design.html">Design</a></li>
             </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <!-- Resume Section -->
-    <section class="resume-section">
-        <div class="container">
-            <div class="section-header">
-                <h1 class="section-title">Resume</h1>
-                <div class="title-underline"></div>
-            </div>
-            <div class="resume-content">
-                <div class="resume-placeholder">
-                    <i class="fas fa-file-alt"></i>
-                    <h2>Resume Content Coming Soon</h2>
-                    <p>This page will contain Jack's detailed resume with work experience, skills, and achievements.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <main id="content-wrapper">
+        <section class="hero">
+            <h1>Resume</h1>
+            <p class="subtitle">Jack Buhr - Electrical Engineering</p>
+        </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Jack Buhr</h4>
-                    <p>Electrical Engineering Student</p>
-                    <p>Queen's University</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <div class="contact-links">
-                        <a href="mailto:jack.buhr@queensu.ca" class="contact-link">
-                            <i class="fas fa-envelope"></i>
-                            <span>Email</span>
-                        </a>
-                        <a href="https://linkedin.com/in/jackbuhr" class="contact-link">
-                            <i class="fab fa-linkedin"></i>
-                            <span>LinkedIn</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Navigation</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="education.html">Education</a></li>
-                        <li><a href="projects.html">Projects</a></li>
-                    </ul>
-                </div>
+        <section class="content-box">
+            <h2>Education</h2>
+            <div class="resume-item">
+                <h3>Queen's University, Kingston, ON</h3>
+                <p><strong>Bachelor of Applied Science, Electrical Engineering</strong> | Expected Graduation: 2026</p>
+                <ul>
+                    <li>Relevant Coursework: Circuits, Electronics, Digital Logic, Signals & Systems, C++ Programming.</li>
+                    <li>Member of the Queen's University Experimental Sustainability Team (QUEST).</li>
+                </ul>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Jack Buhr. All rights reserved.</p>
+        </section>
+
+        <section class="content-box">
+            <h2>Work Experience</h2>
+            <div class="resume-item">
+                <h3>Cellcentric GmbH & Co. KG | Fuel Cell Co-op</h3>
+                <p><strong>R&D Test Engineer Co-op</strong> | May 2023 - Present</p>
+                <ul>
+                    <li>Developing and executing test plans for next-generation hydrogen fuel cell components.</li>
+                    <li>Analyzing test data to validate performance and identify areas for improvement.</li>
+                    <li>Collaborating with a multinational team of engineers in a fast-paced R&D environment.</li>
+                </ul>
             </div>
-        </div>
-    </footer>
+        </section>
+
+        <section class="content-box">
+            <h2>Skills</h2>
+            <div class="skills-list">
+                <span>Python</span>
+                <span>C++</span>
+                <span>MATLAB</span>
+                <span>VHDL</span>
+                <span>JavaScript</span>
+                <span>HTML/CSS</span>
+                <span>Circuit Design</span>
+                <span>Data Analysis</span>
+            </div>
+        </section>
+
+    </main>
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

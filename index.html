@@ -3,340 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jack Buhr - Electrical Engineering Portfolio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Jack Buhr | Design Portfolio</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span class="logo-text">JB</span>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="resume.html" class="nav-link">Resume</a>
-                </li>
-                <li class="nav-item">
-                    <a href="education.html" class="nav-link">Education</a>
-                </li>
-                <li class="nav-item">
-                    <a href="projects.html" class="nav-link">Projects</a>
-                </li>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="resume.html">Resume</a></li>
+                <li><a href="design.html">Design</a></li>
             </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-background">
-            <div class="circuit-grid"></div>
-            <div class="floating-elements">
-                <div class="floating-element" data-speed="0.5">
-                    <i class="fas fa-microchip"></i>
-                </div>
-                <div class="floating-element" data-speed="0.8">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div class="floating-element" data-speed="0.3">
-                    <i class="fas fa-cog"></i>
-                </div>
-                <div class="floating-element" data-speed="0.6">
-                    <i class="fas fa-atom"></i>
-                </div>
-            </div>
-        </div>
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <span class="title-line">Jack Buhr</span>
-                    <span class="title-subtitle">Electrical Engineer</span>
-                </h1>
-                <p class="hero-description">
-                    Passionate about innovation in electrical engineering, currently working on cutting-edge fuel cell technology at Cellcentric.
-                </p>
-                <div class="hero-buttons">
-                    <a href="resume.html" class="btn btn-primary">
-                        <span>View Resume</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                    <a href="projects.html" class="btn btn-secondary">
-                        <span>See Projects</span>
-                        <i class="fas fa-code"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="profile-card">
-                    <div class="profile-image">
-                        <div class="image-placeholder">
-                            <i class="fas fa-user"></i>
-                        </div>
-                    </div>
-                    <div class="profile-info">
-                        <h3>Jack Buhr</h3>
-                        <p>Electrical Engineering Student</p>
-                        <p>Queen's University</p>
-                        <div class="current-role">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Co-op at Cellcentric</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <main id="content-wrapper">
+        <section class="hero">
+            <h1>Jack Buhr</h1>
+            <p class="subtitle">Electrical Engineering Student & Aspiring Designer</p>
+            <p class="blurb">
+                I am a third-year Electrical Engineering student at Queen's University in Ontario, currently on a year-long co-op with Cellcentric GmbH & Co. KG, the joint fuel cell venture between Daimler Trucks and Volvo Group. This portfolio showcases my passion for creative design and technical implementation.
+            </p>
+        </section>
 
-    <!-- About Section -->
-    <section class="about">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">About Me</h2>
-                <div class="title-underline"></div>
-            </div>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>
-                        I've completed my third year of Electrical Engineering at Queen's University. I'm currently on co-op with Cellcentric gmbh & co. kg, the joint venture hydrogen fuel cell arm of Daimler Trucks and Volvo Group.
-                    </p>
-                    <p>
-                        My passion lies in electrical engineering and sustainable technology, particularly 
-                        in the rapidly evolving field of fuel cell technology. I'm dedicated to contributing 
-                        to innovative solutions that drive the future of clean energy.
-                    </p>
-                    <div class="skills-grid">
-                        <div class="skill-category">
-                            <h4>Technical Skills</h4>
-                            <div class="skill-tags">
-                                <span class="skill-tag">Circuit Design</span>
-                                <span class="skill-tag">PCB Design</span>
-                                <span class="skill-tag">Microcontrollers</span>
-                                <span class="skill-tag">Power Systems</span>
-                            </div>
-                        </div>
-                        <div class="skill-category">
-                            <h4>Software</h4>
-                            <div class="skill-tags">
-                                <span class="skill-tag">MATLAB</span>
-                                <span class="skill-tag">Python</span>
-                                <span class="skill-tag">C++</span>
-                                <span class="skill-tag">SPICE</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">3</div>
-                        <div class="stat-label">Years Completed</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">Co-op</div>
-                        <div class="stat-label">Current Position</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">Fuel Cell</div>
-                        <div class="stat-label">Specialization</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Company Logos Background -->
-        <div class="company-logos">
-            <div class="logo-container">
-                <div class="logo-item">
-                    <svg class="company-logo-svg" viewBox="0 0 100 100">
-                        <!-- Daimler Logo Silhouette -->
-                        <path d="M20 20 L80 20 L80 80 L20 80 Z" fill="none" stroke="#666" stroke-width="2"/>
-                        <text x="50" y="50" text-anchor="middle" fill="#666" font-size="8" font-family="Arial">DAIMLER</text>
-                    </svg>
-                    <span class="logo-label">Daimler Trucks</span>
-                </div>
-                <div class="logo-item">
-                    <svg class="company-logo-svg" viewBox="0 0 100 100">
-                        <!-- Volvo Logo Silhouette -->
-                        <circle cx="50" cy="50" r="35" fill="none" stroke="#666" stroke-width="2"/>
-                        <text x="50" y="55" text-anchor="middle" fill="#666" font-size="8" font-family="Arial">VOLVO</text>
-                    </svg>
-                    <span class="logo-label">Volvo Group</span>
-                </div>
-                <div class="logo-item">
-                    <svg class="company-logo-svg" viewBox="0 0 100 100">
-                        <!-- Cellcentric Logo Silhouette -->
-                        <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" fill="none" stroke="#666" stroke-width="2"/>
-                        <text x="50" y="55" text-anchor="middle" fill="#666" font-size="6" font-family="Arial">CELLCENTRIC</text>
-                    </svg>
-                    <span class="logo-label">Cellcentric</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Truck Animation Background -->
-        <div class="truck-animation-bg">
-            <div class="road-line"></div>
-            <div class="truck-silhouette">
-                <svg viewBox="0 0 500 300" class="truck-svg">
-                    <!-- Detailed Truck Silhouette -->
-                    <!-- Main Truck Body -->
-                    <path d="M80 180 L420 180 L420 220 L80 220 Z" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Truck Cab -->
-                    <path d="M80 140 L160 140 L160 220 L80 220 Z" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Cab Roof -->
-                    <path d="M85 140 L155 140 L155 120 L85 120 Z" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Front Grill -->
-                    <path d="M80 160 L70 160 L70 200 L80 200 Z" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Front Bumper -->
-                    <path d="M65 170 L75 170 L75 190 L65 190 Z" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Wheels -->
-                    <circle cx="140" cy="220" r="30" fill="#333" opacity="0.5"/>
-                    <circle cx="360" cy="220" r="30" fill="#333" opacity="0.5"/>
-                    
-                    <!-- Wheel Rims -->
-                    <circle cx="140" cy="220" r="20" fill="#555" opacity="0.3"/>
-                    <circle cx="360" cy="220" r="20" fill="#555" opacity="0.3"/>
-                    
-                    <!-- Wheel Hubs -->
-                    <circle cx="140" cy="220" r="8" fill="#666" opacity="0.4"/>
-                    <circle cx="360" cy="220" r="8" fill="#666" opacity="0.4"/>
-                    
-                    <!-- Headlights -->
-                    <ellipse cx="75" cy="150" rx="8" ry="12" fill="#666" opacity="0.4"/>
-                    <ellipse cx="95" cy="150" rx="8" ry="12" fill="#666" opacity="0.4"/>
-                    
-                    <!-- Headlight Reflections -->
-                    <ellipse cx="73" cy="148" rx="3" ry="5" fill="#888" opacity="0.6"/>
-                    <ellipse cx="93" cy="148" rx="3" ry="5" fill="#888" opacity="0.6"/>
-                    
-                    <!-- Side Windows -->
-                    <path d="M90 125 L150 125 L150 155 L90 155 Z" fill="#666" opacity="0.3"/>
-                    <path d="M95 130 L145 130 L145 150 L95 150 Z" fill="#888" opacity="0.2"/>
-                    
-                    <!-- Windshield -->
-                    <path d="M160 125 L180 125 L180 155 L160 155 Z" fill="#666" opacity="0.3"/>
-                    <path d="M165 130 L175 130 L175 150 L165 150 Z" fill="#888" opacity="0.2"/>
-                    
-                    <!-- Side Mirrors -->
-                    <ellipse cx="165" cy="135" rx="6" ry="8" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Exhaust Stack -->
-                    <rect x="400" y="160" width="15" height="50" fill="#333" opacity="0.4"/>
-                    <rect x="402" y="155" width="11" height="8" fill="#333" opacity="0.4"/>
-                    
-                    <!-- Exhaust Smoke -->
-                    <ellipse cx="407" cy="150" rx="8" ry="12" fill="#666" opacity="0.2"/>
-                    <ellipse cx="407" cy="140" rx="6" ry="10" fill="#666" opacity="0.15"/>
-                    
-                    <!-- Side Steps -->
-                    <rect x="160" y="200" width="260" height="8" fill="#555" opacity="0.4"/>
-                    
-                    <!-- Fuel Tank -->
-                    <ellipse cx="200" cy="210" rx="25" ry="15" fill="#444" opacity="0.3"/>
-                    <ellipse cx="200" cy="210" rx="20" ry="10" fill="#555" opacity="0.2"/>
-                    
-                    <!-- Air Intake -->
-                    <rect x="180" y="130" width="8" height="40" fill="#444" opacity="0.4"/>
-                    <ellipse cx="184" cy="125" rx="6" ry="8" fill="#444" opacity="0.4"/>
-                    
-                    <!-- Side Panel Details -->
-                    <rect x="200" y="160" width="200" height="20" fill="#555" opacity="0.2"/>
-                    <rect x="220" y="165" width="160" height="10" fill="#666" opacity="0.1"/>
-                    
-                    <!-- License Plate Area -->
-                    <rect x="300" y="200" width="80" height="15" fill="#666" opacity="0.3"/>
-                    <rect x="305" y="205" width="70" height="5" fill="#888" opacity="0.2"/>
-                    
-                    <!-- Tail Lights -->
-                    <rect x="410" y="170" width="8" height="15" fill="#666" opacity="0.4"/>
-                    <rect x="410" y="185" width="8" height="15" fill="#666" opacity="0.4"/>
-                    
-                    <!-- Mud Flaps -->
-                    <path d="M130 220 L140 240 L150 220 Z" fill="#333" opacity="0.4"/>
-                    <path d="M350 220 L360 240 L370 220 Z" fill="#333" opacity="0.4"/>
-                    
-                    <!-- Chrome Trim -->
-                    <rect x="155" y="140" width="5" height="80" fill="#888" opacity="0.3"/>
-                    <rect x="395" y="160" width="5" height="60" fill="#888" opacity="0.3"/>
-                </svg>
-            </div>
-        </div>
-    </section>
+        <section class="content-box">
+            <h2>The Background</h2>
+            <p>
+                The animated background of this site is a dynamic, procedurally generated piece of art. It's designed to be unique on every visit and to adapt to the content of the page, no matter how long it is. Here's how it works:
+            </p>
+            <ul>
+                <li><strong>Seed Generation:</strong> Upon loading, a unique 32-character hexadecimal "seed" is generated locally in your browser. This seed is the single source of truth for everything you see in the background.</li>
+                <li><strong>Pseudo-Randomness:</strong> This seed is fed into a pseudo-random number generator (PRNG). Unlike true randomness, a PRNG will always produce the same sequence of numbers for the same seed, ensuring the visual is consistent for that specific seed.</li>
+                <li><strong>Color Palette:</strong> The PRNG determines the number of colors (from 2 to 10) and their specific shades. The colors are intentionally muted, dark, and subtly tinted to create a sophisticated, space-like atmosphere.</li>
+                <li><strong>Star Field:</strong> The number and size of the stars are determined by a normal distribution (a "bell curve") seeded by the PRNG. This creates a more natural-feeling distribution than pure randomness, with most stars being small and a few being noticeably larger. The density of stars is maintained even when the page content grows.</li>
+                <li><strong>Dynamic Density:</strong> The script measures the total height of the web page. It then adjusts the number of stars and background gradient nodes proportionally. This ensures that as you scroll down a long page, the density of the starfield and the complexity of the gradient remain consistent, giving the impression of an infinitely vast space.</li>
+            </ul>
+        </section>
 
-    <!-- Current Role Section -->
-    <section class="current-role-section">
-        <div class="container">
-            <div class="role-card">
-                <div class="role-header">
-                    <div class="company-logo">
-                        <i class="fas fa-industry"></i>
-                    </div>
-                    <div class="role-info">
-                        <h3>Electrical Engineering Co-op</h3>
-                        <h4>Cellcentric</h4>
-                        <p>Fuel Cell Division of Volvo Group & Daimler Trucks</p>
-                    </div>
-                </div>
-                <div class="role-description">
-                    <p>
-                        Working on cutting-edge fuel cell technology development, contributing to the 
-                        future of sustainable transportation and clean energy solutions.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Jack Buhr</h4>
-                    <p>Electrical Engineering Student</p>
-                    <p>Queen's University</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <div class="contact-links">
-                        <a href="mailto:jack.buhr@queensu.ca" class="contact-link">
-                            <i class="fas fa-envelope"></i>
-                            <span>Email</span>
-                        </a>
-                        <a href="https://linkedin.com/in/jackbuhr" class="contact-link">
-                            <i class="fab fa-linkedin"></i>
-                            <span>LinkedIn</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Navigation</h4>
-                    <ul class="footer-links">
-                        <li><a href="resume.html">Resume</a></li>
-                        <li><a href="education.html">Education</a></li>
-                        <li><a href="projects.html">Projects</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Jack Buhr. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+        <section class="content-box" id="long-content-expander">
+            <h2>More Content</h2>
+            <p>This is a placeholder section to demonstrate the scrolling effect. Click the button to add more content and see how the background adapts.</p>
+            <button id="add-content-btn">Add More Content</button>
+            <div id="additional-content-container"></div>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

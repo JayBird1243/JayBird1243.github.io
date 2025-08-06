@@ -1,394 +1,245 @@
-// Mobile Navigation Toggle
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
-
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
-
-// Close mobile menu when clicking on a link
-document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
-    hamburger.classList.remove('active');
-    navMenu.classList.remove('active');
-}));
-
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// Parallax effect for floating elements
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const parallaxElements = document.querySelectorAll('.floating-element');
-    
-    parallaxElements.forEach(element => {
-        const speed = element.getAttribute('data-speed');
-        const yPos = -(scrolled * speed);
-        element.style.transform = `translateY(${yPos}px)`;
-    });
-});
-
-// Scroll animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, observerOptions);
-
-// Observe elements for scroll animations
 document.addEventListener('DOMContentLoaded', () => {
-    const fadeElements = document.querySelectorAll('.about, .current-role-section, .footer');
-    fadeElements.forEach(el => {
-        el.classList.add('fade-in');
-        observer.observe(el);
-    });
-});
+    // --- DOM Elements ---
+    const nodesContainer = document.getElementById('nodes-container');
+    const starsContainer = document.getElementById('stars-container');
+    const contentWrapper = document.getElementById('content-wrapper');
+    const addContentBtn = document.getElementById('add-content-btn');
+    const additionalContentContainer = document.getElementById('additional-content-container');
 
-// Navbar background change on scroll
-window.addEventListener('scroll', () => {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 100) {
-        navbar.style.background = 'rgba(10, 10, 10, 0.98)';
-        navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.3)';
-    } else {
-        navbar.style.background = 'rgba(10, 10, 10, 0.95)';
-        navbar.style.boxShadow = 'none';
-    }
-});
+    // --- State ---
+    let currentSeed = null;
+    let prng = null;
 
-// Truck animation for about section
-function initTruckAnimation() {
-    const aboutSection = document.querySelector('.about');
-    const truckBg = document.querySelector('.truck-animation-bg');
-    
-    if (!aboutSection || !truckBg) {
-        console.log('Truck animation elements not found');
-        return;
+    // --- Core Functions ---
+
+    /**
+     * Generates a 32-character hexadecimal seed using Math.random().
+     * This is a simpler, self-contained method compared to an external API.
+     */
+    function generateLocalSeed() {
+        let seed = '';
+        const hexChars = '0123456789abcdef';
+        for (let i = 0; i < 32; i++) {
+            seed += hexChars[Math.floor(Math.random() * 16)];
+        }
+        return seed;
+    }
+
+    /**
+     * A mulberry32 pseudo-random number generator.
+     * Takes a 32-bit integer seed and returns a function that generates random numbers.
+     * @param {string} hexSeed - A 32-character hex string.
+     */
+    function mulberry32(hexSeed) {
+        let seed = parseInt(hexSeed.substring(0, 8), 16);
+        return function() {
+            let t = seed += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
+    /**
+     * Generates a value from a normal distribution.
+     * @param {function} prng - The pseudo-random number generator.
+     * @param {number} mean - The mean of the distribution.
+     * @param {number} stdDev - The standard deviation.
+     */
+    function normalRandom(prng, mean, stdDev) {
+        let u = 0, v = 0;
+        while (u === 0) u = prng();
+        while (v === 0) v = prng();
+        const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        return z * stdDev + mean;
     }
     
-    console.log('Initializing truck animation...');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                console.log('About section visible, triggering truck animation');
-                
-                // Add a small delay for dramatic effect
-                setTimeout(() => {
-                    truckBg.classList.add('animate');
-                    console.log('Truck animation class added');
-                    
-                    // Add some extra visual effects
-                    createTruckParticles();
-                    
-                    // Simulate truck sound effect with visual feedback
-                    setTimeout(() => {
-                        truckBg.style.filter = 'brightness(1.3)';
-                        setTimeout(() => {
-                            truckBg.style.filter = 'brightness(1)';
-                        }, 300);
-                    }, 1200);
-                    
-                }, 500);
-                
-                // Stop observing after animation triggers
-                observer.unobserve(entry.target);
+    /**
+     * Calculates the number of stars to generate based on page height.
+     * The density is kept constant relative to the viewport height.
+     * @param {function} prng - The pseudo-random number generator.
+     * @param {string} seed - The current hex seed.
+     * @param {number} pageHeightRatio - The ratio of total page height to viewport height.
+     */
+    function getStarCount(prng, seed, pageHeightRatio) {
+        const baseCount = 500; 
+        const countPerScreen = 250; 
+        const mean = baseCount + (countPerScreen * (pageHeightRatio - 1));
+        const stdDev = 150 * Math.sqrt(pageHeightRatio); 
+
+        const count = normalRandom(prng, mean, stdDev);
+        return Math.max(50 * pageHeightRatio, Math.floor(count));
+    }
+
+
+    /**
+     * Calculates the size of a star using a normal distribution.
+     * Rare, larger stars are possible but infrequent.
+     */
+    function getStarSize(prng) {
+        const size = normalRandom(prng, 2, 1.426);
+        return Math.max(1, Math.min(10, Math.floor(size)));
+    }
+
+    /**
+     * Generates a sophisticated, dark, and muted color palette.
+     * Uses the seed for deterministic color generation.
+     */
+    function generateColorPalette(count, prng, hexSeed) {
+        const colors = [];
+        const colorHints = {
+            red: { r: 0.15, g: 0.05, b: 0.05 },
+            orange: { r: 0.12, g: 0.08, b: 0.03 },
+            yellow: { r: 0.10, g: 0.10, b: 0.02 },
+            purple: { r: 0.08, g: 0.05, b: 0.12 }
+        };
+        const hintNames = Object.keys(colorHints);
+
+        for (let i = 0; i < count; i++) {
+            const seedSegment1 = (i * 3) % 28;
+            const seedSegment2 = (i * 5 + 7) % 28;
+            const seedSegment3 = (i * 7 + 13) % 28;
+            
+            const val1 = parseInt(hexSeed.substring(seedSegment1, seedSegment1 + 2), 16);
+            const val2 = parseInt(hexSeed.substring(seedSegment2, seedSegment2 + 2), 16);
+            const val3 = parseInt(hexSeed.substring(seedSegment3, seedSegment3 + 2), 16);
+            
+            let baseGray = Math.max(0.05, Math.min(0.45, 
+                (((val1 * 0.299) + (val2 * 0.587) + (val3 * 0.114)) / 255 * 0.3) + 
+                (Math.sin(val1 * 0.0245) * Math.cos(val2 * 0.0314) * 0.12) + 
+                (((val1 ^ val2 ^ val3) % 64) / 255.0 * 0.12) + 0.05
+            ));
+            
+            const hintSelector = (val1 * val2 + val3 * (i + 1)) % hintNames.length;
+            const selectedHint = colorHints[hintNames[hintSelector]];
+            const hintStrength = ((val3 + (val1 % val2 || 1)) % 64) / 255.0 * 0.15 + 0.03;
+
+            const r = Math.min(1.0, baseGray + (selectedHint.r * hintStrength));
+            const g = Math.min(1.0, baseGray + (selectedHint.g * hintStrength));
+            const b = Math.min(1.0, baseGray + (selectedHint.b * hintStrength));
+            
+            const hexR = Math.round(r * 255).toString(16).padStart(2, '0');
+            const hexG = Math.round(g * 255).toString(16).padStart(2, '0');
+            const hexB = Math.round(b * 255).toString(16).padStart(2, '0');
+            
+            colors.push(`#${hexR}${hexG}${hexB}`);
+        }
+        return colors;
+    }
+
+    /**
+     * Renders the entire visual background based on the seed and page height.
+     */
+    function renderVisuals() {
+        if (!nodesContainer || !starsContainer) return;
+
+        const totalPageHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const pageHeightRatio = Math.max(1, totalPageHeight / viewportHeight);
+
+        // --- Clear existing visuals ---
+        nodesContainer.style.backgroundImage = '';
+        starsContainer.innerHTML = '';
+        
+        // --- Generate Gradients (Nodes) ---
+        const baseNodeCount = 2;
+        const extraNodesPerScreen = 8;
+        const numColors = Math.floor(baseNodeCount + prng() * extraNodesPerScreen * pageHeightRatio);
+        const colors = generateColorPalette(numColors, prng, currentSeed);
+        
+        const gradients = [];
+        for (let i = 0; i < numColors; i++) {
+            const x = prng() * 100;
+            // Distribute gradients over the entire page height
+            const y = prng() * (100 * pageHeightRatio); 
+            const color = colors[i];
+            gradients.push(`radial-gradient(circle at ${x}% ${y}px, ${color}, transparent 50%)`);
+        }
+        
+        // --- Generate Stars ---
+        const numStars = getStarCount(prng, currentSeed, pageHeightRatio);
+        const stars = [];
+
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            // Distribute stars over the entire page height
+            star.style.left = `${prng() * 100}%`;
+            star.style.top = `${prng() * totalPageHeight}px`;
+            
+            const size = getStarSize(prng);
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            if (size >= 6) {
+                star.classList.add(`star-${size}`);
             }
-        });
-    }, {
-        threshold: 0.2,
-        rootMargin: '0px 0px -50px 0px'
-    });
-    
-    observer.observe(aboutSection);
-}
+            
+            stars.push(star);
+        }
 
-// Create particle effects for truck animation
-function createTruckParticles() {
-    const aboutSection = document.querySelector('.about');
-    if (!aboutSection) return;
-    
-    console.log('Creating truck particles...');
-    
-    for (let i = 0; i < 30; i++) {
+        // --- Animate into view ---
+        // Animate nodes
         setTimeout(() => {
-            const particle = document.createElement('div');
-            particle.className = 'truck-particle';
-            particle.style.cssText = `
-                position: absolute;
-                width: ${Math.random() * 6 + 3}px;
-                height: ${Math.random() * 6 + 3}px;
-                background: ${Math.random() > 0.5 ? '#00d4ff' : '#ffffff'};
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 10;
-                left: ${Math.random() * 100}%;
-                bottom: ${Math.random() * 30 + 10}%;
-                animation: particleFloat ${Math.random() * 2 + 2}s ease-out forwards;
-                box-shadow: 0 0 10px ${Math.random() > 0.5 ? '#00d4ff' : '#ffffff'};
-            `;
-            
-            aboutSection.appendChild(particle);
-            
-            // Remove particle after animation
+            nodesContainer.style.height = `${totalPageHeight}px`;
+            nodesContainer.style.backgroundImage = gradients.join(', ');
+            nodesContainer.style.opacity = '1';
+        }, 50);
+
+        // Animate stars
+        const animationDelay = numStars > 0 ? 4000 / numStars : 0;
+        stars.forEach((star, index) => {
+            starsContainer.appendChild(star);
             setTimeout(() => {
-                if (particle.parentNode) {
-                    particle.parentNode.removeChild(particle);
-                }
-            }, 4000);
-        }, i * 80);
-    }
-}
-
-// Initialize truck animation when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    initTruckAnimation();
-    
-    // Add interactive effects to company logos
-    const logoItems = document.querySelectorAll('.logo-item');
-    logoItems.forEach((logo, index) => {
-        logo.addEventListener('mouseenter', () => {
-            logo.style.transform = 'translateY(-10px) scale(1.1)';
-            logo.style.filter = 'drop-shadow(0 10px 20px rgba(0, 212, 255, 0.3))';
+                star.style.opacity = '1';
+            }, index * animationDelay);
         });
         
-        logo.addEventListener('mouseleave', () => {
-            logo.style.transform = 'translateY(0) scale(1)';
-            logo.style.filter = 'none';
+        // Adjust container heights to match page height
+        starsContainer.style.height = `${totalPageHeight}px`;
+    }
+
+    /**
+     * Initializes the application.
+     * Generates a seed and triggers the first render.
+     */
+    function init() {
+        currentSeed = generateLocalSeed();
+        prng = mulberry32(currentSeed);
+        
+        // Use a ResizeObserver to dynamically re-render visuals when content changes height
+        const resizeObserver = new ResizeObserver(debounce(renderVisuals, 250));
+        resizeObserver.observe(contentWrapper);
+
+        renderVisuals();
+    }
+
+    /**
+     * Debounce function to limit how often a function can run.
+     */
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // --- Event Listeners ---
+    if (addContentBtn) {
+        addContentBtn.addEventListener('click', () => {
+            const newContent = document.createElement('div');
+            newContent.className = 'content-box';
+            newContent.innerHTML = `
+                <h2>Newly Added Section</h2>
+                <p>This section was added dynamically. Notice how the background remains consistent, and you can scroll further down to see more of the generated starfield.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.</p>
+            `;
+            additionalContentContainer.appendChild(newContent);
+            // The ResizeObserver will automatically trigger a re-render
         });
-        
-        // Add staggered animation on page load
-        setTimeout(() => {
-            logo.style.opacity = '1';
-            logo.style.transform = 'translateY(0)';
-            logo.style.transition = 'all 0.8s ease-out';
-        }, index * 300 + 1000);
-    });
+    }
+
+    // --- Start the app ---
+    init();
 });
-
-// Particle system for background
-class Particle {
-    constructor(canvas, ctx) {
-        this.canvas = canvas;
-        this.ctx = ctx;
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.size = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.2;
-    }
-
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        if (this.x < 0 || this.x > this.canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > this.canvas.height) this.vy *= -1;
-    }
-
-    draw() {
-        this.ctx.save();
-        this.ctx.globalAlpha = this.opacity;
-        this.ctx.fillStyle = '#00d4ff';
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.restore();
-    }
-}
-
-// Initialize particle system
-function initParticles() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.zIndex = '-2';
-    canvas.style.pointerEvents = 'none';
-    
-    const heroBackground = document.querySelector('.hero-background');
-    if (heroBackground) {
-        heroBackground.appendChild(canvas);
-    }
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    const particles = [];
-    const particleCount = 50;
-
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle(canvas, ctx));
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(particle => {
-            particle.update();
-            particle.draw();
-        });
-
-        requestAnimationFrame(animate);
-    }
-
-    animate();
-}
-
-// Initialize particles when page loads
-document.addEventListener('DOMContentLoaded', initParticles);
-
-// Button hover effects
-document.querySelectorAll('.btn').forEach(button => {
-    button.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-3px) scale(1.05)';
-    });
-    
-    button.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-    });
-});
-
-// Skill tag animations
-document.querySelectorAll('.skill-tag').forEach(tag => {
-    tag.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-3px) scale(1.1)';
-    });
-    
-    tag.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-    });
-});
-
-// Profile card tilt effect
-const profileCard = document.querySelector('.profile-card');
-if (profileCard) {
-    profileCard.addEventListener('mousemove', function(e) {
-        const rect = this.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 10;
-        const rotateY = (centerX - x) / 10;
-        
-        this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-    });
-    
-    profileCard.addEventListener('mouseleave', function() {
-        this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
-    });
-}
-
-// Loading animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity 0.5s ease-in-out';
-    
-    setTimeout(() => {
-        document.body.style.opacity = '1';
-    }, 100);
-});
-
-// Cursor trail effect
-class CursorTrail {
-    constructor() {
-        this.points = [];
-        this.maxPoints = 20;
-        this.init();
-    }
-
-    init() {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.style.position = 'fixed';
-        canvas.style.top = '0';
-        canvas.style.left = '0';
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        canvas.style.pointerEvents = 'none';
-        canvas.style.zIndex = '9999';
-        
-        document.body.appendChild(canvas);
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        document.addEventListener('mousemove', (e) => {
-            this.points.push({
-                x: e.clientX,
-                y: e.clientY,
-                timestamp: Date.now()
-            });
-
-            if (this.points.length > this.maxPoints) {
-                this.points.shift();
-            }
-        });
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            this.points.forEach((point, index) => {
-                const age = Date.now() - point.timestamp;
-                const opacity = Math.max(0, 1 - age / 1000);
-                const size = Math.max(0, 3 - age / 200);
-                
-                ctx.save();
-                ctx.globalAlpha = opacity;
-                ctx.fillStyle = '#00d4ff';
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-
-            requestAnimationFrame(animate.bind(this));
-        }
-
-        animate();
-    }
-}
-
-// Initialize cursor trail (optional - can be disabled for performance)
-// new CursorTrail();
-
-// Console welcome message
-console.log('%c🚀 Welcome to Jack Buhr\'s Portfolio!', 'color: #00d4ff; font-size: 20px; font-weight: bold;');
-console.log('%c💡 Built with modern web technologies', 'color: #0099cc; font-size: 14px;'); 
