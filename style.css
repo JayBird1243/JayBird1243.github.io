@@ -128,6 +128,31 @@ main {
     margin-bottom: 4rem;
 }
 
+.hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.hero-text {
+    text-align: left;
+}
+
+.hero-image-container {
+    flex-shrink: 0;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--primary-color);
+    object-fit: cover;
+}
+
 .hero h1 {
     font-size: 3.5rem;
     margin-bottom: 0.5rem;
