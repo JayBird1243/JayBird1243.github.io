@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const contentWrapper = document.getElementById('content-wrapper');
     const addContentBtn = document.getElementById('add-content-btn');
     const additionalContentContainer = document.getElementById('additional-content-container');
+    const seedDisplay = document.getElementById('seed-display');
 
     // --- State ---
     let currentSeed = null;
@@ -58,14 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
      * Calculates the number of stars to generate based on page height.
      * The density is kept constant relative to the viewport height.
      * @param {function} prng - The pseudo-random number generator.
-     * @param {string} seed - The current hex seed.
      * @param {number} pageHeightRatio - The ratio of total page height to viewport height.
      */
-    function getStarCount(prng, seed, pageHeightRatio) {
-        const baseCount = 500; 
-        const countPerScreen = 250; 
-        const mean = baseCount + (countPerScreen * (pageHeightRatio - 1));
-        const stdDev = 150 * Math.sqrt(pageHeightRatio); 
+    function getStarCount(prng, pageHeightRatio) {
+        const meanPerScreen = 750;
+        const stdDevPerScreen = 200;
+        
+        const mean = meanPerScreen * pageHeightRatio;
+        const stdDev = stdDevPerScreen * Math.sqrt(pageHeightRatio); 
 
         const count = normalRandom(prng, mean, stdDev);
         return Math.max(50 * pageHeightRatio, Math.floor(count));
@@ -142,31 +143,31 @@ document.addEventListener('DOMContentLoaded', () => {
         starsContainer.innerHTML = '';
         
         // --- Generate Gradients (Nodes) ---
-        const baseNodeCount = 2;
-        const extraNodesPerScreen = 8;
-        const numColors = Math.floor(baseNodeCount + prng() * extraNodesPerScreen * pageHeightRatio);
+        const minNodes = 2;
+        const baseMaxNodes = 10;
+        const maxNodes = Math.floor(baseMaxNodes * pageHeightRatio);
+        const numColors = Math.floor(prng() * (maxNodes - minNodes + 1)) + minNodes;
+
         const colors = generateColorPalette(numColors, prng, currentSeed);
         
         const gradients = [];
         for (let i = 0; i < numColors; i++) {
             const x = prng() * 100;
-            // Distribute gradients over the entire page height
-            const y = prng() * (100 * pageHeightRatio); 
+            const y = prng() * 100; 
             const color = colors[i];
-            gradients.push(`radial-gradient(circle at ${x}% ${y}px, ${color}, transparent 50%)`);
+            gradients.push(`radial-gradient(circle at ${x}% ${y}%, ${color}, transparent 50%)`);
         }
         
         // --- Generate Stars ---
-        const numStars = getStarCount(prng, currentSeed, pageHeightRatio);
+        const numStars = getStarCount(prng, pageHeightRatio);
         const stars = [];
 
         for (let i = 0; i < numStars; i++) {
             const star = document.createElement('div');
             star.className = 'star';
             
-            // Distribute stars over the entire page height
             star.style.left = `${prng() * 100}%`;
-            star.style.top = `${prng() * totalPageHeight}px`;
+            star.style.top = `${prng() * 100}%`;
             
             const size = getStarSize(prng);
             star.style.width = `${size}px`;
@@ -179,24 +180,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- Animate into view ---
-        // Animate nodes
         setTimeout(() => {
-            nodesContainer.style.height = `${totalPageHeight}px`;
+            const backgroundHeight = Math.max(totalPageHeight, viewportHeight);
+            nodesContainer.style.height = `${backgroundHeight}px`;
+            starsContainer.style.height = `${backgroundHeight}px`;
+            document.getElementById('background-container').style.height = `${backgroundHeight}px`;
+
             nodesContainer.style.backgroundImage = gradients.join(', ');
             nodesContainer.style.opacity = '1';
-        }, 50);
 
-        // Animate stars
-        const animationDelay = numStars > 0 ? 4000 / numStars : 0;
-        stars.forEach((star, index) => {
-            starsContainer.appendChild(star);
-            setTimeout(() => {
-                star.style.opacity = '1';
-            }, index * animationDelay);
-        });
-        
-        // Adjust container heights to match page height
-        starsContainer.style.height = `${totalPageHeight}px`;
+            const fragment = document.createDocumentFragment();
+            stars.forEach(star => fragment.appendChild(star));
+            starsContainer.appendChild(fragment);
+
+            // Animate stars in batches
+            const animationDelay = 2; //ms
+            for (let i = 0; i < stars.length; i++) {
+                setTimeout(() => {
+                    stars[i].style.opacity = '1';
+                }, i * animationDelay);
+            }
+        }, 50);
     }
 
     /**
@@ -206,12 +210,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function init() {
         currentSeed = generateLocalSeed();
         prng = mulberry32(currentSeed);
-        
-        // Use a ResizeObserver to dynamically re-render visuals when content changes height
-        const resizeObserver = new ResizeObserver(debounce(renderVisuals, 250));
-        resizeObserver.observe(contentWrapper);
 
+        if(seedDisplay){
+             seedDisplay.textContent = `Seed: ${currentSeed}`;
+        }
+        
+        const debouncedRender = debounce(renderVisuals, 250);
+
+        // Initial render
         renderVisuals();
+
+        // Use a ResizeObserver to dynamically re-render visuals when content changes height
+        const resizeObserver = new ResizeObserver(entries => {
+             // We are only observing one element, so we can just use the first entry.
+            if (entries.length > 0) {
+                debouncedRender();
+            }
+        });
+        
+        if (contentWrapper) {
+            resizeObserver.observe(contentWrapper);
+        }
+
+        window.addEventListener('resize', debouncedRender);
     }
 
     /**

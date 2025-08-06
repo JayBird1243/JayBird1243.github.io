@@ -20,6 +20,7 @@
                 <li><a href="resume.html">Resume</a></li>
                 <li><a href="design.html">Design</a></li>
             </ul>
+            <div id="seed-display" class="seed-display">Seed: </div>
         </nav>
     </header>
 
@@ -38,10 +39,10 @@
                 The animated background of this site is a dynamic, procedurally generated piece of art. It's designed to be unique on every visit and to adapt to the content of the page, no matter how long it is. Here's how it works:
             </p>
             <ul>
-                <li><strong>Seed Generation:</strong> Upon loading, a unique 32-character hexadecimal "seed" is generated locally in your browser. This seed is the single source of truth for everything you see in the background.</li>
+                <li><strong>Seed Generation:</strong> Upon loading, a unique 32-character hexadecimal "seed" is generated locally in your browser. This seed is the single source of truth for everything you see in the background. You can see the current seed in the top menu.</li>
                 <li><strong>Pseudo-Randomness:</strong> This seed is fed into a pseudo-random number generator (PRNG). Unlike true randomness, a PRNG will always produce the same sequence of numbers for the same seed, ensuring the visual is consistent for that specific seed.</li>
-                <li><strong>Color Palette:</strong> The PRNG determines the number of colors (from 2 to 10) and their specific shades. The colors are intentionally muted, dark, and subtly tinted to create a sophisticated, space-like atmosphere.</li>
-                <li><strong>Star Field:</strong> The number and size of the stars are determined by a normal distribution (a "bell curve") seeded by the PRNG. This creates a more natural-feeling distribution than pure randomness, with most stars being small and a few being noticeably larger. The density of stars is maintained even when the page content grows.</li>
+                <li><strong>Color Palette:</strong> The PRNG determines the number of colors and their specific shades. The number of color nodes scales with the page length to maintain a consistent visual feel. The colors are intentionally muted, dark, and subtly tinted to create a sophisticated, space-like atmosphere.</li>
+                <li><strong>Star Field:</strong> The number and size of the stars are determined by a normal distribution (a "bell curve") seeded by the PRNG. This creates a more natural-feeling distribution than pure randomness, with most stars being small and a few being noticeably larger.</li>
                 <li><strong>Dynamic Density:</strong> The script measures the total height of the web page. It then adjusts the number of stars and background gradient nodes proportionally. This ensures that as you scroll down a long page, the density of the starfield and the complexity of the gradient remain consistent, giving the impression of an infinitely vast space.</li>
             </ul>
         </section>
@@ -52,6 +53,19 @@
             <button id="add-content-btn">Add More Content</button>
             <div id="additional-content-container"></div>
         </section>
+         <section class="content-box">
+            <h2>Section 1</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
+        </section>
+        <section class="content-box">
+            <h2>Section 2</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
+        </section>
+         <section class="content-box">
+            <h2>Section 3</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.</p>
+        </section>
+
     </main>
 
     <script src="script.js"></script>
