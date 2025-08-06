@@ -40,18 +40,17 @@
             </p>
         </section>
 
-        <section class="content-box">
-            <h2>The Background</h2>
+        <section class="starry-sky-section">
+            <h2>Starry Sky</h2>
             <p>
                 The animated background of this site is a dynamic, procedurally generated piece of art. It's designed to be unique on every visit and to adapt to the content of the page, no matter how long it is. Here's how it works:
             </p>
-            <ul>
-                <li><strong>Seed Generation:</strong> Upon loading, a unique 32-character hexadecimal "seed" is generated locally in your browser. This seed is the single source of truth for everything you see in the background. You can see the current seed in the top menu.</li>
-                <li><strong>Pseudo-Randomness:</strong> This seed is fed into a pseudo-random number generator (PRNG). Unlike true randomness, a PRNG will always produce the same sequence of numbers for the same seed, ensuring the visual is consistent for that specific seed.</li>
-                <li><strong>Color Palette:</strong> The PRNG determines the number of colors and their specific shades. The number of color nodes scales with the page length to maintain a consistent visual feel. The colors are intentionally muted, dark, and subtly tinted to create a sophisticated, space-like atmosphere.</li>
-                <li><strong>Star Field:</strong> The number and size of the stars are determined by a normal distribution (a "bell curve") seeded by the PRNG. This creates a more natural-feeling distribution than pure randomness, with most stars being small and a few being noticeably larger.</li>
-                <li><strong>Dynamic Density:</strong> The script measures the total height of the web page. It then adjusts the number of stars and background gradient nodes proportionally. This ensures that as you scroll down a long page, the density of the starfield and the complexity of the gradient remain consistent, giving the impression of an infinitely vast space.</li>
-            </ul>
+            <div class="features">
+                <p><strong>Seed Generation</strong></p>
+                <p><strong>Field of Stars</strong></p>
+                <p><strong>Nebula Gradient</strong></p>
+            </div>
+            <a href="stars.html" class="btn deep-dive-btn">Deep Dive</a>
         </section>
 
         <section class="content-box" id="long-content-expander">

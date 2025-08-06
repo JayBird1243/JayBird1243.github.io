@@ -119,13 +119,13 @@ nav a:hover::after, nav a.active::after {
 
 main {
     padding: 100px 2rem 2rem;
-    max-width: 900px;
+    max-width: 75%;
     margin: 0 auto;
 }
 
 .hero {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 400px;
 }
 
 .hero-content {
@@ -229,10 +229,6 @@ main {
     font-family: 'Space Mono', monospace;
     font-size: 0.9rem;
     color: var(--text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 250px; /* Adjust as needed */
 }
 
 #add-content-btn {
@@ -249,3 +245,45 @@ main {
 #add-content-btn:hover {
     background-color: #7cc0ff;
 }
+
+.starry-sky-section {
+    margin-bottom: 2rem;
+}
+
+.deep-dive-btn {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    padding: 12px 24px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+}
+
+.deep-dive-btn:hover {
+    background-color: #7cc0ff;
+}
+
+pre {
+    background-color: #1a1a1a;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+    overflow-x: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+}
+
+code.language-javascript {
+    color: #c9d1d9;
+}
+
+.hljs-keyword { color: #569cd6; }
+.hljs-built_in { color: #4ec9b0; }
+.hljs-string { color: #ce9178; }
+.hljs-comment { color: #6a9955; }
+.hljs-number { color: #b5cea8; }
+.hljs-function { color: #dcdcaa; }
+.hljs-params { color: #9cdcfe; }
