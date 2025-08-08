@@ -15,7 +15,8 @@
     <header>
         <nav>
             <div class="logo">JB</div>
-            <ul>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="resume.html">Resume</a></li>
                 <li><a href="design.html" class="active">Design</a></li>
@@ -26,17 +27,11 @@
     <main id="content-wrapper">
         <section class="hero">
             <h1>Design Projects</h1>
-            <p class="subtitle">A collection of my creative work.</p>
+            <p class="subtitle">Bubble experiments seeded by this session.</p>
         </section>
 
-        <section class="content-box">
-            <h2>Project 1: Procedural Sky</h2>
-            <p>This website's background is my first design project. It's an exploration of procedural generation using JavaScript to create a unique and dynamic user experience.</p>
-        </section>
-
-        <section class="content-box">
-            <h2>Project 2: Coming Soon</h2>
-            <p>More design projects will be added here soon.</p>
+        <section id="bubble-grid" class="bubble-grid" aria-label="Procedural bubble gallery">
+            <!-- Bubbles will be generated here by script.js using the current seed -->
         </section>
     </main>
 
