@@ -266,6 +266,43 @@ main {
     background-color: #7cc0ff;
 }
 
+/* Logo pyramid below about blurb */
+.logo-pyramid-section {
+    /* matches main width (75%) via container, this is centered within hero */
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 100px; /* 100px below the about section (blurb) */
+}
+
+.logo-pyramid {
+    width: 75px; /* target overall width */
+    height: auto;
+}
+
+.logo-pyramid .logo {
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+.logo-pyramid .logo-top {
+    width: 30px;
+    height: auto;
+    margin: 0 auto 6px auto; /* center top logo, small gap to row */
+}
+
+.logo-pyramid .logo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 75px; /* match pyramid width */
+}
+
+.logo-pyramid .logo-row .logo {
+    width: 32px; /* two logos with small gutter fit into 75 */
+    height: auto;
+}
+
 pre {
     background-color: #1a1a1a;
     border: 1px solid #30363d;
