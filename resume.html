@@ -25,52 +25,219 @@
     </header>
 
     <main id="content-wrapper">
+        <!-- Hero Section -->
         <section class="hero">
-            <h1>Resume</h1>
-            <p class="subtitle">Jack Buhr - Electrical Engineering</p>
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Jack I. W. Buhr</h1>
+                    <p class="subtitle">Electrical Engineering Student</p>
+                </div>
+                <div class="hero-image-container">
+                    <img src="Images/1720469597486.jpg" alt="Jack Buhr" class="profile-picture">
+                </div>
+            </div>
         </section>
 
-        <section class="content-box">
+        <!-- Contact Information -->
+        <section class="content-box contact-section">
+            <h2>Contact & Personal Information</h2>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <span class="contact-label">Email:</span>
+                    <a href="mailto:jack.buhr@gmail.com" class="contact-link">jack.buhr@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">Phone:</span>
+                    <span class="contact-value">+1 778 970 0027</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">LinkedIn:</span>
+                    <a href="https://linkedin.com/in/jack-buhr" class="contact-link" target="_blank">linkedin.com/in/jack-buhr</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">GitHub:</span>
+                    <a href="https://github.com/JayBird1243" class="contact-link" target="_blank">github.com/JayBird1243</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">Citizenship:</span>
+                    <span class="contact-value">US, Canada, South Africa</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">Languages:</span>
+                    <span class="contact-value">Native English, French Immersion</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section class="content-box education-section">
             <h2>Education</h2>
-            <div class="resume-item">
-                <h3>Queen's University, Kingston, ON</h3>
-                <p><strong>Bachelor of Applied Science, Electrical Engineering</strong> | Expected Graduation: 2026</p>
-                <ul>
-                    <li>Relevant Coursework: Circuits, Electronics, Digital Logic, Signals & Systems, C++ Programming.</li>
-                    <li>Member of the Queen's University Experimental Sustainability Team (QUEST).</li>
-                </ul>
+            <div class="education-timeline">
+                <div class="education-card" data-education="queens">
+                    <div class="education-header">
+                        <h3>Queen's University</h3>
+                        <span class="education-location">Kingston, ON</span>
+                        <span class="education-date">Expected May 2026</span>
+                    </div>
+                    <div class="education-preview">
+                        <p class="education-degree">Bachelor of Applied Science in Electrical Engineering</p>
+                        <p class="education-gpa">CGPA: 3.1</p>
+                    </div>
+                    <div class="education-details" id="queens-details">
+                        <div class="details-content">
+                            <h4>Relevant Coursework:</h4>
+                            <p>Computer Architecture, Earth Systems Engineering, Electromagnetics, Engineering Graphics, Digital Systems, Engineering Project Design</p>
+                            <h4>Activities:</h4>
+                            <p>Vex-U Robotics, Software design, Competitive soccer intramurals, Jiu Jitsu/MMA club</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="education-card" data-education="collingwood">
+                    <div class="education-header">
+                        <h3>Collingwood School</h3>
+                        <span class="education-location">Vancouver, BC</span>
+                        <span class="education-date">Graduated June 2022</span>
+                    </div>
+                    <div class="education-preview">
+                        <p class="education-degree">BC Dogwood Diploma</p>
+                        <p class="education-gpa">GPA: 4.2 (A+)</p>
+                    </div>
+                    <div class="education-details" id="collingwood-details">
+                        <div class="details-content">
+                            <h4>Relevant Coursework:</h4>
+                            <p>AP Calculus AB, AP Physics 1</p>
+                            <h4>Activities:</h4>
+                            <p>Senior soccer, Senior rugby, Senior basketball manager</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="content-box">
-            <h2>Work Experience</h2>
-            <div class="resume-item">
-                <h3>Cellcentric GmbH & Co. KG | Fuel Cell Co-op</h3>
-                <p><strong>R&D Test Engineer Co-op</strong> | May 2023 - Present</p>
-                <ul>
-                    <li>Developing and executing test plans for next-generation hydrogen fuel cell components.</li>
-                    <li>Analyzing test data to validate performance and identify areas for improvement.</li>
-                    <li>Collaborating with a multinational team of engineers in a fast-paced R&D environment.</li>
-                </ul>
+        <!-- Technical Experience Section -->
+        <section class="content-box technical-experience-section">
+            <h2>Technical Experience</h2>
+            <div class="experience-card technical-card" data-experience="cellcentric">
+                <div class="experience-header">
+                    <div class="experience-title-group">
+                        <h3>Process Engineering and Maintenance Intern</h3>
+                        <p class="experience-company">cellcentric - Daimler Trucks & Volvo Group</p>
+                    </div>
+                    <div class="experience-meta">
+                        <span class="experience-location">Burnaby, BC</span>
+                        <span class="experience-date">Summer 2024</span>
+                    </div>
+                </div>
+                <div class="experience-details" id="cellcentric-details">
+                    <div class="details-content">
+                        <h4>Key Responsibilities:</h4>
+                        <ul>
+                            <li>PLC Programming with Beckhoff TwinCAT</li>
+                            <li>Industrial machine renovation and electrical panel construction</li>
+                            <li>Maintenance of industrial infrastructure</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="content-box">
-            <h2>Skills</h2>
-            <div class="skills-list">
-                <span>Python</span>
-                <span>C++</span>
-                <span>MATLAB</span>
-                <span>VHDL</span>
-                <span>JavaScript</span>
-                <span>HTML/CSS</span>
-                <span>Circuit Design</span>
-                <span>Data Analysis</span>
+        <!-- Miscellaneous Experience Section -->
+        <section class="content-box misc-experience-section">
+            <h2>Miscellaneous Experience</h2>
+            <div class="misc-experience-grid">
+                <div class="misc-job-card">
+                    <h4>Restaurant Assistant</h4>
+                    <p class="misc-company">Hollyburn Country Club</p>
+                    <p class="misc-location">West Vancouver, BC</p>
+                    <p class="misc-date">Summer 2021, 2023</p>
+                </div>
+                <div class="misc-job-card">
+                    <h4>Retail Assistant</h4>
+                    <p class="misc-company">Lions Bay General Store</p>
+                    <p class="misc-location">West Vancouver, BC</p>
+                    <p class="misc-date">Summer 2020</p>
+                </div>
+                <div class="misc-job-card">
+                    <h4>Busser</h4>
+                    <p class="misc-company">Trattoria Restaurant</p>
+                    <p class="misc-location">West Vancouver, BC</p>
+                    <p class="misc-date">Summer 2018, 2019</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Network Section -->
+        <section class="content-box skills-section">
+            <h2>Technical Skills</h2>
+            <div class="skills-network-container">
+                <svg class="skills-network" id="skills-svg" width="100%" height="500">
+                    <!-- Connections will be drawn here -->
+                </svg>
+                <div class="skills-nodes" id="skills-nodes">
+                    <!-- Core Programming -->
+                    <div class="skill-node" data-skill="python" data-category="programming" style="top: 15%; left: 20%;">Python</div>
+                    <div class="skill-node" data-skill="java" data-category="programming" style="top: 25%; left: 35%;">Java</div>
+                    <div class="skill-node" data-skill="cpp" data-category="programming" style="top: 35%; left: 15%;">C/C++</div>
+                    
+                    <!-- Design & CAD -->
+                    <div class="skill-node" data-skill="pcb" data-category="design" style="top: 20%; left: 65%;">PCB/Circuit Design</div>
+                    <div class="skill-node" data-skill="ltspice" data-category="design" style="top: 40%; left: 75%;">LTSpice</div>
+                    <div class="skill-node" data-skill="cad" data-category="design" style="top: 30%; left: 80%;">CAD</div>
+                    <div class="skill-node" data-skill="solidworks" data-category="design" style="top: 45%; left: 60%;">Solidworks</div>
+                    
+                    <!-- Industrial Automation -->
+                    <div class="skill-node" data-skill="plc" data-category="automation" style="top: 60%; left: 25%;">PLC Programming</div>
+                    <div class="skill-node" data-skill="twincat" data-category="automation" style="top: 70%; left: 40%;">Beckhoff Twincat</div>
+                    <div class="skill-node" data-skill="ladder" data-category="automation" style="top: 80%; left: 20%;">Ladder Logic</div>
+                    <div class="skill-node" data-skill="industrial" data-category="automation" style="top: 65%; left: 50%;">Industrial Automation</div>
+                    <div class="skill-node" data-skill="electrical" data-category="automation" style="top: 75%; left: 65%;">Electrical Drawings</div>
+                    
+                    <!-- Software & Tools -->
+                    <div class="skill-node" data-skill="git" data-category="tools" style="top: 50%; left: 10%;">Git</div>
+                    <div class="skill-node" data-skill="microsoft" data-category="tools" style="top: 55%; left: 85%;">Microsoft Suite</div>
+                    <div class="skill-node" data-skill="adobe" data-category="tools" style="top: 15%; left: 50%;">Adobe Suite</div>
+                    <div class="skill-node" data-skill="google" data-category="tools" style="top: 10%; left: 75%;">Google Products</div>
+                </div>
+            </div>
+            
+            <div class="interests-section">
+                <h3>Interests</h3>
+                <div class="interests-list">
+                    <span class="interest-tag">Microprocessor design</span>
+                    <span class="interest-tag">AI/Neural networks</span>
+                    <span class="interest-tag">Game design</span>
+                    <span class="interest-tag">Travel</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Awards & Volunteering Section -->
+        <section class="content-box awards-section">
+            <h2>Awards & Volunteering</h2>
+            <div class="awards-grid">
+                <div class="awards-column">
+                    <h3>Awards</h3>
+                    <ul class="awards-list">
+                        <li>Clark de Boer Memorial Scholarship (2022)</li>
+                        <li>Community Scholarship (2022)</li>
+                        <li>Excellence Scholarship (2022)</li>
+                        <li>AP Scholar Award (2021)</li>
+                    </ul>
+                </div>
+                <div class="volunteering-column">
+                    <h3>Volunteering</h3>
+                    <ul class="volunteering-list">
+                        <li>Assistant Coach, West Vancouver Football Club (2019-2021)</li>
+                        <li>Media Team Member, Engineering Society (2024)</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
     </main>
 
     <script src="script.js"></script>
+    <script src="resume-interactive.js"></script>
 </body>
 </html>
