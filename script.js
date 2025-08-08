@@ -328,6 +328,408 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Resume Interactive Features ---
+    
+    /**
+     * Detailed information for timeline items
+     */
+    const timelineDetails = {
+        'education-2026': {
+            title: 'Queen\'s University - Bachelor of Applied Science',
+            content: `
+                <h3>Degree Details</h3>
+                <p><strong>Program:</strong> Bachelor of Applied Science in Electrical Engineering</p>
+                <p><strong>Expected Graduation:</strong> May 2026</p>
+                <p><strong>CGPA:</strong> 3.1</p>
+                <p><strong>Location:</strong> Kingston, ON</p>
+                
+                <h3>Relevant Coursework</h3>
+                <ul>
+                    <li>Computer Architecture</li>
+                    <li>Earth Systems Engineering</li>
+                    <li>Electromagnetics</li>
+                    <li>Engineering Graphics</li>
+                    <li>Digital Systems</li>
+                    <li>Engineering Project Design</li>
+                </ul>
+                
+                <h3>Activities</h3>
+                <ul>
+                    <li>Vex-U Robotics</li>
+                    <li>Software design</li>
+                    <li>Competitive soccer intramurals</li>
+                    <li>Jiu Jitsu/MMA club</li>
+                </ul>
+            `
+        },
+        'experience-2024': {
+            title: 'cellcentric - Process Engineering & Maintenance Intern',
+            content: `
+                <h3>Position Details</h3>
+                <p><strong>Company:</strong> cellcentric - Daimler Trucks & Volvo Group</p>
+                <p><strong>Duration:</strong> Summer 2024</p>
+                <p><strong>Location:</strong> Burnaby, BC</p>
+                
+                <h3>Key Responsibilities</h3>
+                <ul>
+                    <li>PLC Programming with Beckhoff TwinCAT</li>
+                    <li>Industrial machine renovation and electrical panel construction</li>
+                    <li>Maintenance of industrial infrastructure</li>
+                </ul>
+                
+                <h3>Skills Developed</h3>
+                <ul>
+                    <li>Industrial automation systems</li>
+                    <li>Electrical panel design and construction</li>
+                    <li>Process optimization</li>
+                    <li>Equipment troubleshooting</li>
+                </ul>
+            `
+        },
+        'experience-2023': {
+            title: 'Hollyburn Country Club - Restaurant Assistant',
+            content: `
+                <h3>Position Details</h3>
+                <p><strong>Company:</strong> Hollyburn Country Club</p>
+                <p><strong>Duration:</strong> Summer 2023</p>
+                <p><strong>Location:</strong> West Vancouver, BC</p>
+                
+                <h3>Responsibilities</h3>
+                <ul>
+                    <li>Customer service in high-end dining environment</li>
+                    <li>Food preparation and kitchen assistance</li>
+                    <li>Event support and catering services</li>
+                    <li>Maintaining club standards and protocols</li>
+                </ul>
+            `
+        },
+        'education-2022': {
+            title: 'Collingwood School - BC Dogwood Diploma',
+            content: `
+                <h3>Academic Achievement</h3>
+                <p><strong>Diploma:</strong> BC Dogwood Diploma</p>
+                <p><strong>Graduation:</strong> June 2022</p>
+                <p><strong>GPA:</strong> 4.2 (A+)</p>
+                <p><strong>Location:</strong> Vancouver, BC</p>
+                
+                <h3>Relevant Coursework</h3>
+                <ul>
+                    <li>AP Calculus AB</li>
+                    <li>AP Physics 1</li>
+                    <li>Advanced mathematics and sciences</li>
+                </ul>
+                
+                <h3>Activities</h3>
+                <ul>
+                    <li>Senior soccer team</li>
+                    <li>Senior rugby team</li>
+                    <li>Senior basketball manager</li>
+                </ul>
+            `
+        },
+        'experience-2021': {
+            title: 'Hollyburn Country Club - Restaurant Assistant',
+            content: `
+                <h3>Position Details</h3>
+                <p><strong>Company:</strong> Hollyburn Country Club</p>
+                <p><strong>Duration:</strong> Summer 2021</p>
+                <p><strong>Location:</strong> West Vancouver, BC</p>
+                
+                <h3>Responsibilities</h3>
+                <ul>
+                    <li>Customer service in premium dining setting</li>
+                    <li>Food service and presentation</li>
+                    <li>Event coordination assistance</li>
+                    <li>Maintaining high service standards</li>
+                </ul>
+            `
+        },
+        'experience-2020': {
+            title: 'Lions Bay General Store - Retail Assistant',
+            content: `
+                <h3>Position Details</h3>
+                <p><strong>Company:</strong> Lions Bay General Store</p>
+                <p><strong>Duration:</strong> Summer 2020</p>
+                <p><strong>Location:</strong> West Vancouver, BC</p>
+                
+                <h3>Responsibilities</h3>
+                <ul>
+                    <li>Customer service and sales</li>
+                    <li>Inventory management</li>
+                    <li>Cash handling and transactions</li>
+                    <li>Store maintenance and organization</li>
+                </ul>
+            `
+        },
+        'experience-2019': {
+            title: 'Trattoria Restaurant - Busser',
+            content: `
+                <h3>Position Details</h3>
+                <p><strong>Company:</strong> Trattoria Restaurant</p>
+                <p><strong>Duration:</strong> Summer 2018, 2019</p>
+                <p><strong>Location:</strong> West Vancouver, BC</p>
+                
+                <h3>Responsibilities</h3>
+                <ul>
+                    <li>Table clearing and setup</li>
+                    <li>Restaurant cleanliness and sanitation</li>
+                    <li>Supporting wait staff</li>
+                    <li>Customer service assistance</li>
+                </ul>
+            `
+        }
+    };
+
+    /**
+     * Skills relationships for highlighting related skills
+     */
+    const skillRelationships = {
+        'Python': ['AI/Neural Networks', 'Game Design'],
+        'Java': ['C/C++', 'Python'],
+        'C/C++': ['Java', 'Python', 'Microprocessors'],
+        'PLC Programming': ['Beckhoff Twincat', 'Ladder Logic', 'Industrial Automation', 'Electrical Drawings'],
+        'Beckhoff Twincat': ['PLC Programming', 'Ladder Logic', 'Industrial Automation'],
+        'Ladder Logic': ['PLC Programming', 'Beckhoff Twincat', 'Industrial Automation'],
+        'Industrial Automation': ['PLC Programming', 'Beckhoff Twincat', 'Ladder Logic', 'Electrical Drawings'],
+        'PCB Design': ['LTSpice', 'CAD', 'Solidworks'],
+        'LTSpice': ['PCB Design', 'CAD'],
+        'CAD': ['Solidworks', 'PCB Design'],
+        'Solidworks': ['CAD', 'PCB Design'],
+        'Microsoft Suite': ['Adobe Suite'],
+        'Adobe Suite': ['Microsoft Suite'],
+        'AI/Neural Networks': ['Python', 'Microprocessors'],
+        'Microprocessors': ['C/C++', 'AI/Neural Networks'],
+        'Game Design': ['Python', 'Java', 'C/C++']
+    };
+
+    /**
+     * Initialize resume interactive features
+     */
+    function initResumeFeatures() {
+        initTimelineInteractions();
+        initSkillsGalaxy();
+        initModal();
+        animateTimelineItems();
+    }
+
+    /**
+     * Initialize timeline interactions
+     */
+    function initTimelineInteractions() {
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        
+        timelineItems.forEach((item, index) => {
+            // Add staggered animation delay
+            item.style.animationDelay = `${index * 0.2}s`;
+            
+            // Add click event to timeline content
+            const content = item.querySelector('.timeline-content');
+            const node = item.querySelector('.timeline-node');
+            const category = item.getAttribute('data-category');
+            const year = item.getAttribute('data-year');
+            const key = `${category}-${year}`;
+            
+            if (content && timelineDetails[key]) {
+                content.addEventListener('click', () => {
+                    showModal(timelineDetails[key].title, timelineDetails[key].content);
+                });
+                
+                node.addEventListener('click', () => {
+                    showModal(timelineDetails[key].title, timelineDetails[key].content);
+                });
+            }
+        });
+    }
+
+    /**
+     * Initialize skills galaxy with floating positions and interactions
+     */
+    function initSkillsGalaxy() {
+        const skillNodes = document.querySelectorAll('.skill-node');
+        const container = document.querySelector('.skills-galaxy');
+        
+        if (!container) return;
+        
+        // Position skills randomly in the galaxy on desktop
+        if (window.innerWidth > 768) {
+            skillNodes.forEach((node, index) => {
+                // Generate positions using the current seed for consistency
+                const angle = (index * 137.508) % 360; // Golden angle for good distribution
+                const radius = 150 + (index % 3) * 80; // Varying distances from center
+                const centerX = 50; // Center percentage
+                const centerY = 50; // Center percentage
+                
+                const x = centerX + (Math.cos(angle * Math.PI / 180) * radius / container.offsetWidth * 100);
+                const y = centerY + (Math.sin(angle * Math.PI / 180) * radius / container.offsetHeight * 100);
+                
+                // Ensure skills stay within bounds
+                const clampedX = Math.max(5, Math.min(95, x));
+                const clampedY = Math.max(5, Math.min(95, y));
+                
+                node.style.left = `${clampedX}%`;
+                node.style.top = `${clampedY}%`;
+                
+                // Stagger animation delays
+                node.style.animationDelay = `${index * 0.5}s`;
+            });
+        }
+        
+        // Add hover interactions for related skills
+        skillNodes.forEach(node => {
+            const skillName = node.getAttribute('data-skill');
+            
+            node.addEventListener('mouseenter', () => {
+                highlightRelatedSkills(skillName);
+            });
+            
+            node.addEventListener('mouseleave', () => {
+                clearSkillHighlights();
+            });
+        });
+    }
+
+    /**
+     * Highlight related skills when hovering over a skill
+     */
+    function highlightRelatedSkills(skillName) {
+        const relatedSkills = skillRelationships[skillName] || [];
+        const allSkills = document.querySelectorAll('.skill-node');
+        
+        allSkills.forEach(skill => {
+            const currentSkill = skill.getAttribute('data-skill');
+            if (relatedSkills.includes(currentSkill)) {
+                skill.classList.add('related-highlight');
+            }
+        });
+    }
+
+    /**
+     * Clear all skill highlights
+     */
+    function clearSkillHighlights() {
+        const allSkills = document.querySelectorAll('.skill-node');
+        allSkills.forEach(skill => {
+            skill.classList.remove('related-highlight');
+        });
+    }
+
+    /**
+     * Initialize modal functionality
+     */
+    function initModal() {
+        const modal = document.getElementById('detail-modal');
+        const closeBtn = document.querySelector('.modal-close');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', hideModal);
+        }
+        
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideModal();
+            }
+        });
+    }
+
+    /**
+     * Show modal with content
+     */
+    function showModal(title, content) {
+        const modal = document.getElementById('detail-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        
+        if (modal && modalTitle && modalBody) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+    }
+
+    /**
+     * Hide modal
+     */
+    function hideModal() {
+        const modal = document.getElementById('detail-modal');
+        
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    }
+
+    /**
+     * Animate timeline items on scroll
+     */
+    function animateTimelineItems() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        timelineItems.forEach(item => {
+            observer.observe(item);
+        });
+    }
+
+    /**
+     * Handle responsive skills galaxy layout
+     */
+    function handleResponsiveSkills() {
+        const skillNodes = document.querySelectorAll('.skill-node');
+        const container = document.querySelector('.skills-galaxy');
+        
+        if (!container) return;
+        
+        if (window.innerWidth <= 768) {
+            // Mobile layout - remove absolute positioning
+            skillNodes.forEach(node => {
+                node.style.position = 'static';
+                node.style.left = 'auto';
+                node.style.top = 'auto';
+            });
+        } else {
+            // Desktop layout - restore absolute positioning
+            skillNodes.forEach(node => {
+                node.style.position = 'absolute';
+            });
+            initSkillsGalaxy(); // Re-initialize positions
+        }
+    }
+
+    // Initialize resume features when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initResumeFeatures);
+    } else {
+        initResumeFeatures();
+    }
+
+    // Handle window resize for responsive skills
+    window.addEventListener('resize', debounce(handleResponsiveSkills, 250));
+
     // --- Start the app ---
     init();
 });
