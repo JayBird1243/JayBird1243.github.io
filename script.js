@@ -204,6 +204,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Randomizes bubble gradient node positions and properties based on seed
+     */
+    function randomizeBubbles() {
+        const bubbleContainers = document.querySelectorAll('.bubble-container');
+        
+        bubbleContainers.forEach((container, bubbleIndex) => {
+            const bubbleSeed = container.getAttribute('data-seed') || `bubble-${bubbleIndex}`;
+            const bubblePrng = mulberry32(currentSeed + bubbleSeed);
+            
+            const gradientNodes = container.querySelectorAll('.gradient-node');
+            const colors = [
+                'rgba(255, 182, 193, 0.8)', // Light pink
+                'rgba(221, 160, 221, 0.8)', // Plum
+                'rgba(173, 216, 230, 0.8)', // Light blue
+                'rgba(138, 43, 226, 0.8)',  // Blue violet
+                'rgba(255, 20, 147, 0.8)'   // Deep pink
+            ];
+            
+            gradientNodes.forEach((node, index) => {
+                // Randomize position
+                const x = bubblePrng() * 80 + 10; // 10-90% range
+                const y = bubblePrng() * 80 + 10; // 10-90% range
+                
+                // Randomize size
+                const size = bubblePrng() * 50 + 40; // 40-90px range
+                
+                // Randomize color
+                const colorIndex = Math.floor(bubblePrng() * colors.length);
+                const selectedColor = colors[colorIndex];
+                
+                // Randomize animation duration
+                const duration = bubblePrng() * 4 + 4; // 4-8 seconds
+                
+                // Apply styles
+                node.style.left = `${x}%`;
+                node.style.top = `${y}%`;
+                node.style.width = `${size}px`;
+                node.style.height = `${size}px`;
+                node.style.background = `radial-gradient(circle, ${selectedColor} 0%, transparent 70%)`;
+                node.style.animationDuration = `${duration}s`;
+                
+                // Randomize opacity
+                const opacity = bubblePrng() * 0.4 + 0.4; // 0.4-0.8 range
+                node.style.opacity = opacity.toString();
+            });
+            
+            // Add slight randomization to the bubble image opacity and mask
+            const bubbleImage = container.querySelector('.bubble-image img');
+            if (bubbleImage) {
+                const imageOpacity = bubblePrng() * 0.3 + 0.5; // 0.5-0.8 range
+                const maskX = bubblePrng() * 20 + 40; // 40-60% range
+                const maskY = bubblePrng() * 20 + 40; // 40-60% range
+                
+                bubbleImage.style.opacity = imageOpacity.toString();
+                const maskGradient = `radial-gradient(ellipse ${maskX}% ${maskY}% at center, black 20%, transparent 75%)`;
+                bubbleImage.style.mask = maskGradient;
+                bubbleImage.style.webkitMask = maskGradient;
+            }
+        });
+    }
+
+    /**
      * Initializes the application.
      * Generates a seed and triggers the first render.
      */
@@ -219,6 +281,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initial render
         renderVisuals();
+        
+        // Randomize bubbles after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            randomizeBubbles();
+        }, 100);
 
         // Use a ResizeObserver to dynamically re-render visuals when content changes height
         const resizeObserver = new ResizeObserver(entries => {
