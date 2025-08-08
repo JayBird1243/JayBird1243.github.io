@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addContentBtn = document.getElementById('add-content-btn');
     const additionalContentContainer = document.getElementById('additional-content-container');
     const seedDisplay = document.getElementById('seed-display');
-    const bubbleGrid = document.getElementById('bubble-grid');
 
     // --- State ---
     let currentSeed = null;
@@ -205,110 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Generate a seeded set of iridescent "bubble" squares with 5 internal gradient nodes each
-     * and an optional image with a randomized fade. Colors: blue/pink/red/purple palette.
-     */
-    function renderBubbles() {
-        if (!bubbleGrid || !prng) return;
-
-        // Clear prior
-        bubbleGrid.innerHTML = '';
-
-        // Projects with explicit images and titles
-        const projects = [
-            {
-                title: 'Autonomous Driving',
-                image: 'Images/Screenshot 2025-08-08 175310.png'
-            }
-        ];
-
-        // Decide how many bubbles to render based on viewport width
-        const viewportWidth = window.innerWidth;
-        const columns = viewportWidth >= 900 ? 4 : viewportWidth >= 600 ? 3 : 2;
-        const rows = 2; // keep it concise; can be adjusted
-        const total = Math.max(columns * rows, projects.length);
-
-        for (let i = 0; i < total; i++) {
-            const bubbleCard = document.createElement('div');
-            bubbleCard.className = 'bubble-card';
-
-            const titleEl = document.createElement('div');
-            titleEl.className = 'bubble-title';
-            const projTitle = i < projects.length ? projects[i].title : `Project ${i + 1}`;
-            titleEl.textContent = projTitle;
-
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-
-            // Build five gradient nodes inside this bubble boundary
-            const palette = pickIridescentPalette(prng);
-            const gradients = [];
-            for (let g = 0; g < 5; g++) {
-                const color = palette[g % palette.length];
-                const x = Math.round(prng() * 100);
-                const y = Math.round(prng() * 100);
-                const stop = 30 + Math.round(prng() * 25); // 30-55%
-                gradients.push(`radial-gradient(circle at ${x}% ${y}%, ${hexWithAlpha(color, 0.55)}, transparent ${stop}%)`);
-            }
-            // Add a subtle border glow blend
-            gradients.push(`radial-gradient(120% 120% at 50% -10%, ${hexWithAlpha('#ffffff', 0.15)}, transparent 70%)`);
-            bubble.style.backgroundImage = gradients.join(', ');
-
-            // Random image fade overlay
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'bubble-image';
-            const imageUrl = i < projects.length ? projects[i].image : 'Images/1720469597486.jpg';
-            imgDiv.style.backgroundImage = `url('${imageUrl}')`;
-
-            // Randomize fade position/shape using CSS mask
-            const cx = Math.round(prng() * 100);
-            const cy = Math.round(prng() * 100);
-            const inner = 40 + Math.round(prng() * 25); // 40-65%
-            const outer = 90 + Math.round(prng() * 10); // 90-100%
-            const ring = 10 + Math.round(prng() * 10);  // added secondary falloff
-            const mask = `radial-gradient(circle at ${cx}% ${cy}%, #000 ${inner}%, rgba(0,0,0,0.75) ${inner + ring}%, transparent ${outer}%)`;
-            imgDiv.style.webkitMaskImage = mask;
-            imgDiv.style.maskImage = mask;
-
-            // Slight random rotation/scale for organic look
-            const rot = (prng() * 8 - 4).toFixed(2); // -4 to 4 deg
-            const scale = (0.96 + prng() * 0.1).toFixed(3); // 0.96 - 1.06
-            imgDiv.style.transform = `rotate(${rot}deg) scale(${scale})`;
-
-            bubble.appendChild(imgDiv);
-            bubbleCard.appendChild(titleEl);
-            bubbleCard.appendChild(bubble);
-            bubbleGrid.appendChild(bubbleCard);
-        }
-    }
-
-    function pickIridescentPalette(prng) {
-        // Patel blue/pink/red/purple-ish hexes
-        const bases = [
-            '#6EE7F9', // blue-cyan
-            '#A78BFA', // purple
-            '#FB7185', // rose
-            '#F472B6', // pink
-            '#60A5FA', // blue
-            '#FCA5A5', // red-pink
-        ];
-        // Shuffle deterministically
-        const shuffled = bases
-            .map(color => ({ color, r: prng() }))
-            .sort((a, b) => a.r - b.r)
-            .map(o => o.color);
-        return shuffled.slice(0, 5);
-    }
-
-    function hexWithAlpha(hex, alpha) {
-        // hex like #RRGGBB
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
-    /**
      * Initializes the application.
      * Generates a seed and triggers the first render.
      */
@@ -324,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initial render
         renderVisuals();
-        renderBubbles();
 
         // Use a ResizeObserver to dynamically re-render visuals when content changes height
         const resizeObserver = new ResizeObserver(entries => {
@@ -337,14 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (contentWrapper) {
             resizeObserver.observe(contentWrapper);
         }
-        if (bubbleGrid) {
-            resizeObserver.observe(bubbleGrid);
-        }
 
-        window.addEventListener('resize', () => {
-            debouncedRender();
-            renderBubbles();
-        });
+        window.addEventListener('resize', debouncedRender);
     }
 
     /**
