@@ -463,6 +463,11 @@ code.language-javascript {
     80% { transform: translate(-6px, 6px) rotate(288deg); }
 }
 
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
 /* Resume Page Styles */
 
 /* Contact Section */
