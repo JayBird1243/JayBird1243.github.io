@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starry Sky | Jack Buhr</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../resume.html">Resume</a></li>
+                <li><a href="../design.html" class="active">Design</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="content-wrapper">
+        <section class="hero">
+            <h1>Starry Sky</h1>
+            <a href="../design.html" class="deep-dive-btn">← Back to Design</a>
+        </section>
+
+        <section class="content-box">
+            <div style="display: flex; gap: 15px; align-items: center; justify-content: center; margin-bottom: 2rem;">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="#FCD34D" style="filter: drop-shadow(0 0 8px #FCD34D); animation: pulse 2s infinite;">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="#FFFFFF" style="filter: drop-shadow(0 0 8px #FFFFFF); animation: pulse 3s infinite 1s;">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="#8B5CF6" style="filter: drop-shadow(0 0 8px #8B5CF6); animation: pulse 1.5s infinite 0.5s;">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <h2>Project Details</h2>
+            <ul>
+                <li>Artistic pursuit</li>
+                <li>Procedurally generated sky</li>
+                <li>Graphics based on normal gradients</li>
+            </ul>
+        </section>
+    </main>
+
+    <script src="../script.js"></script>
+</body>
+</html>
