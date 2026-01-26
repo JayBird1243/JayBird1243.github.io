@@ -19,6 +19,7 @@
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="resume.html">Resume</a></li>
                 <li><a href="design.html">Design</a></li>
+                <li><a href="skills.html">Skills</a></li>
             </ul>
             <div id="seed-display" class="seed-display">Seed: </div>
         </nav>
@@ -51,6 +52,26 @@
                 <p><strong>Nebula Gradient</strong></p>
             </div>
             <a href="stars.html" class="btn deep-dive-btn">Deep Dive</a>
+            
+            <div id="seed-stats" class="seed-stats">
+                <h3>Current Seed Statistics</h3>
+                <div class="stat-row">
+                    <div class="stat-item">
+                        <span class="label">Total Stars:</span>
+                        <span id="total-stars-count" class="value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">Gradient Nodes:</span>
+                        <span id="gradient-nodes-count" class="value">0</span>
+                    </div>
+                </div>
+                <div class="star-sizes-container">
+                    <h4>Star Size Distribution (1-10px)</h4>
+                    <div id="star-size-list" class="star-size-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>

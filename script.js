@@ -7,9 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const additionalContentContainer = document.getElementById('additional-content-container');
     const seedDisplay = document.getElementById('seed-display');
 
+    // Stats Elements
+    const totalStarsEl = document.getElementById('total-stars-count');
+    const nodesCountEl = document.getElementById('gradient-nodes-count');
+    const starSizeListEl = document.getElementById('star-size-list');
+
     // --- State ---
     let currentSeed = null;
-    let prng = null;
+    let prng = null; // Still keep global for other functions if needed, but renderVisuals will use local
 
     // --- Core Functions ---
 
@@ -133,6 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function renderVisuals() {
         if (!nodesContainer || !starsContainer) return;
+        
+        // --- Determinism Fix ---
+        // Create a local PRNG instance for this render to ensure consistency
+        // regardless of how many times renderVisuals is called.
+        const localPrng = mulberry32(currentSeed);
+
+        // Stats tracking
+        const starSizeCounts = new Array(11).fill(0); // Indices 1-10
 
         const totalPageHeight = document.documentElement.scrollHeight;
         const viewportHeight = window.innerHeight;
@@ -146,30 +159,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const minNodes = 2;
         const baseMaxNodes = 10;
         const maxNodes = Math.floor(baseMaxNodes * pageHeightRatio);
-        const numColors = Math.floor(prng() * (maxNodes - minNodes + 1)) + minNodes;
+        const numColors = Math.floor(localPrng() * (maxNodes - minNodes + 1)) + minNodes;
 
-        const colors = generateColorPalette(numColors, prng, currentSeed);
+        // Update stats
+        if (nodesCountEl) nodesCountEl.textContent = numColors;
+
+        const colors = generateColorPalette(numColors, localPrng, currentSeed);
         
         const gradients = [];
         for (let i = 0; i < numColors; i++) {
-            const x = prng() * 100;
-            const y = prng() * 100; 
+            const x = localPrng() * 100;
+            const y = localPrng() * 100; 
             const color = colors[i];
             gradients.push(`radial-gradient(circle at ${x}% ${y}%, ${color}, transparent 50%)`);
         }
         
         // --- Generate Stars ---
-        const numStars = getStarCount(prng, pageHeightRatio);
+        const numStars = getStarCount(localPrng, pageHeightRatio);
+        
+        // Update stats
+        if (totalStarsEl) totalStarsEl.textContent = numStars;
+
         const stars = [];
 
         for (let i = 0; i < numStars; i++) {
             const star = document.createElement('div');
             star.className = 'star';
             
-            star.style.left = `${prng() * 100}%`;
-            star.style.top = `${prng() * 100}%`;
+            star.style.left = `${localPrng() * 100}%`;
+            star.style.top = `${localPrng() * 100}%`;
             
-            const size = getStarSize(prng);
+            const size = getStarSize(localPrng);
+            
+            // Track size stat
+            if (size >= 1 && size <= 10) {
+                starSizeCounts[size]++;
+            }
+
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
             if (size >= 6) {
@@ -177,6 +203,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             stars.push(star);
+        }
+
+        // Update Star Size Chart UI
+        if (starSizeListEl) {
+            starSizeListEl.innerHTML = '';
+            for (let s = 1; s <= 10; s++) {
+                const count = starSizeCounts[s];
+                const item = document.createElement('div');
+                item.className = 'star-size-item';
+                item.innerHTML = `
+                    <span class="star-size-label">${s}px</span>
+                    <span class="star-size-value">${count}</span>
+                `;
+                starSizeListEl.appendChild(item);
+            }
         }
 
         // --- Animate into view ---
@@ -210,8 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const bubbleContainers = document.querySelectorAll('.bubble-container');
         
         bubbleContainers.forEach((container, bubbleIndex) => {
-            const bubbleSeed = container.getAttribute('data-seed') || `bubble-${bubbleIndex}`;
-            const bubblePrng = mulberry32(currentSeed + bubbleSeed);
+            // Create a unique seed for each bubble by mixing the main seed with the index
+            // This ensures each bubble is unique but deterministic relative to the main seed
+            const baseSeedInt = parseInt(currentSeed.substring(0, 8), 16);
+            const uniqueSeedInt = (baseSeedInt + (bubbleIndex + 1) * 0x9E3779B9) >>> 0; 
+            const uniqueSeedHex = uniqueSeedInt.toString(16).padStart(8, '0');
+            const bubblePrng = mulberry32(uniqueSeedHex);
             
             const gradientNodes = container.querySelectorAll('.gradient-node');
             const colors = [
@@ -266,15 +311,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Updates the seed display and re-initializes
+     */
+    function updateSeed(newSeed) {
+        // Basic validation: ensure it's a hex string
+        if (!/^[0-9a-fA-F]+$/.test(newSeed)) {
+            alert('Seed must be a hexadecimal string.');
+            return;
+        }
+
+        // Pad with zeros to ensure 32 characters for color generation stability
+        currentSeed = newSeed.padEnd(32, '0');
+        
+        seedDisplay.textContent = `Seed: ${currentSeed}`;
+        
+        // Re-initialize logic
+        prng = mulberry32(currentSeed);
+        renderVisuals();
+        randomizeBubbles();
+    }
+
+    /**
      * Initializes the application.
      * Generates a seed and triggers the first render.
      */
     function init() {
-        currentSeed = generateLocalSeed();
+        // Check if seed is already set (e.g. via URL param in future, or local storage)
+        if (!currentSeed) {
+            currentSeed = generateLocalSeed();
+        }
+        
         prng = mulberry32(currentSeed);
 
         if(seedDisplay){
              seedDisplay.textContent = `Seed: ${currentSeed}`;
+
+             // --- Double Click Handler for Seed Input ---
+             seedDisplay.addEventListener('dblclick', () => {
+                 // Check if already editing
+                 if (seedDisplay.querySelector('input')) return;
+
+                 const currentText = seedDisplay.textContent.replace('Seed: ', '').trim();
+                 seedDisplay.textContent = 'Seed: '; // Keep prefix? Or just replace all.
+                 // Let's replace just the number part
+                 
+                 const input = document.createElement('input');
+                 input.type = 'text';
+                 input.value = currentText;
+                 input.className = 'seed-input';
+                 
+                 // Replace content
+                 seedDisplay.innerHTML = 'Seed: ';
+                 seedDisplay.appendChild(input);
+                 
+                 input.focus();
+                 input.select();
+
+                 // Handle commit
+                 const commitChange = () => {
+                     let val = input.value.trim().toLowerCase();
+                     if (val === currentText) {
+                         // No change, revert UI
+                         seedDisplay.textContent = `Seed: ${currentText}`;
+                     } else {
+                         if (/^[0-9a-fA-F]+$/.test(val)) {
+                             updateSeed(val);
+                         } else {
+                             alert('Invalid hex seed. Reverting.');
+                             seedDisplay.textContent = `Seed: ${currentText}`;
+                         }
+                     }
+                 };
+
+                 input.addEventListener('blur', commitChange);
+                 input.addEventListener('keypress', (e) => {
+                     if (e.key === 'Enter') {
+                         input.blur(); // Triggers commitChange
+                     }
+                 });
+             });
         }
         
         const debouncedRender = debounce(renderVisuals, 250);

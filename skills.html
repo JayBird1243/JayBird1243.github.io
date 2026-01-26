@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills | Jack Buhr</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .skill-category-card {
+            background: rgba(22, 27, 34, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(160, 57, 198, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .skill-category-title {
+            color: var(--primary-color);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skill-item {
+            display: inline-block;
+            background: rgba(160, 57, 198, 0.1);
+            color: var(--text-color);
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(160, 57, 198, 0.2);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .skill-item:hover {
+            background: rgba(160, 57, 198, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        /* Tooltip Styles */
+        .skill-tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: #161b22;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%; /* Position above the skill item */
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            pointer-events: none; /* Prevent tooltip from blocking mouse events if overlapped, but might need to be auto for links */
+        }
+        
+        /* Enable pointer events so links can be clicked. 
+           However, hovering the tooltip itself might be tricky if there's a gap.
+           Moving it to bottom might be safer or ensuring no gap. */
+        .skill-tooltip {
+            pointer-events: auto; 
+        }
+
+        .skill-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+
+        .skill-item:hover .skill-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .skill-tooltip a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .skill-tooltip a:hover {
+            text-decoration: underline;
+        }
+        
+        .tooltip-project-list {
+            margin: 5px 0 0 0;
+            padding: 0;
+            list-style: none;
+            font-size: 0.8rem;
+        }
+        
+        .tooltip-project-list li {
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="resume.html">Resume</a></li>
+                <li><a href="design.html">Design</a></li>
+                <li><a href="skills.html" class="active">Skills</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="content-wrapper">
+        <section class="hero">
+            <h1>Skills & Technologies</h1>
+            <p class="subtitle">A comprehensive overview of my technical capabilities.</p>
+        </section>
+
+        <section class="content-box">
+            <h2>Technical Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-category-card">
+                    <div class="skill-category-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        Google Cloud & Firebase
+                    </div>
+                    
+                    <div class="skill-item">Google Firebase
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-item">Cloud Functions
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Firebase Hosting
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Authentication
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Cloud Pub-Sub
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Cloud Scheduler
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Secret Manager
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Firestore
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Firestore Security Rules
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">IAM Permission Optimization
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Cloud Console
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category-card">
+                    <div class="skill-category-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1v1h-2V4c0-.55.45-1 1-1zm0 20c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zm6-12h-2c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h2v2zm0-4h-2V5h2v2z"/></svg>
+                        Data & Integration
+                    </div>
+                    
+                    <div class="skill-item">Reddit Data API
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">LLM API Integration
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Google Analytics
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">Data Security
+                        <div class="skill-tooltip">
+                            Used in:
+                            <ul class="tooltip-project-list">
+                                <li><a href="design/Daemon-Data.html">Daemon Data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
