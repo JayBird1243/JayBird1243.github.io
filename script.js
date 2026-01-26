@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function getStarCount(prng, pageHeightRatio) {
         const meanPerScreen = 750;
-        const stdDevPerScreen = 200;
+        const stdDevPerScreen = 500;
         
         const mean = meanPerScreen * pageHeightRatio;
         const stdDev = stdDevPerScreen * Math.sqrt(pageHeightRatio); 
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.className = 'star-size-item';
                 
                 // Add tint classes for larger stars
-                if (s >= 7 && s <= 10) {
+                if (s >= 6 && s <= 10) {
                     item.classList.add(`tint-${s}`);
                 }
 
