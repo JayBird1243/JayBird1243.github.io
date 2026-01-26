@@ -1029,6 +1029,24 @@ code.language-javascript {
     flex-direction: column;
 }
 
+/* Star Size Tints */
+.star-size-item.tint-7 { 
+    background-color: rgba(239, 68, 68, 0.2); 
+    border: 1px solid rgba(239, 68, 68, 0.4); 
+}
+.star-size-item.tint-8 { 
+    background-color: rgba(139, 92, 246, 0.2); 
+    border: 1px solid rgba(139, 92, 246, 0.4); 
+}
+.star-size-item.tint-9 { 
+    background-color: rgba(59, 130, 246, 0.2); 
+    border: 1px solid rgba(59, 130, 246, 0.4); 
+}
+.star-size-item.tint-10 { 
+    background-color: rgba(124, 58, 237, 0.2); 
+    border: 1px solid rgba(124, 58, 237, 0.4); 
+}
+
 .star-size-label {
     color: var(--text-color);
     font-size: 0.75rem;

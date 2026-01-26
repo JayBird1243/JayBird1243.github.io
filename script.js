@@ -212,6 +212,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const count = starSizeCounts[s];
                 const item = document.createElement('div');
                 item.className = 'star-size-item';
+                
+                // Add tint classes for larger stars
+                if (s >= 7 && s <= 10) {
+                    item.classList.add(`tint-${s}`);
+                }
+
                 item.innerHTML = `
                     <span class="star-size-label">${s}px</span>
                     <span class="star-size-value">${count}</span>
