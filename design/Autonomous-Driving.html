@@ -28,13 +28,20 @@
             margin-top: 1.5rem;
         }
 
+        /* Prevent grid overflow on narrow viewports */
+        .contributions-grid > *,
+        .tech-tags > * {
+            min-width: 0;
+        }
+
         .contribution-card {
             background: rgba(160, 57, 198, 0.06);
             border: 1px solid rgba(160, 57, 198, 0.25);
             border-radius: 10px;
             padding: 1.4rem;
-            position: relative;
             transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .contribution-card:hover {
@@ -46,6 +53,12 @@
             background: rgba(160, 57, 198, 0.09);
         }
 
+        /* Collaborative cards are visually secondary */
+        .contribution-card.collaborative {
+            background: rgba(22, 27, 34, 0.5);
+            border-color: rgba(160, 57, 198, 0.15);
+        }
+
         .contribution-card .card-label {
             font-family: 'Space Mono', monospace;
             font-size: 0.65rem;
@@ -55,49 +68,33 @@
             margin-bottom: 0.5rem;
         }
 
+        .contribution-card.collaborative .card-label {
+            color: rgba(160, 57, 198, 0.45);
+        }
+
         .contribution-card h3 {
             color: white;
-            font-size: 1.1rem;
-            margin: 0 0 0.75rem 0;
+            font-size: 1.05rem;
+            margin: 0 0 0.6rem 0;
         }
 
-        .contribution-card p {
-            color: var(--text-color);
+        .contribution-card.collaborative h3 {
+            color: rgba(201, 209, 217, 0.8);
+        }
+
+        /* Bold lead line in each card for scan speed */
+        .contribution-card .card-lead {
+            color: rgba(201, 209, 217, 0.95);
             font-size: 0.9rem;
-            line-height: 1.6;
-            margin: 0;
+            font-weight: 600;
+            line-height: 1.5;
+            margin: 0 0 0.6rem 0;
         }
 
-        /* ─── Team contributions ─── */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-top: 1.25rem;
-        }
-
-        .team-card {
-            background: rgba(22, 27, 34, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.1rem 1.25rem;
-            transition: border-color 0.25s ease;
-        }
-
-        .team-card:hover {
-            border-color: rgba(160, 57, 198, 0.3);
-        }
-
-        .team-card h4 {
-            color: rgba(201, 209, 217, 0.85);
-            font-size: 0.95rem;
-            margin: 0 0 0.5rem 0;
-        }
-
-        .team-card p {
-            color: rgba(201, 209, 217, 0.55);
-            font-size: 0.82rem;
-            line-height: 1.55;
+        .contribution-card .card-detail {
+            color: rgba(201, 209, 217, 0.65);
+            font-size: 0.875rem;
+            line-height: 1.65;
             margin: 0;
         }
 
@@ -113,19 +110,24 @@
 
         .tab-btn {
             background: transparent;
-            border: none;
+            border: 1px solid transparent;
             color: var(--text-color);
             padding: 8px 18px;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 500;
             border-radius: 5px;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
 
         .tab-btn:hover {
             background: rgba(160, 57, 198, 0.1);
             color: var(--primary-color);
+        }
+
+        .tab-btn:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
         .tab-btn.active {
@@ -135,29 +137,37 @@
 
         .tab-content {
             display: none;
-            animation: fadeUp 0.35s ease;
         }
 
         .tab-content.active {
             display: block;
+            animation: fadeUp 0.3s ease;
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tab-content.active {
+                animation: none;
+            }
         }
 
         .tab-content h3 {
             color: white;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             margin-top: 0;
             margin-bottom: 0.75rem;
         }
 
-        .tab-content p, .tab-content li {
+        .tab-content p,
+        .tab-content li {
             font-size: 0.92rem;
             line-height: 1.7;
             color: var(--text-color);
+            max-width: 72ch;
         }
 
         /* ─── Tech tags ─── */
@@ -169,12 +179,13 @@
         }
 
         .tech-tag {
-            background: rgba(160, 57, 198, 0.1);
-            color: var(--text-color);
+            background: rgba(160, 57, 198, 0.08);
+            color: rgba(201, 209, 217, 0.8);
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.82rem;
-            border: 1px solid rgba(160, 57, 198, 0.2);
+            border: 1px solid rgba(160, 57, 198, 0.18);
+            white-space: nowrap;
         }
 
         /* ─── Stat strip ─── */
@@ -195,28 +206,36 @@
 
         .stat-value {
             font-family: 'Space Mono', monospace;
-            font-size: 1.4rem;
-            color: white;
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 700;
         }
 
         .stat-label {
-            font-size: 0.75rem;
-            color: rgba(201, 209, 217, 0.5);
+            font-size: 0.72rem;
+            color: rgba(201, 209, 217, 0.45);
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
 
-        /* ─── Results note ─── */
-        .results-note {
+        /* ─── Outcome callout ─── */
+        .outcome-callout {
             background: rgba(22, 27, 34, 0.6);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 1rem 1.25rem;
             font-size: 0.88rem;
             color: rgba(201, 209, 217, 0.65);
-            line-height: 1.6;
+            line-height: 1.65;
             margin-top: 1rem;
+        }
+
+        /* ─── Section intro copy ─── */
+        .section-intro {
+            font-size: 0.9rem;
+            color: rgba(201, 209, 217, 0.6);
+            margin-bottom: 1.5rem;
+            margin-top: 0;
         }
     </style>
 </head>
@@ -252,7 +271,7 @@
                 A semester-long team project to build a fully autonomous robot capable of navigating a miniature city, accepting passenger fares, and obeying traffic rules — all in real time on the constrained hardware of a Raspberry Pi. The robot combined graph-based path planning, computer vision lane tracking, hardware-accelerated object detection, and a live fare-dispatch server to simulate a scaled-down autonomous taxi.
             </p>
             <p style="margin-bottom: 0;">
-                The competition was ultimately cancelled before deployment, but all major subsystems were built, integrated, and tested in controlled conditions. Individual components performed well in isolation; full-system autonomy was close but not complete within the available timeline.
+                Most individual components reached a functional baseline. Pathfinding and fare logic ran correctly, lane following held for ~7 seconds on straight paths, and object detection identified signs at 0.67+ confidence in controlled testing. The competition was cancelled before full integration could be completed, but the architecture was sound — remaining gaps were tuning problems, not design failures.
             </p>
 
             <div class="stat-strip">
@@ -278,49 +297,45 @@
         <!-- ── My Contributions ── -->
         <section class="content-box">
             <div class="contribution-banner">My Contributions</div>
-            <h2 style="border-bottom-color: var(--primary-color); margin-top: 0;">What I Built</h2>
-            <p style="margin-bottom: 0.25rem;">
+            <h2>What I Built</h2>
+            <p class="section-intro" style="margin-top: 0.25rem;">
                 My work centred on the systems that determined <em>where</em> the vehicle went and <em>why</em> — the intelligence layer above raw motion. I also built the vehicle's brake and turn lights from scratch.
             </p>
 
             <div class="contributions-grid">
                 <div class="contribution-card primary">
-                    <div class="card-label">Primary · Navigation</div>
-                    <h3>Intelligent Pathfinding</h3>
-                    <p>
-                        Designed and implemented the route planning system using a modified Dijkstra's algorithm via NetworkX. Beyond shortest-path, edges were assigned custom priority weights — roads through a designated "risk zone" were penalized to make them appear longer, naturally avoiding them unless the profit gain was significant. Turn penalties further discouraged high-turn routes by doubling the effective distance of direction-changing branches, producing smoother and safer paths without hard-coded rules.
+                    <div class="card-label">Primary · Navigation &amp; Routing</div>
+                    <h3>Pathfinding &amp; Position Tracking</h3>
+                    <p class="card-lead">Designed the full route intelligence layer: modified Dijkstra's algorithm with custom edge weights, plus a dead-reckoning position fallback for when GPS was too slow.</p>
+                    <p class="card-detail">
+                        Implemented via NetworkX with edges weighted by distance plus a priority value — risk zone roads were penalised to appear longer, and any branch where the vehicle changed direction had its effective distance doubled, naturally discouraging high-turn routes. The competition's VPFS GPS had up to 4-second latency, so I built a dead-reckoning layer that polled vehicle speed and heading to keep an internal x/y position updated between GPS fixes. Pathfinding always operated against the latest combined estimate.
                     </p>
                 </div>
 
                 <div class="contribution-card primary">
                     <div class="card-label">Primary · Fare Logic</div>
                     <h3>Fare Selection &amp; Dispatch</h3>
-                    <p>
-                        Built the fare-claiming engine that polled the competition server for available rides and selected them by profit-per-unit-time. The system estimated total trip duration — including travel to the pickup point, the ride itself, and a turn-count penalty — divided the fare by that estimate, and picked the highest-value option. This meant the car wasn't just accepting fares sequentially; it was actively optimising revenue per minute.
+                    <p class="card-lead">Built the engine that picked the most profitable fare — not just the nearest one — by dividing payout by estimated completion time.</p>
+                    <p class="card-detail">
+                        The system polled the competition server for available rides, then estimated total trip time including travel to pickup, the ride itself, and a turn-count penalty. Dividing fare by time gave a profit-per-minute score; the highest-scoring fare was claimed. This made the car actively optimise revenue rather than accepting rides sequentially.
                     </p>
                 </div>
 
                 <div class="contribution-card primary">
-                    <div class="card-label">Primary · Position Tracking</div>
-                    <h3>Location Estimation</h3>
-                    <p>
-                        The competition's VPFS GPS system had a broadcast latency of up to 4 seconds — too slow for precise real-time navigation. I built a dead-reckoning fallback that estimated position by continuously polling vehicle speed and heading from the movement algorithms, keeping an internal x/y coordinate updated between GPS fixes. When the VPFS updated, the internal estimate was corrected. Pathfinding always operated against the latest combined estimate.
-                    </p>
-                </div>
-
-                <div class="contribution-card">
                     <div class="card-label">Hardware · Physical Build</div>
                     <h3>Brake &amp; Turn Light Assembly</h3>
-                    <p>
-                        Designed and hand-soldered the brake and indicator light board onto a 15 × 8 cm protoboard. Red and yellow LEDs were wired in series with 100 Ω current-limiting resistors, matched to the 3.3 V digital I/O output of the Raspberry Pi. Controlled directly from GPIO, the lights provided real-world signalling behaviour consistent with road traffic norms.
+                    <p class="card-lead">Hand-soldered the vehicle's brake and indicator light board onto a 15 × 8 cm protoboard, wired directly to Raspberry Pi GPIO.</p>
+                    <p class="card-detail">
+                        Red and yellow LEDs were wired in series with 100 Ω current-limiting resistors, sized for the 3.3 V digital I/O output. The lights provided real-world signalling behaviour consistent with road traffic norms and were controlled programmatically alongside the navigation system.
                     </p>
                 </div>
 
-                <div class="contribution-card">
+                <div class="contribution-card collaborative">
                     <div class="card-label">Collaborative · Research</div>
                     <h3>Computer Vision Direction</h3>
-                    <p>
-                        Contributed to the research and technology selection for the computer vision stack — including the choice of the Coral Edge TPU for hardware-accelerated inference, the EfficientDet-Lite model architecture, and the dataset sourcing strategy using Google Street View imagery. While implementation was led by teammates, I had input on approach and methodology throughout.
+                    <p class="card-lead">Contributed to technology selection for the CV stack — Coral TPU, EfficientDet-Lite, and Street View dataset strategy.</p>
+                    <p class="card-detail">
+                        While implementation was led by a teammate, I had input on the choice of the Coral Edge TPU for hardware-accelerated inference, the EfficientDet-Lite model for its edge-device speed/accuracy balance, and the approach of sourcing training data from Google Street View imagery of Ontario roads.
                     </p>
                 </div>
             </div>
@@ -329,130 +344,90 @@
         <!-- ── Full System Breakdown ── -->
         <section class="content-box">
             <h2>Full System Breakdown</h2>
-            <p style="margin-bottom: 1.5rem; color: rgba(201, 209, 217, 0.7); font-size: 0.9rem;">
-                The remaining subsystems were developed by teammates. I had varying degrees of input and direction on each.
+            <p class="section-intro">
+                The remaining subsystems were built by teammates, with varying input from me on research and direction.
             </p>
 
-            <div class="tabs">
-                <button class="tab-btn active" onclick="openTab('lane')">Lane Detection</button>
-                <button class="tab-btn" onclick="openTab('object')">Object Detection</button>
-                <button class="tab-btn" onclick="openTab('motion')">Motion Control</button>
-                <button class="tab-btn" onclick="openTab('arch')">Architecture</button>
+            <div class="tabs" role="tablist" aria-label="System subsystems">
+                <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="lane" data-tab="lane">Lane Detection</button>
+                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="object" data-tab="object">Object Detection</button>
+                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="motion" data-tab="motion">Motion Control</button>
+                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="arch" data-tab="arch">Architecture</button>
             </div>
 
-            <div id="lane" class="tab-content active">
+            <div id="lane" class="tab-content active" role="tabpanel" aria-labelledby="tab-lane">
                 <h3>Lane Detection</h3>
                 <p>
-                    Developed by a teammate, the lane detection system used OpenCV's Hough line transform to identify both solid white and dashed yellow lane markings from live camera frames. The pipeline pre-processed each frame through grayscale conversion, Gaussian blur, binary thresholding, and Canny edge detection before applying a trapezoidal road mask and extracting lane lines.
+                    Developed by a teammate, this system used OpenCV's Hough line transform to identify both solid white and dashed yellow lane markings from live camera frames. Each frame was pre-processed through grayscale conversion, Gaussian blur, binary thresholding, and Canny edge detection before a trapezoidal road mask was applied and lane lines were extracted.
                 </p>
                 <p>
-                    A key insight during development was that dotted yellow lines returned four lines per dot (the four edges of each rectangle), requiring a horizontal-line filter to discard stop-line noise and an outlier filter to consolidate valid lines into a single best-fit lane per side. All parameters were stored as global variables for rapid tuning.
-                </p>
-                <p>
-                    Testing progressed from static simulation screenshots to real course footage, with each frame split into five diagnostic views during development. The algorithm performed consistently on straight paths, though curved roads proved more difficult due to Hough transform's linear assumptions.
+                    A key insight: dotted yellow lines returned four Hough lines per dot (the edges of each rectangular segment), requiring a horizontal-line filter to discard stop-line noise and an outlier filter to consolidate valid lines into a single best-fit lane per side. All parameters were stored as global variables for rapid tuning. The algorithm performed consistently on straight paths; curved roads proved more difficult due to the Hough transform's linear assumptions.
                 </p>
             </div>
 
-            <div id="object" class="tab-content">
+            <div id="object" class="tab-content" role="tabpanel" aria-labelledby="tab-object">
                 <h3>Object Detection</h3>
                 <p>
-                    Led by a teammate, the object detection system ran a retrained EfficientDet-Lite model on a Google Coral Edge TPU — offloading inference from the Raspberry Pi's CPU entirely. The model was fine-tuned in a Google Colab notebook using a dataset of rubber ducks and road signs sourced from Google Street View imagery of Ontario roads, annotated with bounding boxes via MakeSense.ai and exported in Pascal VOC format.
+                    Led by a teammate, this system ran a retrained EfficientDet-Lite model on a Google Coral Edge TPU — offloading inference from the Raspberry Pi's CPU entirely. The model was fine-tuned using a dataset of rubber ducks and road signs sourced from Google Street View imagery, annotated with bounding boxes via MakeSense.ai and exported in Pascal VOC format.
                 </p>
                 <p>
-                    The deployed model produced real-time bounding box predictions with confidence scores. If confidence fell below 0.67 on a target object class, the dataset was expanded and retraining repeated. In practice, the model performed well in static conditions but struggled with motion blur and variable lighting during active driving.
-                </p>
-                <p>
-                    I contributed to the research phase — specifically the decision to use the Coral TPU for acceleration and the EfficientDet-Lite architecture for its balance of speed and accuracy on edge hardware.
+                    The deployed model produced real-time bounding box predictions with confidence scores. If confidence fell below 0.67 on a target class, the dataset was expanded and retraining repeated. In practice, the model performed well in static conditions but struggled with motion blur and variable lighting during active driving — a known gap that would have required a larger dataset and more moving-vehicle test sessions to resolve.
                 </p>
             </div>
 
-            <div id="motion" class="tab-content">
+            <div id="motion" class="tab-content" role="tabpanel" aria-labelledby="tab-motion">
                 <h3>Motion Control</h3>
                 <p>
                     A proportional-derivative (PD) controller translated lane detection outputs into steering and speed commands. The proportional component (k<sub>p</sub> = 0.4) produced correction force proportional to lane-centre error; the derivative component (k<sub>d</sub> = 0.15) damped oscillation by tracking the rate of error change, preventing overshoot.
                 </p>
                 <p>
-                    Steering handled three detection states: both lanes visible (target lane centre), right lane only (100 px inward offset), or left lane only (120 px rightward offset). Speed was dynamically scaled across four zones: full speed for straight paths (&lt;5° steering), 80% for gentle curves (5–10°), 60% for moderate curves (10–15°), and 40% for sharp curves (&gt;15°).
-                </p>
-                <p>
-                    A recovery behaviour managed lane-loss: short gaps (&le;10 frames) maintained the last known steering angle with 0.7× damping at 50% speed. Prolonged loss (&gt;10 frames) straightened the wheels and crept forward at 30%, minimising uncontrolled drift.
+                    Speed was dynamically scaled across four zones: full speed for straight paths (&lt;5° steering), 80% for gentle curves (5–10°), 60% for moderate curves (10–15°), and 40% for sharp curves (&gt;15°). A recovery behaviour managed lane-loss: short gaps (≤10 frames) held the last known steering at 50% speed with 0.7× damping; prolonged loss (&gt;10 frames) straightened the wheels and crept forward at 30%.
                 </p>
             </div>
 
-            <div id="arch" class="tab-content">
+            <div id="arch" class="tab-content" role="tabpanel" aria-labelledby="tab-arch">
                 <h3>System Architecture</h3>
                 <p>
-                    The software ran as a single central loop on the Raspberry Pi, calling modular functions from each subsystem on their respective polling schedules. Lane following ran every frame; VPFS position updates were polled several times per second; fare checking happened on a longer interval.
+                    The software ran as a single central loop on the Raspberry Pi, calling modular functions on their respective polling schedules. Lane following ran every frame; VPFS position updates polled several times per second; fare checking on a longer interval.
                 </p>
                 <p>
-                    The layered architecture separated concerns clearly: a <strong>perception layer</strong> (camera + grayscale sensors), a <strong>decision layer</strong> (pathfinding, fare selection, position tracking), and a <strong>control layer</strong> (PD steering, adaptive speed). Data flowed upward from sensors to decisions, and commands downward to actuators. Each subsystem exposed simple input/output interfaces to ease integration across the team.
+                    Three clear layers: a <strong>perception layer</strong> (camera + grayscale sensors), a <strong>decision layer</strong> (pathfinding, fare selection, position tracking), and a <strong>control layer</strong> (PD steering, adaptive speed). Data flowed upward from sensors to decisions, commands downward to actuators. Each subsystem exposed simple interfaces to ease cross-team integration.
                 </p>
                 <p>
-                    The main integration challenge was moving from simulation to real course — noise and visual clutter on the physical track degraded lane detection performance, requiring parameter tightening. The steering servo also exhibited slight mechanical drift that caused rightward bias despite neutral steering commands, likely a calibration imperfection rather than a software issue.
+                    The main integration challenge was the simulation-to-real-course transition — physical track noise degraded lane detection, requiring parameter tightening. A steering servo mechanical imperfection caused rightward drift despite neutral commands, a hardware calibration issue rather than a software bug.
                 </p>
             </div>
         </section>
 
-        <!-- ── Team ── -->
-        <section class="content-box">
-            <h2>Team Breakdown</h2>
-            <p style="margin-bottom: 1.25rem; font-size: 0.9rem; color: rgba(201, 209, 217, 0.65);">Four members each owned a primary area of the system.</p>
-            <div class="team-grid">
-                <div class="team-card">
-                    <h4>Jack (me) — Navigation &amp; Fare Logic</h4>
-                    <p>Path planning, fare dispatch, position estimation, hardware lights, CV research input.</p>
-                </div>
-                <div class="team-card">
-                    <h4>Mike — Motion Control</h4>
-                    <p>PD steering controller, adaptive speed zones, recovery behaviour, hardware integration.</p>
-                </div>
-                <div class="team-card">
-                    <h4>Braeden — Object Detection</h4>
-                    <p>EfficientDet-Lite retraining, Coral TPU deployment, dataset preparation and annotation.</p>
-                </div>
-                <div class="team-card">
-                    <h4>Brian — Lane Detection</h4>
-                    <p>Hough transform pipeline, filter design, parameter tuning, simulation-to-real transition.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ── Results ── -->
+        <!-- ── Outcome ── -->
         <section class="content-box">
             <h2>Outcome</h2>
             <p>
-                All individual subsystems reached a functional baseline within the semester. The robot could course-correct via grayscale sensors, follow straight paths under camera guidance for ~7 seconds before drift, detect objects with adequate confidence in controlled conditions, and execute pathfinding and fare selection logic correctly.
+                All individual subsystems reached a functional baseline. The robot course-corrected via grayscale sensors, followed straight paths under camera guidance for ~7 seconds before drift, detected objects at adequate confidence in controlled conditions, and correctly executed pathfinding and fare selection logic.
             </p>
             <p>
-                Full integration exposed gaps — most visibly a mechanical steering drift and reduced vision performance under motion — that would have required further tuning to be competition-ready. The competition was ultimately cancelled before those issues could be fully resolved.
+                Full integration exposed two main gaps — mechanical steering drift and reduced vision performance under motion — that would have needed further tuning to be competition-ready. The competition was cancelled before those issues were resolved.
             </p>
-            <div class="results-note">
-                Given the project scope, the team's limited prior experience with computer vision, embedded systems, and machine learning, and the compressed timeline alongside other coursework, the outcome reflects a meaningful technical achievement. The architecture was sound; the remaining deficits were tuning problems, not design failures.
+            <div class="outcome-callout">
+                Given the project scope, the team's limited prior experience with computer vision, embedded systems, and machine learning, and the compressed timeline alongside other coursework, the result reflects a meaningful technical achievement. The architecture was sound; remaining deficits were tuning problems, not design failures.
             </div>
         </section>
 
         <!-- ── Technologies ── -->
         <section class="content-box">
             <h2>Technologies</h2>
-            <div class="tech-tags">
-                <span class="tech-tag">Python</span>
-                <span class="tech-tag">NetworkX</span>
-                <span class="tech-tag">Dijkstra's Algorithm</span>
-                <span class="tech-tag">REST API</span>
-                <span class="tech-tag">OpenCV</span>
-                <span class="tech-tag">Hough Transform</span>
-                <span class="tech-tag">EfficientDet-Lite</span>
-                <span class="tech-tag">TensorFlow Lite</span>
-                <span class="tech-tag">Coral Edge TPU</span>
-                <span class="tech-tag">Raspberry Pi 4B</span>
-                <span class="tech-tag">Robot HAT</span>
-                <span class="tech-tag">PiCar-X</span>
-                <span class="tech-tag">PD Control</span>
-                <span class="tech-tag">Google Colab</span>
-                <span class="tech-tag">Dead Reckoning</span>
-                <span class="tech-tag">Hardware Soldering</span>
-                <span class="tech-tag">GPIO</span>
-                <span class="tech-tag">RealVNC</span>
+            <div class="tech-tags" role="list">
+                <span class="tech-tag" role="listitem">Python</span>
+                <span class="tech-tag" role="listitem">NetworkX</span>
+                <span class="tech-tag" role="listitem">Dijkstra's Algorithm</span>
+                <span class="tech-tag" role="listitem">Dead Reckoning</span>
+                <span class="tech-tag" role="listitem">REST API</span>
+                <span class="tech-tag" role="listitem">OpenCV · Hough Transform</span>
+                <span class="tech-tag" role="listitem">EfficientDet-Lite · TF Lite</span>
+                <span class="tech-tag" role="listitem">Coral Edge TPU</span>
+                <span class="tech-tag" role="listitem">Raspberry Pi 4B · PiCar-X</span>
+                <span class="tech-tag" role="listitem">PD Control</span>
+                <span class="tech-tag" role="listitem">GPIO · Hardware Soldering</span>
             </div>
         </section>
     </main>
@@ -460,11 +435,37 @@
     <script>
         function openTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
-            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.setAttribute('aria-selected', 'false');
+            });
+            const panel = document.getElementById(tabId);
+            if (panel) panel.classList.add('active');
+            const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+            if (btn) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+            }
         }
+
+        // Arrow-key keyboard navigation for tabs
+        document.querySelector('.tabs').addEventListener('keydown', function (e) {
+            const tabs = Array.from(this.querySelectorAll('.tab-btn'));
+            const current = tabs.findIndex(t => t.classList.contains('active'));
+            let next = -1;
+            if (e.key === 'ArrowRight') next = (current + 1) % tabs.length;
+            if (e.key === 'ArrowLeft')  next = (current - 1 + tabs.length) % tabs.length;
+            if (next !== -1) {
+                tabs[next].focus();
+                openTab(tabs[next].dataset.tab);
+                e.preventDefault();
+            }
+        });
+
+        // Wire up tab buttons via data-tab (no inline onclick)
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => openTab(btn.dataset.tab));
+        });
     </script>
     <script src="../script.js"></script>
 </body>
