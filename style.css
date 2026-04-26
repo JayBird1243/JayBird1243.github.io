@@ -271,10 +271,6 @@ main {
     background-color: #7cc0ff;
 }
 
-.starry-sky-section {
-    margin-bottom: 2rem;
-}
-
 .deep-dive-btn {
     display: inline-block;
     background-color: var(--primary-color);
