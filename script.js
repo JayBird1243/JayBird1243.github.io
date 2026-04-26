@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const additionalContentContainer = document.getElementById('additional-content-container');
     const seedDisplay = document.getElementById('seed-display');
 
-    // Stats Elements
-    const totalStarsEl = document.getElementById('total-stars-count');
-    const nodesCountEl = document.getElementById('gradient-nodes-count');
-    const starSizeListEl = document.getElementById('star-size-list');
+    // Footer Elements
+    const footerSeedEl = document.getElementById('footer-seed-val');
+    const footerStarsEl = document.getElementById('footer-stars-count');
+    const footerNodesEl = document.getElementById('footer-nodes-count');
+    const footerSizeBarsEl = document.getElementById('footer-size-bars');
+    const rerollBtn = document.getElementById('reroll-btn');
 
     // --- State ---
     let currentSeed = null;
@@ -161,8 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxNodes = Math.floor(baseMaxNodes * pageHeightRatio);
         const numColors = Math.floor(localPrng() * (maxNodes - minNodes + 1)) + minNodes;
 
-        // Update stats
-        if (nodesCountEl) nodesCountEl.textContent = numColors;
+        // Update footer stats
+        if (footerNodesEl) footerNodesEl.textContent = numColors;
 
         const colors = generateColorPalette(numColors, localPrng, currentSeed);
         
@@ -177,8 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Generate Stars ---
         const numStars = getStarCount(localPrng, pageHeightRatio);
         
-        // Update stats
-        if (totalStarsEl) totalStarsEl.textContent = numStars;
+        if (footerStarsEl) footerStarsEl.textContent = numStars;
 
         const stars = [];
 
@@ -205,24 +206,21 @@ document.addEventListener('DOMContentLoaded', () => {
             stars.push(star);
         }
 
-        // Update Star Size Chart UI
-        if (starSizeListEl) {
-            starSizeListEl.innerHTML = '';
+        // Update footer size bar chart
+        if (footerSizeBarsEl) {
+            footerSizeBarsEl.innerHTML = '';
+            const maxCount = Math.max(1, ...starSizeCounts.slice(1));
             for (let s = 1; s <= 10; s++) {
                 const count = starSizeCounts[s];
-                const item = document.createElement('div');
-                item.className = 'star-size-item';
-                
-                // Add tint classes for larger stars
-                if (s >= 6 && s <= 10) {
-                    item.classList.add(`tint-${s}`);
-                }
-
-                item.innerHTML = `
-                    <span class="star-size-label">${s}px</span>
-                    <span class="star-size-value">${count}</span>
-                `;
-                starSizeListEl.appendChild(item);
+                const bar = document.createElement('div');
+                bar.className = 'footer-bar';
+                bar.dataset.size = s;
+                const logH = count > 0
+                    ? Math.round((Math.log(count + 1) / Math.log(maxCount + 1)) * 24)
+                    : 2;
+                bar.style.height = `${Math.max(2, logH)}px`;
+                bar.title = `${s}px stars: ${count}`;
+                footerSizeBarsEl.appendChild(bar);
             }
         }
 
@@ -328,8 +326,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Pad with zeros to ensure 32 characters for color generation stability
         currentSeed = newSeed.padEnd(32, '0');
-        
-        seedDisplay.textContent = `Seed: ${currentSeed}`;
+
+        if (seedDisplay) seedDisplay.textContent = `Seed: ${currentSeed}`;
+        if (footerSeedEl) footerSeedEl.textContent = currentSeed.substring(0, 8) + '\u2026';
         
         // Re-initialize logic
         prng = mulberry32(currentSeed);
@@ -348,6 +347,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         prng = mulberry32(currentSeed);
+
+        if (footerSeedEl) footerSeedEl.textContent = currentSeed.substring(0, 8) + '\u2026';
+
+        if (rerollBtn) {
+            rerollBtn.addEventListener('click', () => {
+                rerollBtn.classList.add('rolling');
+                rerollBtn.addEventListener('animationend', () => {
+                    rerollBtn.classList.remove('rolling');
+                }, { once: true });
+                updateSeed(generateLocalSeed());
+            });
+        }
 
         if(seedDisplay){
              seedDisplay.textContent = `Seed: ${currentSeed}`;
