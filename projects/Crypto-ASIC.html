@@ -92,15 +92,17 @@
         }
 
         .photo-pair {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: clamp(1rem, 3vw, 1.75rem);
-            max-width: 980px;
+            max-width: 1100px;
             margin: 0 auto clamp(2.5rem, 6vw, 4rem);
         }
 
         .photo-figure {
             margin: 0;
+            width: min(521px, 100%);
             opacity: 0;
             transform: translateY(18px);
             animation: asicReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -113,8 +115,8 @@
         .photo-figure img {
             display: block;
             width: 100%;
+            aspect-ratio: 521 / 938;
             height: auto;
-            aspect-ratio: 4 / 3;
             object-fit: cover;
             border: 1px solid oklch(0.4 0.04 55);
             background: oklch(0.12 0.015 55);
@@ -225,10 +227,6 @@
         }
 
         @media (max-width: 720px) {
-            .photo-pair {
-                grid-template-columns: 1fr;
-            }
-
             .asic-page .hero {
                 text-align: center;
             }
@@ -289,11 +287,11 @@
 
         <div class="photo-pair">
             <figure class="photo-figure">
-                <img src="../Images/Miner1.png" alt="IceRiver KS3M ASIC miner in stock configuration" width="1200" height="900">
+                <img src="../Images/Miner1.png" alt="IceRiver KS3M ASIC miner in stock configuration" width="521" height="938">
                 <figcaption>KS3M Stock</figcaption>
             </figure>
             <figure class="photo-figure">
-                <img src="../Images/Miner2.png" alt="IceRiver KS3M ASIC miner with upgraded airflow ducting" width="1200" height="900">
+                <img src="../Images/Miner2.png" alt="IceRiver KS3M ASIC miner with upgraded airflow ducting" width="521" height="938">
                 <figcaption>KS3M with upgraded airflow</figcaption>
             </figure>
         </div>
