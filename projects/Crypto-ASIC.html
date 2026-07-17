@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto ASIC | Jack Buhr</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .asic-page {
+            --asic-ink: oklch(0.93 0.02 75);
+            --asic-muted: oklch(0.78 0.03 75);
+            --asic-faint: oklch(0.64 0.03 75);
+            --asic-panel: oklch(0.18 0.02 55 / 0.88);
+            --asic-accent: oklch(0.78 0.14 65);
+            --asic-copper: oklch(0.68 0.13 45);
+            --asic-link: oklch(0.82 0.12 85);
+            font-family: 'Figtree', sans-serif;
+            color: var(--asic-ink);
+        }
+
+        .asic-page .hero {
+            margin-bottom: clamp(2rem, 6vw, 4rem);
+            text-align: left;
+            max-width: 980px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .asic-page h1,
+        .asic-page h2,
+        .asic-page h3 {
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.02em;
+            font-weight: 700;
+        }
+
+        .case-kicker {
+            color: var(--asic-accent);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .case-title {
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            line-height: 0.95;
+            margin: 0.5rem 0 1rem;
+            color: var(--asic-ink);
+        }
+
+        .case-deck {
+            max-width: 68ch;
+            color: var(--asic-muted);
+            font-size: clamp(1.05rem, 2vw, 1.25rem);
+            line-height: 1.65;
+            margin: 0 0 1.25rem;
+        }
+
+        .case-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.25rem;
+            margin: 0 0 0.5rem;
+        }
+
+        .case-links a {
+            color: var(--asic-link);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 1px solid oklch(0.78 0.14 65 / 0.35);
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .case-links a:hover {
+            color: var(--asic-accent);
+            border-color: var(--asic-accent);
+        }
+
+        .asic-page .deep-dive-btn {
+            background-color: var(--asic-copper);
+            color: oklch(0.14 0.02 55);
+        }
+
+        .asic-page .deep-dive-btn:hover {
+            background-color: var(--asic-accent);
+        }
+
+        .photo-pair {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(1rem, 3vw, 1.75rem);
+            max-width: 980px;
+            margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+        }
+
+        .photo-figure {
+            margin: 0;
+            opacity: 0;
+            transform: translateY(18px);
+            animation: asicReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .photo-figure:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .photo-figure img {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border: 1px solid oklch(0.4 0.04 55);
+            background: oklch(0.12 0.015 55);
+        }
+
+        .photo-figure figcaption {
+            margin-top: 0.65rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--asic-faint);
+            font-weight: 600;
+        }
+
+        .asic-body {
+            max-width: 72ch;
+            margin: 0 auto;
+        }
+
+        .asic-panel {
+            background: var(--asic-panel);
+            border: 1px solid oklch(0.36 0.04 55);
+            border-radius: 4px;
+            padding: clamp(1.4rem, 3vw, 2.25rem);
+            margin-bottom: clamp(1.5rem, 3vw, 2rem);
+            opacity: 0;
+            transform: translateY(16px);
+            animation: asicReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        .asic-panel.delay-2 {
+            animation-delay: 0.32s;
+        }
+
+        .asic-panel.delay-3 {
+            animation-delay: 0.44s;
+        }
+
+        .asic-body p {
+            color: var(--asic-muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            margin: 0 0 1.15rem;
+            max-width: 68ch;
+        }
+
+        .asic-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .asic-body a {
+            color: var(--asic-link);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        .asic-body a:hover {
+            color: var(--asic-accent);
+        }
+
+        .asic-body h2 {
+            font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+            color: var(--asic-ink);
+            margin: 0 0 1rem;
+            line-height: 1.1;
+        }
+
+        .asic-body h3 {
+            font-size: clamp(1.25rem, 2.5vw, 1.55rem);
+            color: var(--asic-accent);
+            margin: 1.75rem 0 0.75rem;
+            line-height: 1.2;
+        }
+
+        .refs {
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid oklch(0.36 0.04 55);
+        }
+
+        .refs h2 {
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--asic-faint);
+            margin-bottom: 0.75rem;
+        }
+
+        .refs ol {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: var(--asic-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .refs a {
+            word-break: break-word;
+        }
+
+        @keyframes asicReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 720px) {
+            .photo-pair {
+                grid-template-columns: 1fr;
+            }
+
+            .asic-page .hero {
+                text-align: center;
+            }
+
+            .case-deck {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .case-links {
+                justify-content: center;
+            }
+
+            .photo-figure figcaption {
+                text-align: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .photo-figure,
+            .asic-panel {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html" class="active">Projects</a></li>
+                <li><a href="../skills.html">Skills</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="content-wrapper" class="asic-page">
+        <section class="hero">
+            <div class="case-kicker">Hardware operations · Market timing</div>
+            <h1 class="case-title">Crypto ASIC</h1>
+            <p class="case-deck">Home operation of an IceRiver KS3M Kaspa miner from October &rsquo;23 to July &rsquo;24 — with airflow upgrades, a resale-vs-yield risk model, and a timed exit that closed at a 200% return.</p>
+            <div class="case-links">
+                <a href="https://kaspa.org/" target="_blank" rel="noopener noreferrer">Kaspa</a>
+                <a href="https://kas.humpool.com/account?login=kaspa%3Aqplgh2y24zss7eq0p0gdg57e3mtte64yjhfhj79hp0ff03nm9ly5zmx4tex3m" target="_blank" rel="noopener noreferrer">My mining pool ID</a>
+            </div>
+            <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
+        </section>
+
+        <div class="photo-pair">
+            <figure class="photo-figure">
+                <img src="../Images/Miner1.png" alt="IceRiver KS3M ASIC miner in stock configuration" width="1200" height="900">
+                <figcaption>KS3M Stock</figcaption>
+            </figure>
+            <figure class="photo-figure">
+                <img src="../Images/Miner2.png" alt="IceRiver KS3M ASIC miner with upgraded airflow ducting" width="1200" height="900">
+                <figcaption>KS3M with upgraded airflow</figcaption>
+            </figure>
+        </div>
+
+        <article class="asic-body">
+            <section class="asic-panel">
+                <p>Between October &rsquo;23 and July &rsquo;24, I operated an ASIC (Application Specific Integrated Circuit) crypto currency miner at my home. The miner was optimised for the Kaspa crypto currency, a promising cutting edge new-tech coin from 2021.</p>
+                <p>At the time, Kaspa was the most profitable coin to mine, and remained as such for almost a year. To capitalise on this, I purchased an IceRiver KS3M in October &rsquo;23. The KS3M is capable of 6 Terahashes per second (TH/s) with a 3400W power draw. To improve temperature management and reduce noise pollution (my mom was complaining), I upgraded the stock system with a FruitionDesign airflow manifold paired with a high-power low-dB exhaust fan.</p>
+                <p>I knew that profitability couldn&rsquo;t last, and would fall as the network hashrate equalized. Such profitability was only present because of Kaspa&rsquo;s youth as a coin and new hardware-level efficiency in its mining algorithm KHeavyHash. To manage risk, I built a tracking model to weigh the secondhand resale value of the ASIC with its projected future yield. In June of 2024 it became more valuable to sell than keep, as it would no longer ever mine enough coins to surpass the sale value.</p>
+                <p>The secondary market for ASICs was highly elevated due to retail FOMO (Fear Of Missing Out). I capitalized on this sentiment, exiting at an optimal moment. I closed the venture with a 200% return over a 10-month period. My exit thesis was ultimately validated; the broader market, Kaspa in particular, entered a severe downturn, which would have driven the operational return into the negative had I continued holding the hardware.</p>
+            </section>
+
+            <section class="asic-panel delay-2">
+                <h2>My thoughts on Kaspa</h2>
+                <p>Along with the profitability at the time, I had thought Kaspa was a high potential coin for several reasons. Crypto alt-coins (not Bitcoin or Ethereum) extensively suffer from developer teams operating with purely profit-driven motives. This often manifests in heavy insider selling, pre-mined allocations, and venture-capital-centric tokenomics. Kaspa, however, was purposefully fair-launched, which means it did not allocate coins unfairly to developers or early adopters, and it launched to the public on the first day, rather than allowing a select few to mine coins with no competition. This equitable distribution boded well for the network&rsquo;s longevity.</p>
+                <p>The technology of the coin is highly innovative, being the first to use a GHOSTDAG, a technically superior version of the Bitcoin architecture. Kaspa largely solves several core Bitcoin issues, including speed and scalability.</p>
+                <p>The mining profitability and technological advancements garnered massive hype, and more people knew of Kaspa than other coins in a similar market-cap range.</p>
+                <p>Despite these strengths, I ultimately believe the coin will struggle long-term, and the core issues come down to developer psychology and network economics.</p>
+
+                <h3>Issue #1: Aggressive (Hopeful) Emission Schedule</h3>
+                <p>The precedent set by Bitcoin for Proof-of-Work networks is to provide miners with a block reward. In reality, &ldquo;mining&rdquo; is the act of securing the network by cryptographically validating that transactions are legitimate. Miners are compensated in two ways: the fixed block reward, and the variable &ldquo;gas&rdquo; fees paid by users to send funds.</p>
+                <p>To create scarcity, these block rewards periodically cut in half. Bitcoin&rsquo;s halving period occurs every four years, providing ample time for the asset&rsquo;s price to appreciate and offset the reduced reward. Kaspa, conversely, operates on an aggressive one-year halving schedule that compounds smoothly every month, resulting in a 5.6% monthly reward reduction.</p>
+                <p>In order to retain miner interest against a rapidly decaying reward, the token price must increase at an incredible rate. If it doesn&rsquo;t, mining profits fall below local electricity costs, and operators power down. We are already seeing this play out: Kaspa has fallen roughly 86% from its August 2024 peak <a href="https://www.coingecko.com/en/coins/kaspa?chart=type%3Dprice%26mode%3Dline%26timeframe%3Dmax" target="_blank" rel="noopener noreferrer">[1]</a>. This triggers a self-sustaining downward spiral, where declining prices price-out current miners, and the dropping network security deters new investment.</p>
+
+                <h3>Issue #2: Inherent Unsustainability</h3>
+                <p>The ultimate goal for any Proof-of-Work coin is to transition into a self-sustaining ecosystem. By the time the final Bitcoin block reward is issued in 2140, the network expects to secure itself entirely through user transaction fees. Kaspa, due to its aggressive schedule, will issue its final block reward around 2037 <a href="https://wiki.kaspa.org/en/tokenomics#:~:text=a%20Nakamoto%27s%20philosophy.-,WHAT%20IS%20THE%20MONETARY%20POLICY%3F,variability%20will%20be%20much%20higher%20for%20other%20reasons%20down%20the%20line.,-WHAT%20IS%20THE" target="_blank" rel="noopener noreferrer">[2]</a>—a mere 16 years after inception.</p>
+                <p>To understand why this is a problem, I like to use a ferry metaphor. Imagine each block is a ferry traveling from &ldquo;waiting to be sent&rdquo; to &ldquo;received.&rdquo; The ferry carries passengers (transactions) who are instructed to bribe the ferry manager (the miner). Whoever brings the largest bribe gets a seat until the boat is full. Since that bribe goes directly to the miner, it provides the financial incentive to keep operating the ferry even after the block rewards disappear.</p>
+                <p>But Kaspa&rsquo;s entire value proposition is that it has revolutionized block speed. Because the network is so incredibly fast, there are thousands of ferries leaving the dock at any given moment. Consequently, there is zero incentive for a passenger to offer a large bribe. If the current ferry is full, you can simply wait a fraction of a second for the next one.</p>
+                <p>Because Kaspa solved the scalability problem so well, block space is no longer scarce. Therefore, in a hypothetical future where Kaspa survives beyond its final halving, even extreme global adoption won&rsquo;t drive gas fees high enough to incentivize miners. Without a financial incentive to secure the network, the longevity of the project comes into serious question.</p>
+            </section>
+
+            <section class="asic-panel delay-3 refs">
+                <h2>References</h2>
+                <ol>
+                    <li><a href="https://www.coingecko.com/en/coins/kaspa?chart=type%3Dprice%26mode%3Dline%26timeframe%3Dmax" target="_blank" rel="noopener noreferrer">CoinGecko — Kaspa price chart (max)</a></li>
+                    <li><a href="https://wiki.kaspa.org/en/tokenomics#:~:text=a%20Nakamoto%27s%20philosophy.-,WHAT%20IS%20THE%20MONETARY%20POLICY%3F,variability%20will%20be%20much%20higher%20for%20other%20reasons%20down%20the%20line.,-WHAT%20IS%20THE" target="_blank" rel="noopener noreferrer">Kaspa Wiki — Monetary policy / tokenomics</a></li>
+                </ol>
+            </section>
+        </article>
+    </main>
+
+    <footer id="site-footer">
+        <div class="footer-inner">
+            <div class="footer-field">
+                <span class="footer-label">seed</span>
+                <span id="footer-seed-val" class="footer-mono">—</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-field">
+                <span id="footer-stars-count" class="footer-num">—</span>
+                <span class="footer-label">stars</span>
+            </div>
+            <div class="footer-field">
+                <span id="footer-nodes-count" class="footer-num">—</span>
+                <span class="footer-label">nodes</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
+            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                new sky
+            </button>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
