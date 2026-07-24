@@ -89,6 +89,14 @@
             background-color: var(--alpine-moss);
         }
 
+        .gallery-section {
+            max-width: 1200px;
+            margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+            opacity: 0;
+            transform: translateY(16px);
+            animation: alpineReveal 0.75s var(--ease-out-expo) 0.12s forwards;
+        }
+
         .alpine-body {
             max-width: 72ch;
             margin: 0 auto clamp(2.5rem, 6vw, 4rem);
@@ -103,7 +111,7 @@
             padding: clamp(1.4rem, 3vw, 2.25rem);
             opacity: 0;
             transform: translateY(16px);
-            animation: alpineReveal 0.75s var(--ease-out-expo) 0.12s forwards;
+            animation: alpineReveal 0.75s var(--ease-out-expo) 0.28s forwards;
         }
 
         .alpine-panel p {
@@ -116,14 +124,6 @@
 
         .alpine-panel p:last-child {
             margin-bottom: 0;
-        }
-
-        .gallery-section {
-            max-width: 1200px;
-            margin: 0 auto clamp(2rem, 5vw, 3.5rem);
-            opacity: 0;
-            transform: translateY(16px);
-            animation: alpineReveal 0.75s var(--ease-out-expo) 0.28s forwards;
         }
 
         .gallery-header {
@@ -178,28 +178,19 @@
             gap: var(--space-md);
             overflow-x: auto;
             overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            scroll-padding-inline: var(--space-md);
             padding: 0.25rem var(--space-md) 0.75rem;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--alpine-forest) transparent;
+            scrollbar-width: none;
         }
 
         .gallery-track::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .gallery-track::-webkit-scrollbar-thumb {
-            background: var(--alpine-forest);
-            border-radius: 999px;
+            display: none;
         }
 
         .gallery-item {
             flex: 0 0 auto;
             width: min(280px, 72vw);
             aspect-ratio: 4 / 3;
-            scroll-snap-align: start;
             padding: 0;
             border: 1px solid oklch(0.38 0.05 155);
             border-radius: 6px;
@@ -429,7 +420,7 @@
         <section class="hero">
             <div class="case-kicker">Startup · Trailhead infrastructure</div>
             <h1 class="case-title">Alpine Charge</h1>
-            <p class="case-deck">Co-founded a BC startup that keeps hikers powered at the trailhead — autonomous charging kiosks, municipal partnerships, and industrial IoT remote management.</p>
+            <p class="case-deck">Co-founded a BC startup that keeps hikers powered at the trailhead; we provide autonomous charging kiosks, municipal partnerships, and industrial IoT remote management.</p>
             <div class="case-meta">
                 <span class="meta-chip">Founded Mar 2026</span>
                 <span class="meta-chip">Lions Bay, BC</span>
@@ -438,23 +429,15 @@
             <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
         </section>
 
-        <article class="alpine-body">
-            <section class="alpine-panel">
-                <p>In March 2026, I co-founded Alpine Charge (Alpine Charging Solutions Inc.), a BC-based startup dedicated to keeping hikers safe and connected. We provide portable phone chargers via autonomous kiosks installed directly at popular trailheads (see gallery for photos).</p>
-                <p>Managing this venture has involved overseeing the entire product lifecycle; from negotiating hardware procurement with international suppliers to drafting and securing a municipal contract with the Village of Lions Bay. We coordinated directly with local public works and electrical departments to ensure seamless installation. The kiosks are powered by industrial IoT networking for remote management, featuring in-house designed branding and signage.</p>
-                <p>We are currently in the active operations phase, continuously monitoring and optimizing the project's performance.</p>
-            </section>
-        </article>
-
         <section class="gallery-section" aria-labelledby="gallery-heading">
             <div class="gallery-header">
                 <h2 id="gallery-heading">Gallery</h2>
-                <span class="gallery-hint">Scroll &middot; click to enlarge</span>
+                <span class="gallery-hint">Click to enlarge</span>
             </div>
             <div class="gallery-track-wrap">
-                <div class="gallery-track" role="list" id="alpine-gallery">
+                <div class="gallery-track" role="list" id="alpine-gallery" aria-label="Alpine Charge photo gallery">
                     <button type="button" class="gallery-item is-graphic" role="listitem" data-index="0" aria-label="View station rendering">
-                        <img src="../Images/Galleries/Alpine%20Charge/Station.png" alt="Alpine Charge trailhead charging station" loading="lazy" width="560" height="420">
+                        <img src="../Images/Galleries/Alpine%20Charge/Station.png" alt="Alpine Charge trailhead charging station" loading="eager" width="560" height="420">
                     </button>
                     <button type="button" class="gallery-item is-graphic" role="listitem" data-index="1" aria-label="View product label">
                         <img src="../Images/Galleries/Alpine%20Charge/Label-cornercut.png" alt="Alpine Charge product label design" loading="lazy" width="560" height="420">
@@ -480,6 +463,14 @@
                 </div>
             </div>
         </section>
+
+        <article class="alpine-body">
+            <section class="alpine-panel">
+                <p>In March 2026, I co-founded Alpine Charge (Alpine Charging Solutions Inc.), a BC-based startup dedicated to keeping hikers safe and connected. We provide portable phone chargers via autonomous kiosks installed directly at popular trailheads (see gallery for photos).</p>
+                <p>Managing this venture has involved overseeing the entire product lifecycle; from negotiating hardware procurement with international suppliers to drafting and securing a municipal contract with the Village of Lions Bay. We coordinated directly with local public works and electrical departments to ensure seamless installation. The kiosks are powered by industrial IoT networking for remote management, featuring in-house designed branding and signage.</p>
+                <p>We are currently in the active operations phase, continuously monitoring and optimizing the project's performance.</p>
+            </section>
+        </article>
     </main>
 
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Image gallery viewer">
@@ -524,23 +515,76 @@
 
     <script>
         (function () {
-            const items = Array.from(document.querySelectorAll('.gallery-item'));
+            const track = document.getElementById('alpine-gallery');
+            const originals = Array.from(track.querySelectorAll('.gallery-item'));
             const lightbox = document.getElementById('lightbox');
             const lightboxImage = document.getElementById('lightbox-image');
             const lightboxCaption = document.getElementById('lightbox-caption');
             const btnClose = document.getElementById('lightbox-close');
             const btnPrev = document.getElementById('lightbox-prev');
             const btnNext = document.getElementById('lightbox-next');
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const speed = 0.35;
             let current = 0;
             let lastFocus = null;
+            let paused = false;
+            let resumeTimer = null;
+
+            // Duplicate slides for a seamless loop
+            originals.forEach(function (el) {
+                const clone = el.cloneNode(true);
+                clone.setAttribute('aria-hidden', 'true');
+                clone.tabIndex = -1;
+                clone.dataset.clone = 'true';
+                track.appendChild(clone);
+            });
+
+            const items = originals;
+
+            function pauseAuto() {
+                paused = true;
+                clearTimeout(resumeTimer);
+            }
+
+            function scheduleResume(delay) {
+                clearTimeout(resumeTimer);
+                resumeTimer = setTimeout(function () {
+                    if (!lightbox.classList.contains('is-open')) paused = false;
+                }, delay);
+            }
+
+            function tick() {
+                if (!reduceMotion && !paused && track.scrollWidth > track.clientWidth) {
+                    track.scrollLeft += speed;
+                    const loopAt = track.scrollWidth / 2;
+                    if (track.scrollLeft >= loopAt) {
+                        track.scrollLeft -= loopAt;
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+
+            track.addEventListener('pointerenter', pauseAuto);
+            track.addEventListener('pointerleave', function () { scheduleResume(400); });
+            track.addEventListener('focusin', pauseAuto);
+            track.addEventListener('focusout', function () { scheduleResume(400); });
+            track.addEventListener('wheel', function () {
+                pauseAuto();
+                scheduleResume(1800);
+            }, { passive: true });
+            track.addEventListener('touchstart', function () {
+                pauseAuto();
+            }, { passive: true });
+            track.addEventListener('touchend', function () { scheduleResume(1800); });
+
+            if (!reduceMotion) requestAnimationFrame(tick);
 
             function getSlide(index) {
                 const btn = items[index];
                 const img = btn.querySelector('img');
                 return {
                     src: img.currentSrc || img.src,
-                    alt: img.alt,
-                    label: btn.getAttribute('aria-label') || img.alt
+                    alt: img.alt
                 };
             }
 
@@ -554,6 +598,7 @@
 
             function open(index) {
                 lastFocus = document.activeElement;
+                pauseAuto();
                 show(index);
                 lightbox.classList.add('is-open');
                 lightbox.setAttribute('aria-hidden', 'false');
@@ -565,15 +610,16 @@
                 lightbox.classList.remove('is-open');
                 lightbox.setAttribute('aria-hidden', 'true');
                 document.body.style.overflow = '';
+                scheduleResume(600);
                 if (lastFocus && typeof lastFocus.focus === 'function') {
                     lastFocus.focus();
                 }
             }
 
-            items.forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    open(Number(btn.dataset.index));
-                });
+            track.addEventListener('click', function (e) {
+                const btn = e.target.closest('.gallery-item');
+                if (!btn) return;
+                open(Number(btn.dataset.index));
             });
 
             btnClose.addEventListener('click', close);
