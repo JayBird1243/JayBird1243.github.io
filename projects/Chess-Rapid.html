@@ -542,7 +542,7 @@
         <section class="hero">
             <div class="case-kicker">Chess.com · Rapid</div>
             <h1 class="case-title">Chess Rapid</h1>
-            <p class="case-deck">Live progress board for <strong>jaybirdddd1</strong> — rapid rating, form, and every rated game pulled straight from the Chess.com Published Data API.</p>
+            <p class="case-deck">Live progress board for <strong>jaybirdddd1</strong> — rapid rating, form, and rated games since Aug&nbsp;1,&nbsp;2026, fetched fresh from the Chess.com API on every page load.</p>
             <div class="hero-actions">
                 <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
                 <a class="profile-link" href="https://www.chess.com/member/jaybirdddd1" target="_blank" rel="noopener noreferrer">Open Chess.com profile</a>
@@ -586,6 +586,9 @@
     (function () {
         const USERNAME = 'jaybirdddd1';
         const API = 'https://api.chess.com/pub';
+        // Inclusive start: Aug 1, 2026 00:00:00 UTC
+        const START_TS = Math.floor(Date.UTC(2026, 7, 1) / 1000);
+        const START_ARCHIVE = '2026/08';
         const root = document.getElementById('chess-root');
 
         function escapeHtml(str) {
@@ -597,9 +600,23 @@
         }
 
         async function fetchJson(url) {
-            const res = await fetch(url, { headers: { Accept: 'application/json' } });
+            const res = await fetch(url, {
+                cache: 'no-store',
+                headers: { Accept: 'application/json' }
+            });
             if (!res.ok) throw new Error('Request failed (' + res.status + ') for ' + url);
             return res.json();
+        }
+
+        function archiveMonthKey(url) {
+            const parts = url.split('/');
+            const year = parts[parts.length - 2];
+            const month = parts[parts.length - 1];
+            return year + '/' + month;
+        }
+
+        function isArchiveInRange(url) {
+            return archiveMonthKey(url) >= START_ARCHIVE;
         }
 
         function parseOpening(ecoUrl) {
@@ -665,7 +682,9 @@
         function normalizeGames(rawGames) {
             const rapid = rawGames
                 .filter(function (g) {
-                    return g.time_class === 'rapid' && g.rules === 'chess';
+                    return g.time_class === 'rapid'
+                        && g.rules === 'chess'
+                        && g.end_time >= START_TS;
                 })
                 .sort(function (a, b) { return a.end_time - b.end_time; });
 
@@ -702,10 +721,15 @@
 
         function renderDashboard(profile, stats, games) {
             const rapid = stats.chess_rapid || {};
-            const record = rapid.record || { win: 0, loss: 0, draw: 0 };
+            const record = { win: 0, loss: 0, draw: 0 };
+            let peak = 0;
+            games.forEach(function (g) {
+                record[g.outcome] += 1;
+                if (g.ratingAfter > peak) peak = g.ratingAfter;
+            });
             const current = (rapid.last && rapid.last.rating) || (games.length ? games[games.length - 1].ratingAfter : '—');
-            const peak = (rapid.best && rapid.best.rating) || current;
-            const total = (record.win || 0) + (record.loss || 0) + (record.draw || 0);
+            if (!peak) peak = typeof current === 'number' ? current : 0;
+            const total = record.win + record.loss + record.draw;
             const winRate = total ? Math.round((record.win / total) * 100) : 0;
 
             const gamesDesc = games.slice().reverse();
@@ -747,29 +771,25 @@
                         ? streak.count + ' D streak'
                         : '—';
 
-            const joined = profile.joined
-                ? formatDate(profile.joined)
-                : '—';
-
             root.innerHTML = [
                 '<section class="chess-panel" aria-labelledby="rating-heading">',
                 '  <div class="board-check" aria-hidden="true"></div>',
                 '  <div class="panel-head">',
                 '    <h2 id="rating-heading">Rapid rating</h2>',
-                '    <span class="panel-note">Live from Chess.com · ' + escapeHtml(String(games.length)) + ' rated rapid games</span>',
+                '    <span class="panel-note">Live on refresh · since Aug 1, 2026 · ' + escapeHtml(String(games.length)) + ' games</span>',
                 '  </div>',
                 '  <div class="rating-band">',
                 '    <div>',
                 '      <p class="chess-elo-hero" id="current-elo">' + escapeHtml(String(current)) + '</p>',
-                '      <p class="elo-caption">Peak <strong>' + escapeHtml(String(peak)) + '</strong> · Member since ' + escapeHtml(joined) + '</p>',
+                '      <p class="elo-caption">Peak since Aug 1 <strong>' + escapeHtml(String(peak)) + '</strong> · ' + escapeHtml(profile.league || '—') + ' league</p>',
                 '    </div>',
                 '    <div class="stat-grid" role="list">',
-                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Wins</span><span class="chess-stat-value is-win">' + escapeHtml(String(record.win || 0)) + '</span></div>',
-                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Losses</span><span class="chess-stat-value is-loss">' + escapeHtml(String(record.loss || 0)) + '</span></div>',
-                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Draws</span><span class="chess-stat-value is-draw">' + escapeHtml(String(record.draw || 0)) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Wins</span><span class="chess-stat-value is-win">' + escapeHtml(String(record.win)) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Losses</span><span class="chess-stat-value is-loss">' + escapeHtml(String(record.loss)) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Draws</span><span class="chess-stat-value is-draw">' + escapeHtml(String(record.draw)) + '</span></div>',
                 '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Win rate</span><span class="chess-stat-value">' + escapeHtml(String(winRate)) + '%</span></div>',
                 '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Form</span><span class="chess-stat-value">' + escapeHtml(streakLabel) + '</span></div>',
-                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">League</span><span class="chess-stat-value">' + escapeHtml(profile.league || '—') + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Games</span><span class="chess-stat-value">' + escapeHtml(String(total)) + '</span></div>',
                 '    </div>',
                 '  </div>',
                 '</section>',
@@ -1030,7 +1050,7 @@
                     fetchJson(API + '/player/' + USERNAME + '/games/archives')
                 ]);
 
-                const archives = archivesPayload.archives || [];
+                const archives = (archivesPayload.archives || []).filter(isArchiveInRange);
                 const months = await Promise.all(archives.map(function (url) {
                     return fetchJson(url).catch(function () { return { games: [] }; });
                 }));
@@ -1044,7 +1064,7 @@
 
                 const rapidGames = normalizeGames(allGames);
                 if (!rapidGames.length) {
-                    root.innerHTML = '<section class="chess-panel"><p class="status-banner">No rapid games found for ' + escapeHtml(USERNAME) + ' yet.</p></section>';
+                    root.innerHTML = '<section class="chess-panel"><p class="status-banner">No rapid games since Aug 1, 2026 for ' + escapeHtml(USERNAME) + ' yet.</p></section>';
                     return;
                 }
 
