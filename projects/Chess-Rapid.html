@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Chess Rapid | Jack Buhr</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        .chess-page {
+            --chess-ink: oklch(0.94 0.015 95);
+            --chess-muted: oklch(0.78 0.03 95);
+            --chess-faint: oklch(0.62 0.03 95);
+            --chess-panel: oklch(0.18 0.02 95 / 0.88);
+            --chess-line: oklch(0.38 0.035 95);
+            --chess-wood: oklch(0.72 0.09 75);
+            --chess-leaf: oklch(0.74 0.13 145);
+            --chess-win: oklch(0.78 0.14 145);
+            --chess-loss: oklch(0.72 0.15 25);
+            --chess-draw: oklch(0.72 0.06 85);
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Source Sans 3', sans-serif;
+            color: var(--chess-ink);
+        }
+
+        .chess-page h1,
+        .chess-page h2,
+        .chess-page h3,
+        .chess-stat-value,
+        .chess-elo-hero {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .chess-page .hero {
+            max-width: 1100px;
+            margin: 0 auto clamp(1.5rem, 4vw, 2.5rem);
+            text-align: left;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: chessReveal 0.7s var(--ease-out-expo) 0.05s forwards;
+        }
+
+        .case-kicker {
+            color: var(--chess-wood);
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .case-title {
+            font-size: clamp(2.8rem, 8vw, 5.4rem);
+            line-height: 0.92;
+            margin: 0.45rem 0 0.85rem;
+            color: var(--chess-ink);
+        }
+
+        .case-deck {
+            max-width: 62ch;
+            color: var(--chess-muted);
+            font-size: clamp(1.05rem, 2vw, 1.22rem);
+            line-height: 1.65;
+            margin: 0 0 1.15rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-sm) var(--space-md);
+        }
+
+        .chess-page .deep-dive-btn {
+            background-color: oklch(0.32 0.05 95);
+            color: var(--chess-ink);
+        }
+
+        .chess-page .deep-dive-btn:hover {
+            background-color: oklch(0.4 0.06 95);
+        }
+
+        .profile-link {
+            color: var(--chess-leaf);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid oklch(0.55 0.1 145 / 0.5);
+            padding-bottom: 1px;
+        }
+
+        .profile-link:hover {
+            color: var(--chess-ink);
+            border-bottom-color: var(--chess-ink);
+        }
+
+        .chess-shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            gap: var(--space-lg);
+            padding-bottom: clamp(2rem, 6vw, 4rem);
+        }
+
+        .chess-panel {
+            background:
+                radial-gradient(ellipse 80% 60% at 0% 0%, oklch(0.42 0.08 145 / 0.14), transparent 55%),
+                radial-gradient(ellipse 50% 40% at 100% 100%, oklch(0.45 0.07 75 / 0.12), transparent 50%),
+                var(--chess-panel);
+            border: 1px solid var(--chess-line);
+            border-radius: 8px;
+            padding: clamp(1.1rem, 2.5vw, 1.75rem);
+            opacity: 0;
+            transform: translateY(16px);
+            animation: chessReveal 0.75s var(--ease-out-expo) forwards;
+        }
+
+        .chess-panel:nth-child(1) { animation-delay: 0.12s; }
+        .chess-panel:nth-child(2) { animation-delay: 0.2s; }
+        .chess-panel:nth-child(3) { animation-delay: 0.28s; }
+        .chess-panel:nth-child(4) { animation-delay: 0.36s; }
+
+        .panel-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: var(--space-sm) var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-head h2 {
+            margin: 0;
+            font-size: clamp(1.55rem, 3vw, 2rem);
+            line-height: 1;
+            color: var(--chess-ink);
+        }
+
+        .panel-note {
+            color: var(--chess-faint);
+            font-size: 0.85rem;
+        }
+
+        .rating-band {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+            gap: var(--space-lg);
+            align-items: end;
+        }
+
+        .chess-elo-hero {
+            font-size: clamp(4.5rem, 12vw, 7rem);
+            line-height: 0.85;
+            color: var(--chess-ink);
+            margin: 0;
+        }
+
+        .elo-caption {
+            margin: 0.35rem 0 0;
+            color: var(--chess-muted);
+            font-size: 0.95rem;
+        }
+
+        .elo-caption strong {
+            color: var(--chess-wood);
+            font-weight: 600;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-sm) var(--space-md);
+        }
+
+        .chess-stat {
+            min-width: 0;
+        }
+
+        .chess-stat-label {
+            display: block;
+            color: var(--chess-faint);
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+        }
+
+        .chess-stat-value {
+            font-size: clamp(1.55rem, 3vw, 2.1rem);
+            line-height: 1;
+            color: var(--chess-ink);
+        }
+
+        .chess-stat-value.is-win { color: var(--chess-win); }
+        .chess-stat-value.is-loss { color: var(--chess-loss); }
+        .chess-stat-value.is-draw { color: var(--chess-draw); }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: var(--space-md);
+        }
+
+        .insight {
+            min-width: 0;
+        }
+
+        .insight-label {
+            display: block;
+            color: var(--chess-faint);
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .insight-value {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+            line-height: 1.05;
+            color: var(--chess-ink);
+        }
+
+        .insight-sub {
+            display: block;
+            margin-top: 0.2rem;
+            color: var(--chess-muted);
+            font-size: 0.88rem;
+            line-height: 1.35;
+        }
+
+        .chart-wrap {
+            position: relative;
+            width: 100%;
+            height: clamp(220px, 32vw, 320px);
+        }
+
+        .chart-wrap canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -120%);
+            background: oklch(0.16 0.02 95 / 0.95);
+            border: 1px solid var(--chess-line);
+            border-radius: 6px;
+            padding: 0.4rem 0.65rem;
+            font-size: 0.82rem;
+            color: var(--chess-ink);
+            white-space: nowrap;
+            transition: opacity 0.15s ease;
+            z-index: 2;
+        }
+
+        .chart-tooltip.is-on {
+            opacity: 1;
+        }
+
+        .dash-split {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+            gap: var(--space-lg);
+            align-items: stretch;
+        }
+
+        .games-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: min(520px, 62vh);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: oklch(0.45 0.05 95) transparent;
+        }
+
+        .games-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .games-list::-webkit-scrollbar-thumb {
+            background: oklch(0.45 0.05 95);
+            border-radius: 999px;
+        }
+
+        .game-row {
+            display: grid;
+            grid-template-columns: 3.2rem minmax(0, 1fr) auto;
+            gap: 0.65rem 0.85rem;
+            align-items: center;
+            padding: 0.7rem 0.35rem;
+            border-bottom: 1px solid oklch(0.3 0.025 95 / 0.85);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.2s var(--ease-out-expo);
+            min-height: 44px;
+        }
+
+        .game-row:last-child {
+            border-bottom: none;
+        }
+
+        @media (hover: hover) {
+            .game-row:hover {
+                background: oklch(0.24 0.03 95 / 0.55);
+            }
+        }
+
+        .game-row:focus-visible {
+            outline: 2px solid var(--chess-leaf);
+            outline-offset: 2px;
+        }
+
+        .result-tag {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.04em;
+            text-align: center;
+            border-radius: 4px;
+            padding: 0.28rem 0.2rem;
+        }
+
+        .result-tag.win {
+            color: var(--chess-win);
+            background: oklch(0.35 0.07 145 / 0.35);
+        }
+
+        .result-tag.loss {
+            color: var(--chess-loss);
+            background: oklch(0.35 0.08 25 / 0.35);
+        }
+
+        .result-tag.draw {
+            color: var(--chess-draw);
+            background: oklch(0.35 0.04 85 / 0.35);
+        }
+
+        .game-main {
+            min-width: 0;
+        }
+
+        .game-opponent {
+            display: block;
+            font-weight: 600;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-meta {
+            display: block;
+            color: var(--chess-faint);
+            font-size: 0.82rem;
+            margin-top: 0.15rem;
+        }
+
+        .game-elo {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .elo-delta {
+            display: block;
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .elo-delta.up { color: var(--chess-win); }
+        .elo-delta.down { color: var(--chess-loss); }
+        .elo-delta.flat { color: var(--chess-faint); }
+
+        .elo-after {
+            display: block;
+            color: var(--chess-muted);
+            font-size: 0.8rem;
+            margin-top: 0.15rem;
+        }
+
+        .opening-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 0.55rem;
+        }
+
+        .opening-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: var(--space-sm);
+            align-items: baseline;
+            font-size: 0.95rem;
+        }
+
+        .opening-name {
+            color: var(--chess-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .opening-count {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-weight: 700;
+            color: var(--chess-ink);
+            font-size: 1.15rem;
+        }
+
+        .status-banner {
+            color: var(--chess-muted);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .status-banner.is-error {
+            color: var(--chess-loss);
+        }
+
+        .board-check {
+            position: absolute;
+            inset: 0;
+            opacity: 0.035;
+            pointer-events: none;
+            background-image:
+                linear-gradient(45deg, oklch(0.9 0.02 95) 25%, transparent 25%),
+                linear-gradient(-45deg, oklch(0.9 0.02 95) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, oklch(0.9 0.02 95) 75%),
+                linear-gradient(-45deg, transparent 75%, oklch(0.9 0.02 95) 75%);
+            background-size: 28px 28px;
+            background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+            border-radius: inherit;
+        }
+
+        .chess-panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chess-panel > *:not(.board-check) {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes chessReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .rating-band,
+            .dash-split {
+                grid-template-columns: 1fr;
+            }
+
+            .insight-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .games-list {
+                max-height: min(420px, 55vh);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: var(--space-md);
+            }
+
+            .stat-grid .chess-stat:last-child {
+                grid-column: 1 / -1;
+            }
+
+            .insight-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-md) var(--space-sm);
+            }
+
+            .game-row {
+                grid-template-columns: 2.8rem minmax(0, 1fr) auto;
+                gap: 0.5rem 0.65rem;
+                padding: 0.75rem 0.15rem;
+            }
+
+            .chess-elo-hero {
+                font-size: clamp(3.8rem, 22vw, 5.5rem);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .chess-page .hero,
+            .chess-panel {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html" class="active">Projects</a></li>
+                <li><a href="../skills.html">Skills</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="content-wrapper" class="chess-page">
+        <section class="hero">
+            <div class="case-kicker">Chess.com · Rapid</div>
+            <h1 class="case-title">Chess Rapid</h1>
+            <p class="case-deck">Live progress board for <strong>jaybirdddd1</strong> — rapid rating, form, and every rated game pulled straight from the Chess.com Published Data API.</p>
+            <div class="hero-actions">
+                <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
+                <a class="profile-link" href="https://www.chess.com/member/jaybirdddd1" target="_blank" rel="noopener noreferrer">Open Chess.com profile</a>
+            </div>
+        </section>
+
+        <div class="chess-shell" id="chess-root" aria-live="polite">
+            <section class="chess-panel" aria-labelledby="status-heading">
+                <div class="board-check" aria-hidden="true"></div>
+                <h2 id="status-heading" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Status</h2>
+                <p class="status-banner" id="chess-status">Loading rapid games from Chess.com…</p>
+            </section>
+        </div>
+    </main>
+
+    <footer id="site-footer">
+        <div class="footer-inner">
+            <div class="footer-field">
+                <span class="footer-label">seed</span>
+                <span id="footer-seed-val" class="footer-mono">—</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-field">
+                <span id="footer-stars-count" class="footer-num">—</span>
+                <span class="footer-label">stars</span>
+            </div>
+            <div class="footer-field">
+                <span id="footer-nodes-count" class="footer-num">—</span>
+                <span class="footer-label">nodes</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
+            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                new sky
+            </button>
+        </div>
+    </footer>
+
+    <script>
+    (function () {
+        const USERNAME = 'jaybirdddd1';
+        const API = 'https://api.chess.com/pub';
+        const root = document.getElementById('chess-root');
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        async function fetchJson(url) {
+            const res = await fetch(url, { headers: { Accept: 'application/json' } });
+            if (!res.ok) throw new Error('Request failed (' + res.status + ') for ' + url);
+            return res.json();
+        }
+
+        function parseOpening(ecoUrl) {
+            if (!ecoUrl) return 'Unknown';
+            const slug = ecoUrl.split('/').pop() || '';
+            const cleaned = slug
+                .replace(/^[A-E]\d{2}-?/, '')
+                .replace(/-/g, ' ')
+                .trim();
+            if (!cleaned) return slug || 'Unknown';
+            const short = cleaned.split(/\s+/).slice(0, 4).join(' ');
+            return short.length > 36 ? short.slice(0, 34) + '…' : short;
+        }
+
+        function resultBucket(myResult) {
+            if (myResult === 'win') return 'win';
+            if (myResult === 'agreed' || myResult === 'repetition' || myResult === 'stalemate' ||
+                myResult === 'insufficient' || myResult === 'timevsinsufficient' || myResult === '50move') {
+                return 'draw';
+            }
+            return 'loss';
+        }
+
+        function formatDelta(n) {
+            if (n == null || Number.isNaN(n)) return { text: '—', cls: 'flat' };
+            if (n > 0) return { text: '+' + n, cls: 'up' };
+            if (n < 0) return { text: String(n), cls: 'down' };
+            return { text: '0', cls: 'flat' };
+        }
+
+        function formatDate(ts) {
+            try {
+                return new Intl.DateTimeFormat(undefined, {
+                    month: 'short', day: 'numeric', year: 'numeric'
+                }).format(new Date(ts * 1000));
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function formatTimeControl(tc) {
+            if (!tc) return 'Rapid';
+            if (tc.includes('+')) {
+                const [base, inc] = tc.split('+').map(Number);
+                return Math.round(base / 60) + '|' + inc;
+            }
+            const secs = Number(tc);
+            if (!Number.isNaN(secs)) return Math.round(secs / 60) + ' min';
+            return tc;
+        }
+
+        function computeStreak(gamesDesc) {
+            if (!gamesDesc.length) return { type: 'none', count: 0 };
+            const first = gamesDesc[0].outcome;
+            let count = 0;
+            for (const g of gamesDesc) {
+                if (g.outcome !== first) break;
+                count += 1;
+            }
+            return { type: first, count: count };
+        }
+
+        function normalizeGames(rawGames) {
+            const rapid = rawGames
+                .filter(function (g) {
+                    return g.time_class === 'rapid' && g.rules === 'chess';
+                })
+                .sort(function (a, b) { return a.end_time - b.end_time; });
+
+            let prevRating = null;
+            return rapid.map(function (g) {
+                const isWhite = (g.white.username || '').toLowerCase() === USERNAME;
+                const me = isWhite ? g.white : g.black;
+                const opp = isWhite ? g.black : g.white;
+                const ratingAfter = me.rating;
+                const delta = prevRating == null ? null : ratingAfter - prevRating;
+                prevRating = ratingAfter;
+                const outcome = resultBucket(me.result);
+                const accuracy = g.accuracies
+                    ? (isWhite ? g.accuracies.white : g.accuracies.black)
+                    : null;
+
+                return {
+                    url: g.url,
+                    endTime: g.end_time,
+                    rated: g.rated !== false,
+                    color: isWhite ? 'White' : 'Black',
+                    opponent: opp.username,
+                    opponentRating: opp.rating,
+                    ratingAfter: ratingAfter,
+                    delta: delta,
+                    outcome: outcome,
+                    resultCode: me.result,
+                    timeControl: formatTimeControl(g.time_control),
+                    opening: parseOpening(g.eco),
+                    accuracy: accuracy
+                };
+            });
+        }
+
+        function renderDashboard(profile, stats, games) {
+            const rapid = stats.chess_rapid || {};
+            const record = rapid.record || { win: 0, loss: 0, draw: 0 };
+            const current = (rapid.last && rapid.last.rating) || (games.length ? games[games.length - 1].ratingAfter : '—');
+            const peak = (rapid.best && rapid.best.rating) || current;
+            const total = (record.win || 0) + (record.loss || 0) + (record.draw || 0);
+            const winRate = total ? Math.round((record.win / total) * 100) : 0;
+
+            const gamesDesc = games.slice().reverse();
+            const streak = computeStreak(gamesDesc);
+
+            let whiteW = 0, whiteN = 0, blackW = 0, blackN = 0;
+            let accSum = 0, accN = 0;
+            const openings = Object.create(null);
+            const methods = Object.create(null);
+
+            games.forEach(function (g) {
+                if (g.color === 'White') {
+                    whiteN += 1;
+                    if (g.outcome === 'win') whiteW += 1;
+                } else {
+                    blackN += 1;
+                    if (g.outcome === 'win') blackW += 1;
+                }
+                if (typeof g.accuracy === 'number') {
+                    accSum += g.accuracy;
+                    accN += 1;
+                }
+                openings[g.opening] = (openings[g.opening] || 0) + 1;
+                if (g.outcome === 'win') {
+                    methods[g.resultCode] = (methods[g.resultCode] || 0) + 1;
+                }
+            });
+
+            const topOpenings = Object.keys(openings)
+                .map(function (k) { return { name: k, count: openings[k] }; })
+                .sort(function (a, b) { return b.count - a.count; })
+                .slice(0, 5);
+
+            const streakLabel = streak.type === 'win'
+                ? streak.count + 'W streak'
+                : streak.type === 'loss'
+                    ? streak.count + 'L streak'
+                    : streak.type === 'draw'
+                        ? streak.count + ' D streak'
+                        : '—';
+
+            const joined = profile.joined
+                ? formatDate(profile.joined)
+                : '—';
+
+            root.innerHTML = [
+                '<section class="chess-panel" aria-labelledby="rating-heading">',
+                '  <div class="board-check" aria-hidden="true"></div>',
+                '  <div class="panel-head">',
+                '    <h2 id="rating-heading">Rapid rating</h2>',
+                '    <span class="panel-note">Live from Chess.com · ' + escapeHtml(String(games.length)) + ' rated rapid games</span>',
+                '  </div>',
+                '  <div class="rating-band">',
+                '    <div>',
+                '      <p class="chess-elo-hero" id="current-elo">' + escapeHtml(String(current)) + '</p>',
+                '      <p class="elo-caption">Peak <strong>' + escapeHtml(String(peak)) + '</strong> · Member since ' + escapeHtml(joined) + '</p>',
+                '    </div>',
+                '    <div class="stat-grid" role="list">',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Wins</span><span class="chess-stat-value is-win">' + escapeHtml(String(record.win || 0)) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Losses</span><span class="chess-stat-value is-loss">' + escapeHtml(String(record.loss || 0)) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Draws</span><span class="chess-stat-value is-draw">' + escapeHtml(String(record.draw || 0)) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Win rate</span><span class="chess-stat-value">' + escapeHtml(String(winRate)) + '%</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">Form</span><span class="chess-stat-value">' + escapeHtml(streakLabel) + '</span></div>',
+                '      <div class="chess-stat" role="listitem"><span class="chess-stat-label">League</span><span class="chess-stat-value">' + escapeHtml(profile.league || '—') + '</span></div>',
+                '    </div>',
+                '  </div>',
+                '</section>',
+
+                '<section class="chess-panel" aria-labelledby="chart-heading">',
+                '  <div class="board-check" aria-hidden="true"></div>',
+                '  <div class="panel-head">',
+                '    <h2 id="chart-heading">Elo over time</h2>',
+                '    <span class="panel-note">Post-game rapid rating</span>',
+                '  </div>',
+                '  <div class="chart-wrap">',
+                '    <canvas id="elo-chart" aria-label="Rapid elo over time chart" role="img"></canvas>',
+                '    <div class="chart-tooltip" id="elo-tooltip" hidden></div>',
+                '  </div>',
+                '</section>',
+
+                '<div class="dash-split">',
+                '  <section class="chess-panel" aria-labelledby="games-heading">',
+                '    <div class="board-check" aria-hidden="true"></div>',
+                '    <div class="panel-head">',
+                '      <h2 id="games-heading">Game history</h2>',
+                '      <span class="panel-note">Newest first · scroll</span>',
+                '    </div>',
+                '    <ul class="games-list" id="games-list">',
+                gamesDesc.map(function (g) {
+                    const d = formatDelta(g.delta);
+                    return [
+                        '<li>',
+                        '<a class="game-row" href="' + escapeHtml(g.url) + '" target="_blank" rel="noopener noreferrer">',
+                        '  <span class="result-tag ' + g.outcome + '">' + (g.outcome === 'win' ? 'W' : g.outcome === 'loss' ? 'L' : 'D') + '</span>',
+                        '  <span class="game-main">',
+                        '    <span class="game-opponent">vs ' + escapeHtml(g.opponent) + '</span>',
+                        '    <span class="game-meta">' + escapeHtml(g.color) + ' · ' + escapeHtml(g.timeControl) + ' · ' + escapeHtml(formatDate(g.endTime)) + '</span>',
+                        '  </span>',
+                        '  <span class="game-elo">',
+                        '    <span class="elo-delta ' + d.cls + '">' + escapeHtml(d.text) + '</span>',
+                        '    <span class="elo-after">' + escapeHtml(String(g.ratingAfter)) + '</span>',
+                        '  </span>',
+                        '</a>',
+                        '</li>'
+                    ].join('');
+                }).join(''),
+                '    </ul>',
+                '  </section>',
+
+                '  <div style="display:grid;gap:var(--space-lg);min-width:0;">',
+                '    <section class="chess-panel" aria-labelledby="insights-heading">',
+                '      <div class="board-check" aria-hidden="true"></div>',
+                '      <div class="panel-head"><h2 id="insights-heading">Form notes</h2></div>',
+                '      <div class="insight-grid">',
+                '        <div class="insight"><span class="insight-label">As White</span><span class="insight-value">' + (whiteN ? Math.round((whiteW / whiteN) * 100) : 0) + '%</span><span class="insight-sub">' + whiteW + 'W / ' + whiteN + ' games</span></div>',
+                '        <div class="insight"><span class="insight-label">As Black</span><span class="insight-value">' + (blackN ? Math.round((blackW / blackN) * 100) : 0) + '%</span><span class="insight-sub">' + blackW + 'W / ' + blackN + ' games</span></div>',
+                '        <div class="insight"><span class="insight-label">Avg accuracy</span><span class="insight-value">' + (accN ? (accSum / accN).toFixed(1) : '—') + '</span><span class="insight-sub">' + (accN ? accN + ' analyzed games' : 'No accuracy data yet') + '</span></div>',
+                '        <div class="insight"><span class="insight-label">Most common win</span><span class="insight-value">' + escapeHtml(topWinMethod(methods)) + '</span><span class="insight-sub">Among rated rapid wins</span></div>',
+                '      </div>',
+                '    </section>',
+
+                '    <section class="chess-panel" aria-labelledby="openings-heading">',
+                '      <div class="board-check" aria-hidden="true"></div>',
+                '      <div class="panel-head">',
+                '        <h2 id="openings-heading">Openings</h2>',
+                '        <span class="panel-note">By ECO family</span>',
+                '      </div>',
+                '      <ul class="opening-list">',
+                topOpenings.map(function (o) {
+                    return '<li class="opening-row"><span class="opening-name">' + escapeHtml(o.name) + '</span><span class="opening-count">' + o.count + '</span></li>';
+                }).join('') || '<li class="opening-row"><span class="opening-name">No opening data yet</span></li>',
+                '      </ul>',
+                '    </section>',
+                '  </div>',
+                '</div>'
+            ].join('');
+
+            drawEloChart(games);
+        }
+
+        function topWinMethod(methods) {
+            const labels = {
+                win: 'Game',
+                resigned: 'Resignation',
+                checkmated: 'Checkmate',
+                timeout: 'Timeout',
+                abandoned: 'Abandon',
+                timevsinsufficient: 'Time'
+            };
+            const keys = Object.keys(methods);
+            if (!keys.length) return '—';
+            keys.sort(function (a, b) { return methods[b] - methods[a]; });
+            return labels[keys[0]] || keys[0];
+        }
+
+        function drawEloChart(games) {
+            const canvas = document.getElementById('elo-chart');
+            const tooltip = document.getElementById('elo-tooltip');
+            if (!canvas || !games.length) return;
+
+            const ctx = canvas.getContext('2d');
+            const points = games.map(function (g) {
+                return { x: g.endTime, y: g.ratingAfter, label: formatDate(g.endTime) };
+            });
+
+            let hoverIndex = -1;
+
+            function resize() {
+                const wrap = canvas.parentElement;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const w = wrap.clientWidth;
+                const h = wrap.clientHeight;
+                canvas.width = Math.floor(w * dpr);
+                canvas.height = Math.floor(h * dpr);
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                paint();
+            }
+
+            function paint() {
+                const w = canvas.clientWidth;
+                const h = canvas.clientHeight;
+                const pad = { t: 18, r: 16, b: 28, l: 44 };
+                const plotW = w - pad.l - pad.r;
+                const plotH = h - pad.t - pad.b;
+
+                ctx.clearRect(0, 0, w, h);
+
+                const ys = points.map(function (p) { return p.y; });
+                let minY = Math.min.apply(null, ys);
+                let maxY = Math.max.apply(null, ys);
+                const padY = Math.max(20, Math.round((maxY - minY) * 0.15) || 20);
+                minY = Math.floor((minY - padY) / 10) * 10;
+                maxY = Math.ceil((maxY + padY) / 10) * 10;
+                if (minY === maxY) {
+                    minY -= 50;
+                    maxY += 50;
+                }
+
+                const minX = points[0].x;
+                const maxX = points[points.length - 1].x;
+                const spanX = Math.max(maxX - minX, 1);
+
+                function toX(t) { return pad.l + ((t - minX) / spanX) * plotW; }
+                function toY(v) { return pad.t + (1 - (v - minY) / (maxY - minY)) * plotH; }
+
+                ctx.strokeStyle = 'oklch(0.35 0.03 95)';
+                ctx.lineWidth = 1;
+                ctx.font = '12px "Source Sans 3", sans-serif';
+                ctx.fillStyle = 'oklch(0.62 0.03 95)';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+
+                const steps = 4;
+                for (let i = 0; i <= steps; i++) {
+                    const v = minY + ((maxY - minY) * i) / steps;
+                    const y = toY(v);
+                    ctx.beginPath();
+                    ctx.moveTo(pad.l, y);
+                    ctx.lineTo(w - pad.r, y);
+                    ctx.stroke();
+                    ctx.fillText(String(Math.round(v)), pad.l - 8, y);
+                }
+
+                const gradient = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
+                gradient.addColorStop(0, 'oklch(0.74 0.13 145 / 0.28)');
+                gradient.addColorStop(1, 'oklch(0.74 0.13 145 / 0)');
+
+                ctx.beginPath();
+                points.forEach(function (p, i) {
+                    const x = toX(p.x);
+                    const y = toY(p.y);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.lineTo(toX(points[points.length - 1].x), h - pad.b);
+                ctx.lineTo(toX(points[0].x), h - pad.b);
+                ctx.closePath();
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                ctx.beginPath();
+                points.forEach(function (p, i) {
+                    const x = toX(p.x);
+                    const y = toY(p.y);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = 'oklch(0.74 0.13 145)';
+                ctx.lineWidth = 2.25;
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+
+                points.forEach(function (p, i) {
+                    const x = toX(p.x);
+                    const y = toY(p.y);
+                    const active = i === hoverIndex;
+                    ctx.beginPath();
+                    ctx.arc(x, y, active ? 4.5 : 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = active ? 'oklch(0.94 0.015 95)' : 'oklch(0.74 0.13 145)';
+                    ctx.fill();
+                    if (active) {
+                        ctx.strokeStyle = 'oklch(0.74 0.13 145)';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+
+                canvas._chartMeta = { points: points, toX: toX, toY: toY, pad: pad, plotW: plotW };
+            }
+
+            function onMove(e) {
+                const meta = canvas._chartMeta;
+                if (!meta) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                let best = -1;
+                let bestDist = Infinity;
+                meta.points.forEach(function (p, i) {
+                    const dx = Math.abs(meta.toX(p.x) - x);
+                    if (dx < bestDist) {
+                        bestDist = dx;
+                        best = i;
+                    }
+                });
+                if (bestDist > 36) {
+                    hoverIndex = -1;
+                    tooltip.hidden = true;
+                    tooltip.classList.remove('is-on');
+                    paint();
+                    return;
+                }
+                hoverIndex = best;
+                const p = meta.points[best];
+                tooltip.hidden = false;
+                tooltip.classList.add('is-on');
+                tooltip.textContent = p.label + ' · ' + p.y;
+                tooltip.style.left = meta.toX(p.x) + 'px';
+                tooltip.style.top = meta.toY(p.y) + 'px';
+                paint();
+            }
+
+            function onLeave() {
+                hoverIndex = -1;
+                tooltip.hidden = true;
+                tooltip.classList.remove('is-on');
+                paint();
+            }
+
+            resize();
+            window.addEventListener('resize', resize);
+            canvas.addEventListener('pointermove', onMove);
+            canvas.addEventListener('pointerleave', onLeave);
+        }
+
+        async function loadAll() {
+            try {
+                const [profile, stats, archivesPayload] = await Promise.all([
+                    fetchJson(API + '/player/' + USERNAME),
+                    fetchJson(API + '/player/' + USERNAME + '/stats'),
+                    fetchJson(API + '/player/' + USERNAME + '/games/archives')
+                ]);
+
+                const archives = archivesPayload.archives || [];
+                const months = await Promise.all(archives.map(function (url) {
+                    return fetchJson(url).catch(function () { return { games: [] }; });
+                }));
+
+                const allGames = [];
+                months.forEach(function (m) {
+                    if (m.games && m.games.length) {
+                        allGames.push.apply(allGames, m.games);
+                    }
+                });
+
+                const rapidGames = normalizeGames(allGames);
+                if (!rapidGames.length) {
+                    root.innerHTML = '<section class="chess-panel"><p class="status-banner">No rapid games found for ' + escapeHtml(USERNAME) + ' yet.</p></section>';
+                    return;
+                }
+
+                renderDashboard(profile, stats, rapidGames);
+            } catch (err) {
+                console.error(err);
+                root.innerHTML = '<section class="chess-panel"><p class="status-banner is-error">Couldn’t load Chess.com data. The API may be briefly unavailable — refresh to try again.</p></section>';
+            }
+        }
+
+        loadAll();
+    })();
+    </script>
+    <script src="../script.js"></script>
+</body>
+</html>
