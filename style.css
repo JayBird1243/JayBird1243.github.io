@@ -1817,3 +1817,997 @@ img, svg, video, canvas {
         transform: none;
     }
 }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   Sky overview: footer help control, modal, rare-star toast.
+   Appended last so it can override the base footer rules above.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Fade the field in with one class flip on the container rather than one
+   timer per star. Per-star delays are set inline. */
+#stars-container.stars-in .star {
+    opacity: 1;
+}
+
+/* ── Footer: help button ──────────────────────────────────────── */
+.footer-help-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    flex-shrink: 0;
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid oklch(36% 0.1 305 / 0.55);
+    border-radius: 50%;
+    color: oklch(62% 0.1 305);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.footer-help-btn:hover {
+    background: oklch(38% 0.12 305 / 0.16);
+    border-color: oklch(58% 0.18 305 / 0.75);
+    color: oklch(84% 0.14 305);
+}
+
+.footer-help-btn:active {
+    transform: scale(0.92);
+}
+
+/* The help button now claims the free space, so the reroll button sits
+   directly beside it instead of fighting it for the same auto margin. */
+.footer-reroll-btn {
+    margin-left: 0.4rem;
+}
+
+.footer-size-bars,
+#footer-seed-val {
+    cursor: pointer;
+}
+
+/* A rare star in the histogram gets a lit column. */
+.footer-bar.is-rare {
+    box-shadow: 0 0 7px 1px currentColor;
+    animation: sky-bar-pulse 2.4s ease-in-out infinite;
+}
+
+.footer-bar[data-size="8"].is-rare { color: oklch(60% 0.22 300); }
+.footer-bar[data-size="9"].is-rare { color: oklch(58% 0.19 250); }
+.footer-bar[data-size="10"].is-rare { color: oklch(46% 0.23 305); }
+
+@keyframes sky-bar-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.6); }
+}
+
+/* ── Modal shell ──────────────────────────────────────────────── */
+.sky-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 1.25rem;
+}
+
+.sky-modal[hidden] {
+    display: none;
+}
+
+.sky-modal__scrim {
+    position: absolute;
+    inset: 0;
+    background: oklch(6% 0.02 290 / 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: sky-fade 0.22s ease-out;
+}
+
+.sky-modal__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(920px, 100%);
+    max-height: 94vh;
+    max-height: 94dvh;
+    background: oklch(13% 0.014 290 / 0.97);
+    border: 1px solid oklch(34% 0.06 305 / 0.55);
+    border-radius: 14px;
+    box-shadow: 0 24px 70px oklch(4% 0.02 290 / 0.7);
+    overflow: hidden;
+    animation: sky-rise 0.26s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes sky-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes sky-rise {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+}
+
+.sky-modal__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.25rem 0.85rem;
+    border-bottom: 1px solid oklch(28% 0.03 290 / 0.6);
+}
+
+.sky-modal__head h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.01em;
+}
+
+.sky-modal__kicker {
+    margin: 0.2rem 0 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: oklch(52% 0.06 305);
+}
+
+.sky-modal__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid oklch(32% 0.04 290 / 0.6);
+    border-radius: 8px;
+    color: oklch(66% 0.03 290);
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.sky-modal__close:hover {
+    background: oklch(26% 0.04 300 / 0.5);
+    color: white;
+}
+
+.sky-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.55rem 1.25rem 0;
+    border-bottom: 1px solid oklch(28% 0.03 290 / 0.6);
+}
+
+.sky-tab {
+    padding: 0.45rem 0.85rem 0.6rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: oklch(58% 0.03 290);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color 0.18s, border-color 0.18s;
+}
+
+.sky-tab:hover {
+    color: oklch(80% 0.05 300);
+}
+
+.sky-tab.is-active {
+    color: oklch(84% 0.14 305);
+    border-bottom-color: oklch(62% 0.19 305);
+}
+
+.sky-modal__body {
+    padding: 1.1rem 1.25rem 1.5rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+body.sky-modal-open {
+    overflow: hidden;
+}
+
+/* ── Seed card ────────────────────────────────────────────────── */
+.sky-seedcard {
+    padding: 0.95rem 1.05rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, oklch(19% 0.05 305 / 0.5), oklch(15% 0.02 290 / 0.5));
+    border: 1px solid oklch(32% 0.07 305 / 0.5);
+    border-radius: 11px;
+}
+
+.sky-seedcard-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: oklch(52% 0.07 305);
+    margin-bottom: 0.4rem;
+}
+
+.sky-seed-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.72rem, 2.4vw, 0.95rem);
+    color: oklch(90% 0.03 290);
+    word-break: break-all;
+}
+
+.sky-seed-group {
+    padding: 0.16rem 0.4rem;
+    background: oklch(10% 0.015 290 / 0.75);
+    border: 1px solid oklch(28% 0.04 300 / 0.5);
+    border-radius: 5px;
+    letter-spacing: 0.06em;
+}
+
+.sky-seedcard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.sky-btn {
+    padding: 0.36rem 0.7rem;
+    background: transparent;
+    border: 1px solid oklch(34% 0.06 305 / 0.6);
+    border-radius: 6px;
+    color: oklch(72% 0.05 300);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.1s;
+}
+
+.sky-btn:hover {
+    background: oklch(30% 0.08 305 / 0.28);
+    border-color: oklch(56% 0.16 305 / 0.7);
+    color: white;
+}
+
+.sky-btn:active {
+    transform: scale(0.96);
+}
+
+.sky-btn--accent {
+    border-color: oklch(52% 0.17 305 / 0.7);
+    color: oklch(82% 0.14 305);
+}
+
+.sky-seed-form {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+}
+
+.sky-seed-form[hidden] {
+    display: none;
+}
+
+.sky-seed-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.36rem 0.55rem;
+    background: oklch(9% 0.012 290);
+    border: 1px solid oklch(34% 0.06 305 / 0.6);
+    border-radius: 6px;
+    color: white;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+}
+
+.sky-seed-input:focus {
+    outline: none;
+    border-color: oklch(60% 0.18 305);
+}
+
+.sky-seed-input.is-invalid {
+    border-color: oklch(60% 0.21 27);
+    animation: sky-shake 0.32s ease;
+}
+
+@keyframes sky-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.sky-seedcard-note {
+    margin: 0.65rem 0 0;
+    font-size: 0.74rem;
+    line-height: 1.5;
+    color: oklch(58% 0.02 290);
+}
+
+/* ── Cards and layout ─────────────────────────────────────────── */
+.sky-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+}
+
+.sky-card {
+    padding: 0.9rem 1rem 1rem;
+    background: oklch(16% 0.012 290 / 0.7);
+    border: 1px solid oklch(28% 0.03 290 / 0.6);
+    border-radius: 11px;
+    min-width: 0;
+}
+
+.sky-card--wide {
+    margin-bottom: 0.85rem;
+}
+
+.sky-card--quiet {
+    background: oklch(14% 0.008 290 / 0.55);
+}
+
+.sky-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.sky-card-head h3 {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: oklch(72% 0.04 300);
+}
+
+.sky-pill {
+    padding: 0.15rem 0.5rem;
+    background: oklch(30% 0.11 305 / 0.3);
+    border: 1px solid oklch(48% 0.14 305 / 0.45);
+    border-radius: 20px;
+    color: oklch(84% 0.13 305);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    white-space: nowrap;
+}
+
+.sky-pill--quiet {
+    background: oklch(24% 0.02 290 / 0.5);
+    border-color: oklch(32% 0.03 290 / 0.6);
+    color: oklch(64% 0.02 290);
+}
+
+.sky-bignum {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1.7rem, 5vw, 2.3rem);
+    font-weight: 700;
+    line-height: 1.05;
+    color: white;
+    letter-spacing: -0.02em;
+}
+
+.sky-sub {
+    margin: 0.3rem 0 0.6rem;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    color: oklch(64% 0.02 290);
+}
+
+.sky-note {
+    margin: 0.55rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    color: oklch(56% 0.02 290);
+}
+
+.sky-dim {
+    color: oklch(54% 0.02 290);
+}
+
+.sky-mono {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.94em;
+    color: oklch(78% 0.06 300);
+}
+
+/* ── Charts ───────────────────────────────────────────────────── */
+.sky-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.sky-axis {
+    stroke: oklch(38% 0.02 290 / 0.8);
+    stroke-width: 1;
+}
+
+.sky-axis-text {
+    fill: oklch(48% 0.02 290);
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+}
+
+.sky-curve {
+    fill: none;
+    stroke: oklch(72% 0.13 305);
+    stroke-width: 1.6;
+}
+
+.sky-marker {
+    stroke: oklch(88% 0.16 95);
+    stroke-width: 1.4;
+    stroke-dasharray: 3 2.5;
+}
+
+.sky-marker-dot {
+    fill: oklch(90% 0.17 95);
+    stroke: oklch(14% 0.01 290);
+    stroke-width: 1.4;
+}
+
+.sky-marker-text {
+    fill: oklch(90% 0.16 95);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.sky-uniform-bg {
+    fill: oklch(26% 0.03 300 / 0.55);
+    stroke: oklch(36% 0.04 300 / 0.7);
+    stroke-width: 1;
+    rx: 3;
+}
+
+.sky-uniform-fill {
+    fill: oklch(56% 0.15 305 / 0.4);
+}
+
+/* ── Tables ───────────────────────────────────────────────────── */
+.sky-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.74rem;
+}
+
+.sky-table th,
+.sky-table td {
+    padding: 0.34rem 0.4rem;
+    text-align: left;
+    border-bottom: 1px solid oklch(26% 0.02 290 / 0.5);
+}
+
+.sky-table thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: oklch(48% 0.02 290);
+    border-bottom-color: oklch(34% 0.03 290 / 0.7);
+    white-space: nowrap;
+}
+
+.sky-table tbody th {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.sky-table tbody tr.is-empty {
+    opacity: 0.42;
+}
+
+.sky-table tbody tr.is-rare {
+    background: oklch(30% 0.1 305 / 0.16);
+}
+
+.sky-table tbody tr.is-rare th,
+.sky-table tbody tr.is-rare td {
+    border-bottom-color: oklch(46% 0.13 305 / 0.5);
+}
+
+.sky-size-num {
+    font-family: 'Space Mono', monospace;
+    color: oklch(86% 0.03 290);
+    min-width: 3.4ch;
+}
+
+.sky-size-name {
+    font-size: 0.9em;
+    color: oklch(50% 0.03 300);
+}
+
+.sky-num {
+    font-family: 'Space Mono', monospace;
+    text-align: right;
+    white-space: nowrap;
+    color: oklch(82% 0.03 290);
+}
+
+.sky-dot {
+    display: inline-block;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px currentColor;
+}
+
+.sky-bar-cell {
+    width: 36%;
+    min-width: 90px;
+}
+
+.sky-bar-track {
+    position: relative;
+    display: block;
+    height: 7px;
+    background: oklch(24% 0.015 290 / 0.8);
+    border-radius: 4px;
+    overflow: visible;
+}
+
+.sky-bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 4px;
+    opacity: 0.75;
+    transition: width 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sky-bar-expected {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: oklch(88% 0.03 290);
+    opacity: 0.75;
+    border-radius: 1px;
+}
+
+/* ── Rare star callout ────────────────────────────────────────── */
+.sky-rare {
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.85rem;
+    border-radius: 11px;
+    border: 1px solid oklch(28% 0.03 290 / 0.6);
+    background: oklch(15% 0.01 290 / 0.6);
+}
+
+.sky-rare h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.4rem;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: oklch(84% 0.03 290);
+}
+
+.sky-rare p {
+    margin: 0.5rem 0 0;
+    font-size: 0.76rem;
+    line-height: 1.55;
+    color: oklch(62% 0.02 290);
+}
+
+.sky-rare--hit {
+    border-color: oklch(52% 0.17 305 / 0.6);
+    background: linear-gradient(135deg, oklch(24% 0.11 305 / 0.42), oklch(16% 0.03 290 / 0.6));
+    box-shadow: inset 0 0 40px oklch(50% 0.18 305 / 0.14);
+}
+
+.sky-rare--hit h4 {
+    color: white;
+}
+
+.sky-rare-badge {
+    padding: 0.1rem 0.45rem;
+    background: oklch(58% 0.2 305);
+    border-radius: 20px;
+    color: white;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.sky-rare-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.55rem;
+}
+
+.sky-rare-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.6rem;
+    background: oklch(10% 0.015 290 / 0.7);
+    border: 1px solid var(--chip, oklch(50% 0.15 305));
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.66rem;
+    color: oklch(90% 0.03 290);
+}
+
+.sky-rare-chip em {
+    font-style: normal;
+    color: oklch(58% 0.03 300);
+}
+
+/* ── Prose panes ──────────────────────────────────────────────── */
+.sky-prose h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    color: white;
+}
+
+.sky-prose p {
+    margin: 0 0 0.65rem;
+    font-size: 0.81rem;
+    line-height: 1.62;
+    color: oklch(68% 0.02 290);
+}
+
+.sky-prose p:last-child {
+    margin-bottom: 0;
+}
+
+.sky-formula {
+    padding: 0.6rem 0.8rem;
+    background: oklch(10% 0.015 290 / 0.8);
+    border-left: 2px solid oklch(58% 0.18 305);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace !important;
+    font-size: 0.76rem !important;
+    color: oklch(88% 0.05 300) !important;
+    overflow-x: auto;
+}
+
+.sky-table--ladder {
+    margin: 0.75rem 0 0.5rem;
+}
+
+/* ── Definition strip ─────────────────────────────────────────── */
+.sky-defs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.6rem;
+    margin: 0;
+}
+
+.sky-defs dt {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: oklch(48% 0.02 290);
+}
+
+.sky-defs dd {
+    margin: 0.15rem 0 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: oklch(86% 0.03 290);
+}
+
+/* ── Rare star toast ──────────────────────────────────────────── */
+.sky-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 66px;
+    z-index: 350;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: min(440px, calc(100vw - 1.6rem));
+    padding: 0.7rem 0.8rem;
+    background: oklch(13% 0.02 290 / 0.96);
+    border: 1px solid var(--rare, oklch(58% 0.2 305));
+    border-radius: 11px;
+    box-shadow: 0 12px 40px oklch(4% 0.02 290 / 0.65),
+                inset 0 0 32px oklch(50% 0.18 305 / 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    transition: transform 0.34s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.34s ease;
+}
+
+.sky-toast.is-in {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.sky-toast__star {
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--rare, white);
+    box-shadow: 0 0 14px 3px var(--rare, white);
+    animation: sky-star-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes sky-star-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.28); opacity: 1; }
+}
+
+.sky-toast__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.sky-toast__text strong {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: white;
+}
+
+.sky-toast__text span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: oklch(62% 0.03 300);
+}
+
+.sky-toast__cta {
+    flex-shrink: 0;
+    padding: 0.35rem 0.6rem;
+    background: transparent;
+    border: 1px solid oklch(46% 0.13 305 / 0.7);
+    border-radius: 6px;
+    color: oklch(84% 0.13 305);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+}
+
+.sky-toast__cta:hover {
+    background: oklch(38% 0.14 305 / 0.28);
+    color: white;
+}
+
+.sky-toast__close {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: oklch(52% 0.02 290);
+    cursor: pointer;
+}
+
+.sky-toast__close:hover {
+    color: white;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Phone layout
+   ══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    /* Two rows: the full 32 character seed on top, counts and controls
+       below. The seed no longer has to compete with the buttons for width,
+       so it can be shown whole rather than truncated. */
+    .footer-inner {
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 44px;
+        padding: 5px 0.75rem 6px;
+        row-gap: 3px;
+        column-gap: 0.5rem;
+    }
+
+    .footer-inner > .footer-field:first-child {
+        flex-basis: 100%;
+        gap: 0.45rem;
+    }
+
+    /* Labels come back: on two rows there is room to say what each
+       number is. */
+    .footer-field .footer-label {
+        display: inline;
+    }
+
+    .footer-mono {
+        max-width: none;
+        overflow: visible;
+        text-overflow: clip;
+        font-size: clamp(0.48rem, 2.75vw, 0.66rem);
+        letter-spacing: 0.01em;
+        color: oklch(76% 0.04 290);
+    }
+
+    .footer-vr {
+        display: none;
+    }
+
+    .footer-num {
+        font-size: 0.72rem;
+        min-width: 0;
+    }
+
+    .footer-help-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.72rem;
+    }
+
+    .footer-reroll-btn {
+        margin-left: 0.35rem;
+    }
+
+    /* Two rows of footer need more clearance than one. */
+    main {
+        padding-bottom: 82px;
+    }
+
+    .sky-toast {
+        bottom: 78px;
+    }
+
+    /* ── Modal on a phone: a sheet, not a dialog ── */
+    .sky-modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .sky-modal__panel {
+        width: 100%;
+        max-height: 92vh;
+        max-height: 92dvh;
+        border-radius: 14px 14px 0 0;
+        border-bottom: none;
+    }
+
+    @keyframes sky-rise {
+        from { opacity: 0; transform: translateY(28px); }
+        to { opacity: 1; transform: none; }
+    }
+
+    .sky-modal__head,
+    .sky-tabs {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+    }
+
+    .sky-modal__body {
+        padding: 0.9rem 0.9rem 1.6rem;
+    }
+
+    .sky-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sky-seed-grid {
+        gap: 0.35rem;
+    }
+
+    /* Drop the columns that only add precision, keep the ones that tell
+       the story: what it is, how many, and how likely. */
+    .sky-table:not(.sky-table--ladder) thead th:nth-child(4),
+    .sky-table:not(.sky-table--ladder) tbody td:nth-child(4) {
+        display: none;
+    }
+
+    /* The ladder keeps size, odds and the practical "will I ever see one"
+       column. The interval, the sigma edge and the raw percentage are all
+       restatements of the odds. */
+    .sky-table--ladder thead th:nth-child(2),
+    .sky-table--ladder tbody td:nth-child(2),
+    .sky-table--ladder thead th:nth-child(3),
+    .sky-table--ladder tbody td:nth-child(3),
+    .sky-table--ladder thead th:nth-child(4),
+    .sky-table--ladder tbody td:nth-child(4) {
+        display: none;
+    }
+
+    .sky-table {
+        font-size: 0.7rem;
+    }
+
+    .sky-table th,
+    .sky-table td {
+        padding: 0.3rem 0.25rem;
+    }
+
+    .sky-size-name {
+        display: none;
+    }
+
+    .sky-toast {
+        flex-wrap: wrap;
+        row-gap: 0.5rem;
+    }
+
+    .sky-toast__cta {
+        order: 4;
+        width: 100%;
+        padding: 0.42rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-inner {
+        column-gap: 0.4rem;
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    /* The base rule hides the histogram this narrow; the seed row above
+       still carries the identity of the sky. */
+    .footer-mono {
+        font-size: clamp(0.44rem, 2.9vw, 0.6rem);
+    }
+
+    .sky-table--ladder thead th:nth-child(6),
+    .sky-table--ladder tbody td:nth-child(6) {
+        display: none;
+    }
+}
+
+/* Phone held sideways: the sheet would eat the whole screen, so keep it
+   centred and let it scroll instead. */
+@media (orientation: landscape) and (max-height: 540px) {
+    .sky-modal {
+        align-items: center;
+        padding: 2vh 1rem;
+    }
+
+    .sky-modal__panel {
+        max-height: 96vh;
+        max-height: 96dvh;
+        border-radius: 12px;
+    }
+
+    main {
+        padding-bottom: 78px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sky-modal__panel,
+    .sky-modal__scrim,
+    .sky-toast__star,
+    .footer-bar.is-rare {
+        animation: none;
+    }
+
+    .star {
+        transition-delay: 0ms !important;
+    }
+}
