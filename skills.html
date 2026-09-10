@@ -53,6 +53,42 @@
             background: rgba(160, 57, 198, 0.3);
             border-color: var(--primary-color);
         }
+
+        /* Phone: the 300px grid minimum is wider than the column itself, which
+           pushes the cards past the viewport. Collapse to one track and shrink
+           the pills so more of them fit per line. */
+        @media (max-width: 768px) {
+            .skills-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .skill-category-card {
+                padding: 0.9rem;
+                border-radius: 10px;
+            }
+
+            .skill-category-title {
+                font-size: 1rem;
+                gap: 8px;
+                padding-bottom: 0.4rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .skill-category-title svg {
+                width: 18px;
+                height: 18px;
+                flex-shrink: 0;
+            }
+
+            .skill-item {
+                font-size: 0.74rem;
+                padding: 4px 8px;
+                margin: 2px;
+                border-radius: 12px;
+            }
+        }
     </style>
 </head>
 <body>

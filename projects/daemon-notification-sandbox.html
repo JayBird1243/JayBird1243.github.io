@@ -109,6 +109,108 @@
   .rollup-badge{display:none;margin:6px 0 2px;padding:2px 6px;border-radius:4px;font-size:9.5px;letter-spacing:.06em;
     text-transform:uppercase;color:var(--blue);background:rgba(0,191,255,.09);border:1px solid rgba(0,191,255,.25);}
   .scope-horizon .node.type-metric .rollup-badge{display:block;}
+
+  /* =====================================================================
+     PHONE LAYER — every rule below is scoped to a phone-sized viewport.
+     Desktop (>= 769px wide and taller than 540px) is deliberately
+     untouched. This page does not load the site-wide style.css, so the
+     global responsive layer is re-stated here at the same breakpoints.
+     ===================================================================== */
+
+  @media (max-width: 768px){
+
+    /* --- Top bar: the sandbox pill nearly filled the row at 375px. --- */
+    body > .flex.items-center.justify-between{ padding:.55rem .8rem; }
+    body > .flex.items-center.justify-between .pill{ font-size:9px; padding:.2rem .5rem; }
+    body > .flex.items-center.justify-between a{ font-size:.78rem; }
+
+    /* --- Header card: desktop padding/type pushed Auto-Layout onto its
+           own row. Trim so all three actions share one line. --- */
+    main > .glass.p-6{ padding:1rem; border-radius:1rem; gap:.85rem; }
+    main > .glass.p-6 h1{ font-size:1.35rem; line-height:1.1; }
+    main > .glass.p-6 p{ font-size:.8rem; line-height:1.35; }
+    main > .glass.p-6 > .flex.flex-wrap{ width:100%; gap:.4rem; }
+    main > .glass.p-6 .btn-tech{
+      padding:.42rem .4rem; font-size:.62rem; letter-spacing:.04em;
+      flex:1 1 0; min-width:0; white-space:nowrap;
+    }
+
+    /* --- Tighten the gaps between the stacked sections. --- */
+    main > .flex.gap-5{ gap:.85rem; }
+    .mobile-note.glass{ padding:.6rem .8rem; font-size:10.5px; line-height:1.35; border-radius:.9rem; gap:.55rem; }
+    .side-col.glass{ padding:.9rem; border-radius:1rem; }
+
+    /* --- Palette: six full-width rows ate a whole screen of scroll.
+           Reflow them into two compact columns. --- */
+    #palette{ display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
+    .palette-btn{ padding:.45rem .5rem; font-size:11.5px; gap:6px; border-radius:8px; }
+    .palette-swatch{ width:8px; height:8px; }
+    .side-col.glass > .mt-4{ margin-top:.7rem; padding-top:.6rem; font-size:9.5px; }
+
+    /* --- Canvas: 620px of viewport is most of a phone screen. The world
+           is pannable, so a shorter window loses nothing. --- */
+    #viewport{ height:360px !important; border-radius:.9rem; }
+    /* pan/zoom hint + zoom stepper row */
+    .font-tech.text-gray-500.items-center{ font-size:9.5px; line-height:1.25; }
+    #zoom-in, #zoom-out{ width:1.7rem; height:1.7rem; }
+    #zoom-label{ width:2.4rem; font-size:9.5px; }
+    /* Connection-rejected toast had white-space:nowrap and could run past
+       the canvas edge; let it wrap inside the viewport instead. */
+    .reject-toast{ max-width:calc(100% - 16px); white-space:normal; font-size:10px; line-height:1.3; overflow-wrap:anywhere; }
+
+    /* --- Controls column: inline max-height:680px + overflow-y:auto made
+           a nested scroll region, and the Evaluation Trace at the bottom
+           was unreachable/clipped. Let it grow with the page instead. --- */
+    .side-col.flex{ max-height:none !important; overflow-y:visible !important; gap:1.05rem; }
+    /* same reason: no second nested scroller inside the first */
+    #trace-list{ max-height:none; padding-right:0; }
+
+    /* --- Control widgets: phone-scale --- */
+    .side-col.flex h3{ font-size:11px; margin-bottom:.5rem; }
+    .side-col.flex input, .side-col.flex select{ font-size:11px; padding:.25rem .4rem; }
+    .side-col.flex input[type=range]{ padding:0; }
+    .side-col.flex .pt-4{ padding-top:.8rem; }
+    .trace-item{ padding:4px 6px; font-size:10.5px; gap:6px; }
+    .trace-val{ font-size:10px; }
+    #output-banner{ font-size:12px; padding:.4rem .7rem; }
+
+    /* Long unbreakable strings must never widen the page. */
+    .trace-name, .io-val, .io-label{ overflow-wrap:anywhere; }
+  }
+
+  /* --- Extra trims for the narrowest phones. --- */
+  @media (max-width: 480px){
+    main > .glass.p-6 h1{ font-size:1.25rem; }
+    main > .glass.p-6 p{ font-size:.76rem; }
+    #viewport{ height:330px !important; }
+    .palette-btn{ font-size:11px; }
+  }
+
+  /* --- Phone held sideways: width is fine, height is the scarce
+         resource, so shrink the canvas and drop the nested scrollers. --- */
+  @media (orientation: landscape) and (max-height: 540px){
+    main > .glass.p-6{ padding:.9rem 1rem; }
+    main > .glass.p-6 h1{ font-size:1.4rem; line-height:1.1; }
+    main > .glass.p-6 p{ font-size:.8rem; line-height:1.35; }
+    main > .glass.p-6 .btn-tech{ padding:.4rem .7rem; font-size:.65rem; }
+    #viewport{ height:300px !important; }
+    .side-col.flex{ max-height:none !important; overflow-y:visible !important; }
+    #trace-list{ max-height:none; }
+    .reject-toast{ max-width:calc(100% - 16px); white-space:normal; font-size:10px; overflow-wrap:anywhere; }
+  }
+
+  /* --- Touch devices: neutralise hover-only affordances (they latch "on"
+         after a tap) and grow the connector ports' hit area, which are
+         only 11px of visual dot. --- */
+  @media (hover: none){
+    .btn-primary:hover{ background:rgba(0,191,255,.1); color:var(--blue); box-shadow:none; }
+    .btn-secondary:hover{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12); color:#d1d5db; }
+    .btn-ghost:hover{ border-color:rgba(255,255,255,.1); color:#9ca3af; }
+    .palette-btn:hover{ background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.07); color:#d1d5db; }
+    .node-close:hover{ background:rgba(0,0,0,.3); border-color:rgba(255,255,255,.15); color:#9ca3af; }
+    .port:hover{ transform:none; box-shadow:0 0 0 2px rgba(0,0,0,.5); }
+    .port::before{ content:""; position:absolute; inset:-7px; border-radius:50%; }
+  }
 </style>
 </head>
 <body class="min-h-screen overflow-x-hidden">

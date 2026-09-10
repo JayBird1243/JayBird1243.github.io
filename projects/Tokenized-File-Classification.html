@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tokenized File Classification | Jack Buhr</title>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Phone held sideways. The 150px token graphic plus its 2rem inline
+           margin, stacked under the hero, pushes "Project Details" off a 375px
+           -tall screen. Scale it back so the art and the content share the
+           fold. Portrait and desktop are handled by the global layer and are
+           untouched. */
+        @media (orientation: landscape) and (max-height: 540px) {
+            .content-box > div:first-child {
+                margin-bottom: 1rem !important;
+            }
+
+            .content-box > div:first-child > svg {
+                width: 84px;
+                height: 84px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="background-container">

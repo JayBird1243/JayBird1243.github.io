@@ -76,7 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const stdDev = stdDevPerScreen * Math.sqrt(pageHeightRatio); 
 
         const count = normalRandom(prng, mean, stdDev);
-        return Math.max(50 * pageHeightRatio, Math.floor(count));
+        // Floor the whole expression: the 50-per-screen lower bound is a float,
+        // and it reaches the footer readout verbatim when it wins.
+        return Math.floor(Math.max(50 * pageHeightRatio, Math.floor(count)));
     }
 
 
@@ -150,8 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const starSizeCounts = new Array(11).fill(0); // Indices 1-10
 
         const totalPageHeight = document.documentElement.scrollHeight;
-        const viewportHeight = window.innerHeight;
-        const pageHeightRatio = Math.max(1, totalPageHeight / viewportHeight);
+        // Mobile browsers can report 0 here while the URL bar is animating,
+        // which would make the ratio (and every count derived from it) Infinity.
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+        const rawRatio = totalPageHeight / viewportHeight;
+        const pageHeightRatio = Number.isFinite(rawRatio) ? Math.max(1, rawRatio) : 1;
 
         // --- Clear existing visuals ---
         nodesContainer.style.backgroundImage = '';

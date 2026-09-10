@@ -199,6 +199,118 @@
   }
   .settings-mobile-panel.open{ transform:translateX(0); }
   @media (min-width:1024px){ .settings-mobile-panel{ display:none !important; } }
+
+  /* =====================================================================
+     PHONE LAYER — everything below is scoped to phone-sized viewports.
+     Desktop (>= 769px portrait / tall) is deliberately untouched.
+     (This page does not load the site-wide style.css, so the global
+      responsive layer is re-stated here at the same breakpoints.)
+     ===================================================================== */
+
+  @media (max-width: 768px){
+
+    /* FIX: the palette + stack grid stayed at "220px + 1fr" below 1024px,
+       leaving the stack column only ~100px wide — the per-block move/delete
+       buttons ran off-screen to x=486 and every label truncated to nothing.
+       Stack the two regions instead. */
+    .layout-grid{ grid-template-columns: minmax(0,1fr); gap:.85rem; }
+
+    /* Decorative corner orbs are 600px of blur on a 375px screen; shrink so
+       they read as corner glow instead of washing the whole page out. */
+    .bg-orb{ width:320px; height:320px; filter:blur(70px); }
+    .bg-orb-tl{ top:-140px; left:-140px; }
+    .bg-orb-br{ bottom:-140px; right:-140px; }
+
+    /* Top bar pill was near-full-width at 375px. */
+    .pill-sandbox{ font-size:.55rem; padding:.28rem .55rem; letter-spacing:.02em; }
+
+    /* Header card: desktop-scale padding/type pushed the action row onto a
+       third line. Trim it and let the three buttons share one row. */
+    #headerCard{ padding:1.1rem 1rem; margin-bottom:.85rem; border-radius:1rem; gap:.9rem; }
+    #headerCard h1{ font-size:1.6rem; line-height:1.05; }
+    #headerCard p{ font-size:.82rem; line-height:1.35; }
+    #headerCard .btn-ghost,
+    #headerCard .btn-primary{
+      padding:.45rem .4rem; font-size:.62rem; letter-spacing:.03em;
+      flex:1 1 0; min-width:0; white-space:nowrap;
+    }
+    #headerCard .btn-ghost i,
+    #headerCard .btn-primary i{ margin-right:.28rem; }
+
+    /* Palette card: compact rows so the list costs less vertical space
+       now that it sits above the stack. */
+    #paletteCard{ padding:.85rem; border-radius:1rem; }
+    .palette-btn{ padding:.5rem .6rem; font-size:.78rem; border-radius:.5rem; gap:.45rem; }
+    .palette-btn .pal-icon{ width:1.1rem; }
+    .palette-count{ font-size:.62rem; }
+    #paletteCard > div:last-child{ font-size:10px; margin-top:.75rem; padding-top:.75rem; }
+
+    /* Stack cards: shrink badges/buttons so title + preview + controls all
+       fit on one row without truncating to an ellipsis. */
+    #promptStack{ gap:.6rem; }
+    .prompt-block{ padding:.65rem .7rem; border-radius:.9rem; }
+    .prompt-block > div{ gap:.45rem !important; }
+    .prompt-block .order-badge{ width:1.3rem; height:1.3rem; font-size:.6rem; }
+    .prompt-block .icon-badge{ width:1.1rem; font-size:.8rem; }
+    .prompt-block .mini-icon-btn{ width:1.55rem; height:1.55rem; font-size:.75rem; }
+    .prompt-block .drag-handle{ font-size:.8rem; }
+    .prompt-block .text-base{ font-size:.8rem !important; }
+    .prompt-block .text-xs{ font-size:.66rem !important; }
+    .contract-tag{ font-size:.62rem; padding:.1rem .35rem; }
+
+    /* Slide-in settings panel: full-bleed on a phone, so tighten the form. */
+    .settings-mobile-panel > div{ padding:1rem; }
+    .settings-mobile-panel input,
+    .settings-mobile-panel select,
+    .settings-mobile-panel textarea{ padding:.4rem .55rem; font-size:.82rem; }
+    .settings-mobile-panel label.block{ font-size:.62rem; margin-bottom:.3rem; }
+
+    /* Modals: p-6 + 85vh left very little room for the payload. */
+    .modal-overlay .modal-card{ padding:1rem; border-radius:1rem; }
+    #compileModal .modal-card{ max-height:88vh; }
+    /* Long unbroken tokens in a compiled prompt must not force a scrollbar. */
+    .compiled-text{ font-size:.72rem; line-height:1.55; overflow-wrap:anywhere; }
+    /* The caption and the Copy button were crammed side by side into ~150px;
+       give the caption the full row and drop Copy beneath it. */
+    #compileSuccess > .flex{ flex-wrap:wrap; gap:.4rem; }
+    #compileSuccess > .flex > p{ flex:1 1 100%; }
+    #copyCompiledBtn{ margin-left:0 !important; padding:.3rem .7rem; font-size:.7rem; }
+    #compileErrors{ padding:.75rem; }
+    #compileErrorsList{ font-size:.78rem; }
+  }
+
+  /* Extra trims for the narrowest phones. */
+  @media (max-width: 480px){
+    #headerCard h1{ font-size:1.45rem; }
+    #headerCard p{ font-size:.78rem; }
+    .prompt-block .text-base{ font-size:.76rem !important; }
+    .palette-btn{ font-size:.74rem; }
+    .compiled-text{ font-size:.68rem; }
+  }
+
+  /* Phone held sideways: width is fine, height is the scarce resource. */
+  @media (orientation: landscape) and (max-height: 540px){
+    .bg-orb{ width:280px; height:280px; filter:blur(70px); }
+    #headerCard{ padding:.85rem 1rem; margin-bottom:.7rem; }
+    #headerCard h1{ font-size:1.5rem; line-height:1.05; }
+    #headerCard p{ font-size:.8rem; line-height:1.35; }
+    #headerCard .btn-ghost,
+    #headerCard .btn-primary{ padding:.4rem .7rem; font-size:.7rem; }
+    .prompt-block{ padding:.55rem .75rem; }
+    #promptStack{ gap:.5rem; }
+    .palette-btn{ padding:.45rem .6rem; font-size:.78rem; }
+    .settings-mobile-panel > div{ padding:.85rem 1rem; }
+    .modal-overlay .modal-card{ padding:.9rem; }
+    #compileModal .modal-card{ max-height:94vh; }
+    .compiled-text{ font-size:.72rem; line-height:1.5; overflow-wrap:anywhere; }
+  }
+
+  /* Touch devices: kill hover-only lifts and the cursor-tracking spotlight,
+     which on touch stick "on" after a tap. */
+  @media (hover: none){
+    .glass-card.hoverable:hover{ transform:none; box-shadow:none; border-color:var(--glass-border); }
+    .glass-card:hover::before{ opacity:0; }
+  }
 </style>
 </head>
 <body class="min-h-screen">

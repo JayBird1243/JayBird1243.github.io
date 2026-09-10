@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Starry Sky | Jack Buhr</title>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Phone held sideways. The decorative star row is ~112px of art plus a
+           2rem inline margin — with the hero above it that pushes "Project
+           Details" off a 375px-tall screen entirely. Scale the row back so the
+           art and the content share the fold. Portrait and desktop are handled
+           by the global layer and are untouched. */
+        @media (orientation: landscape) and (max-height: 540px) {
+            .content-box > div:first-child {
+                margin-bottom: 1rem !important;
+                gap: 10px !important;
+            }
+
+            .content-box > div:first-child > svg:nth-child(1) { width: 50px; height: 50px; }
+            .content-box > div:first-child > svg:nth-child(2) { width: 38px; height: 38px; }
+            .content-box > div:first-child > svg:nth-child(3) { width: 26px; height: 26px; }
+        }
+    </style>
 </head>
 <body>
     <div id="background-container">

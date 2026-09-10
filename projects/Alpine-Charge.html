@@ -396,6 +396,208 @@
                 transition: none;
             }
         }
+
+        /* ══════════════════════════════════════════════════════════════
+           PHONE LAYER — matches the breakpoints used by style.css so the
+           whole site scales consistently. Nothing below fires above 768px,
+           so the desktop layout is untouched.
+           ══════════════════════════════════════════════════════════════ */
+
+        @media (max-width: 768px) {
+            /* 0.95rem + 0.18em tracking ran the kicker edge-to-edge and
+               wrapped mid-phrase. */
+            .case-kicker {
+                font-size: 0.68rem;
+                letter-spacing: 0.13em;
+            }
+
+            .case-deck {
+                font-size: 0.9rem;
+                line-height: 1.55;
+                margin-bottom: 1rem;
+            }
+
+            .case-meta {
+                gap: 0.4rem;
+                margin-bottom: 0.9rem;
+            }
+
+            .meta-chip {
+                font-size: 0.72rem;
+                padding: 0.28rem 0.55rem;
+            }
+
+            /* Shared button is desktop-scaled (12px/24px, bold). */
+            .alpine-page .deep-dive-btn {
+                font-size: 0.82rem;
+                padding: 0.5rem 0.95rem;
+                margin-top: 0.5rem;
+            }
+
+            /* Section rhythm: the clamp() floors (2rem / 2.5rem) are a lot of
+               dead space on a 812px-tall screen. */
+            .alpine-page .hero,
+            .gallery-section,
+            .alpine-body {
+                margin-bottom: 1.75rem;
+            }
+
+            .gallery-header {
+                gap: 0.1rem;
+                margin-bottom: 0.8rem;
+                padding: 0;
+            }
+
+            .gallery-header h2 {
+                font-size: 1.35rem;
+            }
+
+            .gallery-hint {
+                font-size: 0.75rem;
+            }
+
+            /* 48px fades on each side masked 28% of a 343px-wide track. */
+            .gallery-track-wrap::before,
+            .gallery-track-wrap::after {
+                width: 20px;
+            }
+
+            .gallery-track {
+                gap: 10px;
+                padding: 0.2rem 10px 0.6rem;
+            }
+
+            /* 280px showed barely one card, so the strip did not read as a
+               scrollable carousel. Smaller cards give a clear second peek. */
+            .gallery-item {
+                width: min(196px, 56vw);
+                border-radius: 5px;
+            }
+
+            .gallery-item.is-graphic img {
+                padding: 0.45rem;
+            }
+
+            .alpine-panel {
+                padding: 1.1rem 1rem;
+            }
+
+            .alpine-panel p {
+                font-size: 0.9rem;
+                line-height: 1.62;
+                margin-bottom: 1rem;
+            }
+
+            /* Lightbox: smaller chrome so the controls stop covering the
+               photo, and room for the caption under it. */
+            .lightbox {
+                padding: 0.75rem;
+            }
+
+            .lightbox-figure {
+                max-width: 100%;
+                max-height: 78vh;
+                gap: 0.6rem;
+            }
+
+            .lightbox-figure img {
+                max-height: 66vh;
+            }
+
+            .lightbox-caption {
+                font-size: 0.78rem;
+                letter-spacing: 0.1em;
+            }
+
+            .lightbox-btn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .lightbox-btn svg {
+                width: 15px;
+                height: 15px;
+            }
+
+            .lightbox-prev {
+                left: 0.4rem;
+            }
+
+            .lightbox-next {
+                right: 0.4rem;
+            }
+
+            .lightbox-close {
+                top: 0.6rem;
+                right: 0.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-item {
+                width: min(176px, 54vw);
+            }
+
+            .alpine-panel p {
+                font-size: 0.88rem;
+            }
+        }
+
+        /* Phone held sideways: 812px wide misses the 768px breakpoint, so the
+           desktop type scale applies against a 375px-tall viewport. Only the
+           vertical rhythm and the fixed-position lightbox need compacting. */
+        @media (orientation: landscape) and (max-height: 540px) {
+            .case-deck {
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+
+            .alpine-page .hero,
+            .gallery-section,
+            .alpine-body {
+                margin-bottom: 1.5rem;
+            }
+
+            .gallery-item {
+                width: min(210px, 28vw);
+            }
+
+            .lightbox {
+                padding: 0.5rem;
+            }
+
+            .lightbox-figure {
+                max-height: 88vh;
+                gap: 0.35rem;
+            }
+
+            .lightbox-figure img {
+                max-height: 74vh;
+            }
+
+            .lightbox-caption {
+                font-size: 0.72rem;
+            }
+
+            .lightbox-btn {
+                width: 34px;
+                height: 34px;
+            }
+
+            .lightbox-close {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+
+        /* Touch: the lift/zoom is hover-only, and a tap leaves it stuck on.
+           Focus-visible keeps its own treatment for keyboard users. */
+        @media (hover: none) {
+            .gallery-item:hover,
+            .gallery-item:hover img {
+                transform: none;
+            }
+        }
     </style>
 </head>
 <body>
