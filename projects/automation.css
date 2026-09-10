@@ -1,0 +1,748 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Industrial Automation case studies — shared design system.
+
+   Used by:  projects/PLC-Database-Executor.html
+             projects/Material-Tracking-HMI.html
+             projects/Ignition-Temperature-HMI.html
+             projects/Servo-Control-Cabinet.html
+             projects.html  (featured band only — .auto-featured)
+
+   Palette is steel/cyan with a single "run" green for status lamps. Red and
+   amber are deliberately absent: on a plant floor those belong to the safety
+   system, and the pages echo that discipline.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.auto-page,
+.auto-featured {
+    --auto-ink: oklch(0.95 0.01 230);
+    --auto-muted: oklch(0.80 0.02 230);
+    --auto-faint: oklch(0.62 0.03 230);
+    --auto-accent: oklch(0.83 0.11 210);
+    --auto-accent-deep: oklch(0.60 0.11 215);
+    --auto-run: oklch(0.80 0.16 150);
+    --auto-panel: oklch(0.17 0.02 235 / 0.9);
+    --auto-panel-2: oklch(0.21 0.025 235 / 0.9);
+    --auto-line: oklch(0.36 0.04 230);
+    --auto-line-soft: oklch(0.28 0.03 230);
+    --auto-sans: 'IBM Plex Sans', 'Inter', system-ui, sans-serif;
+    --auto-mono: 'IBM Plex Mono', 'Space Mono', ui-monospace, monospace;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auto-page {
+    font-family: var(--auto-sans);
+    color: var(--auto-ink);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────── */
+
+.auto-page .hero {
+    max-width: 1040px;
+    margin: 0 auto clamp(1.75rem, 4vw, 2.75rem);
+    text-align: left;
+}
+
+.auto-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--auto-accent);
+    font-family: var(--auto-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.auto-kicker .idx {
+    color: var(--auto-faint);
+}
+
+.auto-kicker .lamp {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--auto-run);
+    box-shadow: 0 0 10px oklch(0.80 0.16 150 / 0.55);
+}
+
+.auto-title {
+    font-family: var(--auto-sans);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-size: clamp(2.5rem, 6.5vw, 4.6rem);
+    line-height: 0.98;
+    margin: 0.6rem 0 0.9rem;
+    color: var(--auto-ink);
+}
+
+.auto-deck {
+    max-width: 66ch;
+    color: var(--auto-muted);
+    font-size: clamp(1.02rem, 1.8vw, 1.22rem);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+}
+
+.auto-page .deep-dive-btn {
+    background: transparent;
+    border: 1px solid var(--auto-line);
+    color: var(--auto-muted);
+    font-family: var(--auto-mono);
+    font-weight: 500;
+    font-size: 0.82rem;
+    padding: 0.55rem 0.95rem;
+    margin-top: 0;
+}
+
+.auto-page .deep-dive-btn:hover {
+    background: oklch(0.24 0.03 230 / 0.8);
+    border-color: var(--auto-accent-deep);
+    color: var(--auto-ink);
+}
+
+/* Facts grid: the four things a recruiter checks against the job posting. */
+.auto-facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--auto-line-soft);
+    border: 1px solid var(--auto-line-soft);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0 0 1.5rem;
+    list-style: none;
+    padding: 0;
+}
+
+.auto-facts li {
+    background: var(--auto-panel);
+    padding: 0.85rem 1rem 0.9rem;
+    min-width: 0;
+}
+
+.auto-facts .k {
+    display: block;
+    font-family: var(--auto-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--auto-faint);
+    margin-bottom: 0.35rem;
+}
+
+.auto-facts .v {
+    display: block;
+    color: var(--auto-ink);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+/* ── Highlights: three punchlines, read first ────────────────────────── */
+
+.auto-highlights {
+    max-width: 1040px;
+    margin: 0 auto clamp(1.75rem, 4vw, 2.75rem);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: autoReveal 0.7s var(--ease-out-expo) 0.1s forwards;
+}
+
+.auto-highlights li {
+    position: relative;
+    background:
+        linear-gradient(180deg, oklch(0.83 0.11 210 / 0.10), transparent 40%),
+        var(--auto-panel-2);
+    border: 1px solid var(--auto-line);
+    border-top: 2px solid var(--auto-accent);
+    border-radius: 6px;
+    padding: 1.1rem 1.15rem 1.2rem;
+    color: var(--auto-ink);
+    font-size: 0.98rem;
+    line-height: 1.55;
+}
+
+.auto-highlights .n {
+    display: block;
+    font-family: var(--auto-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--auto-accent);
+    margin-bottom: 0.55rem;
+}
+
+.auto-highlights strong {
+    color: var(--auto-ink);
+    font-weight: 600;
+}
+
+/* ── Body panels ─────────────────────────────────────────────────────── */
+
+.auto-body {
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+.auto-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.auto-panel {
+    background: var(--auto-panel);
+    border: 1px solid var(--auto-line-soft);
+    border-radius: 6px;
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    margin-bottom: 1rem;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: autoReveal 0.7s var(--ease-out-expo) 0.22s forwards;
+    min-width: 0;
+}
+
+.auto-grid-2 .auto-panel {
+    margin-bottom: 0;
+}
+
+.auto-panel h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--auto-sans);
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    color: var(--auto-ink);
+    margin: 0 0 0.9rem;
+    line-height: 1.2;
+}
+
+.auto-panel h2::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--auto-accent);
+    flex-shrink: 0;
+}
+
+.auto-panel h2 .tag {
+    margin-left: auto;
+    font-family: var(--auto-mono);
+    font-weight: 400;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--auto-faint);
+}
+
+.auto-panel p {
+    color: var(--auto-muted);
+    font-size: 0.98rem;
+    line-height: 1.68;
+    margin: 0 0 0.9rem;
+    max-width: 70ch;
+}
+
+.auto-panel p:last-child,
+.auto-panel ul:last-child,
+.auto-panel ol:last-child {
+    margin-bottom: 0;
+}
+
+.auto-panel ul,
+.auto-panel ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.auto-panel ul li,
+.auto-panel ol li {
+    position: relative;
+    padding-left: 1.15rem;
+    color: var(--auto-muted);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    margin-bottom: 0.55rem;
+}
+
+.auto-panel ul li:last-child,
+.auto-panel ol li:last-child {
+    margin-bottom: 0;
+}
+
+.auto-panel ul li::before,
+.auto-panel ol li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: var(--auto-accent-deep);
+}
+
+.auto-panel li strong,
+.auto-panel p strong {
+    color: var(--auto-ink);
+    font-weight: 600;
+}
+
+/* Sequencer steps: numbered flow, the visual signature of these pages. */
+.auto-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: step;
+}
+
+.auto-panel .auto-steps li {
+    padding-left: 3rem;
+    margin-bottom: 0.75rem;
+}
+
+.auto-panel .auto-steps li::before {
+    counter-increment: step;
+    content: counter(step, decimal-leading-zero);
+    top: 0.1em;
+    width: auto;
+    height: auto;
+    background: none;
+    font-family: var(--auto-mono);
+    font-size: 0.82rem;
+    color: var(--auto-accent);
+    letter-spacing: 0.05em;
+}
+
+.auto-panel .auto-steps li::after {
+    content: '';
+    position: absolute;
+    left: 2.35rem;
+    top: 0.45em;
+    width: 1px;
+    height: calc(100% + 0.3rem);
+    background: var(--auto-line-soft);
+}
+
+.auto-panel .auto-steps li:last-child::after {
+    display: none;
+}
+
+/* Stack chips */
+.auto-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.auto-panel .auto-stack li {
+    padding: 0.32rem 0.6rem;
+    margin: 0;
+    border: 1px solid var(--auto-line);
+    border-radius: 4px;
+    font-family: var(--auto-mono);
+    font-size: 0.76rem;
+    color: var(--auto-muted);
+    line-height: 1.3;
+}
+
+.auto-panel .auto-stack li::before {
+    display: none;
+}
+
+/* NDA note */
+.auto-nda {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    max-width: 1040px;
+    margin: 0 auto 1.25rem;
+    padding: 0.8rem 1rem;
+    border: 1px dashed var(--auto-line);
+    border-radius: 6px;
+    color: var(--auto-faint);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.auto-nda svg {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    color: var(--auto-accent-deep);
+}
+
+/* Prev / next between the four cases */
+.auto-casenav {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.auto-casenav a {
+    display: block;
+    text-decoration: none;
+    border: 1px solid var(--auto-line-soft);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    background: var(--auto-panel);
+    transition: border-color 0.2s ease, background 0.2s ease;
+    min-width: 0;
+}
+
+.auto-casenav a:hover {
+    border-color: var(--auto-accent-deep);
+    background: var(--auto-panel-2);
+}
+
+.auto-casenav a.next {
+    text-align: right;
+}
+
+.auto-casenav .dir {
+    display: block;
+    font-family: var(--auto-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--auto-faint);
+    margin-bottom: 0.3rem;
+}
+
+.auto-casenav .name {
+    display: block;
+    color: var(--auto-ink);
+    font-weight: 500;
+    font-size: 0.98rem;
+}
+
+@keyframes autoReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Featured band on projects.html ──────────────────────────────────── */
+
+.auto-featured {
+    margin: 0 auto clamp(2rem, 5vw, 3.25rem);
+    max-width: 1200px;
+    color: var(--auto-ink);
+}
+
+.auto-featured-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--auto-line-soft);
+}
+
+.auto-featured-head .auto-kicker {
+    margin-bottom: 0.45rem;
+}
+
+.auto-featured-head h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--auto-ink);
+    line-height: 1.1;
+}
+
+.auto-featured-head p {
+    margin: 0.45rem 0 0;
+    color: var(--auto-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 62ch;
+}
+
+.auto-featured-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 420px;
+    justify-content: flex-end;
+}
+
+.auto-featured-stack li {
+    padding: 0.28rem 0.55rem;
+    border: 1px solid var(--auto-line);
+    border-radius: 4px;
+    font-family: var(--auto-mono);
+    font-size: 0.7rem;
+    color: var(--auto-muted);
+    white-space: nowrap;
+}
+
+.auto-cases {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.auto-cases > li {
+    display: flex;
+    min-width: 0;
+}
+
+.auto-case {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1rem 1.05rem 1.05rem;
+    border: 1px solid var(--auto-line-soft);
+    border-radius: 6px;
+    background:
+        linear-gradient(180deg, oklch(0.83 0.11 210 / 0.07), transparent 45%),
+        var(--auto-panel);
+    text-decoration: none;
+    color: var(--auto-ink);
+    transition: border-color 0.2s ease, transform 0.25s var(--ease-out-expo), background 0.2s ease;
+}
+
+.auto-case:hover,
+.auto-case:focus-visible {
+    border-color: var(--auto-accent-deep);
+    transform: translateY(-3px);
+    outline: none;
+}
+
+.auto-case .idx {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--auto-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--auto-accent);
+}
+
+.auto-case .idx .arrow {
+    color: var(--auto-faint);
+    transition: transform 0.25s var(--ease-out-expo), color 0.2s ease;
+}
+
+.auto-case:hover .idx .arrow {
+    transform: translateX(3px);
+    color: var(--auto-accent);
+}
+
+.auto-case h3 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    color: var(--auto-ink);
+}
+
+.auto-case p {
+    margin: 0;
+    color: var(--auto-muted);
+    font-size: 0.86rem;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.auto-case .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+}
+
+.auto-case .tags span {
+    font-family: var(--auto-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.02em;
+    color: var(--auto-faint);
+    padding: 0.18rem 0.45rem;
+    border: 1px solid var(--auto-line-soft);
+    border-radius: 3px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+    .auto-cases {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .auto-kicker {
+        font-size: 0.66rem;
+        letter-spacing: 0.11em;
+    }
+
+    .auto-title {
+        font-size: clamp(2rem, 9vw, 2.6rem);
+    }
+
+    .auto-deck {
+        font-size: 0.92rem;
+        line-height: 1.55;
+        margin-bottom: 1.1rem;
+    }
+
+    .auto-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 1.1rem;
+    }
+
+    .auto-facts li {
+        padding: 0.7rem 0.8rem;
+    }
+
+    .auto-facts .v {
+        font-size: 0.88rem;
+    }
+
+    .auto-page .hero,
+    .auto-highlights {
+        margin-bottom: 1.25rem;
+    }
+
+    .auto-highlights {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+    }
+
+    .auto-highlights li {
+        padding: 0.9rem 0.95rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .auto-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .auto-panel {
+        padding: 1rem 0.95rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .auto-panel h2 {
+        font-size: 1.02rem;
+        flex-wrap: wrap;
+    }
+
+    .auto-panel h2 .tag {
+        margin-left: 0;
+        width: 100%;
+        padding-left: 1.15rem;
+    }
+
+    .auto-panel p,
+    .auto-panel ul li,
+    .auto-panel ol li {
+        font-size: 0.9rem;
+        line-height: 1.58;
+    }
+
+    .auto-panel .auto-steps li {
+        padding-left: 2.5rem;
+    }
+
+    .auto-panel .auto-steps li::after {
+        left: 1.95rem;
+    }
+
+    .auto-nda {
+        font-size: 0.8rem;
+        padding: 0.7rem 0.85rem;
+    }
+
+    .auto-casenav {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+    }
+
+    .auto-casenav a.next {
+        text-align: left;
+    }
+
+    .auto-featured-head {
+        align-items: flex-start;
+    }
+
+    .auto-featured-stack {
+        justify-content: flex-start;
+        max-width: none;
+    }
+
+    .auto-featured-head h2 {
+        font-size: 1.35rem;
+    }
+
+    .auto-featured-head p {
+        font-size: 0.88rem;
+    }
+
+    .auto-cases {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+    }
+
+    .auto-case:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .auto-facts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auto-highlights,
+    .auto-panel {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .auto-case,
+    .auto-case .idx .arrow,
+    .auto-casenav a {
+        transition: none;
+    }
+}
+
+@media (hover: none) {
+    .auto-case:hover {
+        transform: none;
+    }
+}

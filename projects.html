@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects | Jack Buhr</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="projects/automation.css">
     <style>
         .hero {
             margin-bottom: 1.5rem;
@@ -14,8 +15,49 @@
             margin-bottom: 0;
         }
 
+        /* Anchor target sits under the fixed header. */
+        #automation {
+            scroll-margin-top: 90px;
+        }
+
+        .personal-head {
+            max-width: 1200px;
+            margin: 0 auto 0.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .personal-head h2 {
+            margin: 0;
+            font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+            font-weight: 600;
+            color: white;
+            letter-spacing: -0.01em;
+        }
+
+        .personal-head p {
+            margin: 0.35rem 0 0;
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.92rem;
+        }
+
         .design-projects-container {
             padding-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            #automation {
+                scroll-margin-top: 64px;
+            }
+
+            .personal-head h2 {
+                font-size: 1.2rem;
+            }
+
+            .personal-head p {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -40,8 +82,65 @@
     <main id="content-wrapper">
         <section class="hero">
             <h1>Projects</h1>
-            <p class="subtitle">A collection of my creative work.</p>
+            <p class="subtitle">Production automation work from a year on co-op, then my own projects.</p>
         </section>
+
+        <section class="auto-featured" id="automation" aria-labelledby="automation-heading">
+            <div class="auto-featured-head">
+                <div>
+                    <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · 12-month co-op</div>
+                    <h2 id="automation-heading">PLC, HMI &amp; controls work</h2>
+                    <p>Hand-written Structured Text, operator HMIs on Beckhoff and Ignition, SQL integration, and a servo cabinet built from drawings. Shipped on a live production line.</p>
+                </div>
+                <ul class="auto-featured-stack" aria-label="Platforms">
+                    <li>TwinCAT 3 · ST</li>
+                    <li>TwinCAT HMI</li>
+                    <li>Ignition</li>
+                    <li>Siemens S7</li>
+                    <li>SQL</li>
+                    <li>Panel build</li>
+                </ul>
+            </div>
+            <ul class="auto-cases">
+                <li>
+                    <a class="auto-case" href="projects/PLC-Database-Executor.html">
+                        <span class="idx">01 · PLC + HMI <span class="arrow" aria-hidden="true">&rarr;</span></span>
+                        <h3>PLC Database Executor</h3>
+                        <p>Ground-up TwinCAT ST program that builds XML payloads from PLC data, runs SQL stored procedures and validates the response. State-machine architecture; role-aware HMI for retries.</p>
+                        <span class="tags"><span>Structured Text</span><span>CX51xx</span><span>SQL / XML</span></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="auto-case" href="projects/Material-Tracking-HMI.html">
+                        <span class="idx">02 · HMI + SQL <span class="arrow" aria-hidden="true">&rarr;</span></span>
+                        <h3>Material Loss Tracking</h3>
+                        <p>End-to-end tool to find where material was disappearing: custom Beckhoff HMI, my own stored procedures, PLC networking, and operator training I ran.</p>
+                        <span class="tags"><span>TwinCAT HMI</span><span>Stored procs</span><span>Training</span></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="auto-case" href="projects/Ignition-Temperature-HMI.html">
+                        <span class="idx">03 · SCADA <span class="arrow" aria-hidden="true">&rarr;</span></span>
+                        <h3>Line Temperature HMI</h3>
+                        <p>Ignition screen for a GWK temperature-control unit: live piping mimic, sequencer state, trend charts and manual heating, fed from a Siemens S7-300.</p>
+                        <span class="tags"><span>Ignition</span><span>S7-300</span><span>Trending</span></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="auto-case" href="projects/Servo-Control-Cabinet.html">
+                        <span class="idx">04 · Hardware <span class="arrow" aria-hidden="true">&rarr;</span></span>
+                        <h3>Servo Control Cabinet</h3>
+                        <p>Full cabinet rebuild from drawings with labelled wiring and Panduit routing, installed in its machine and PID-tuned with the integrator.</p>
+                        <span class="tags"><span>Panel build</span><span>Servo</span><span>PID</span></span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <div class="personal-head">
+            <h2>Personal projects</h2>
+            <p>Startups, hardware and software built on my own time.</p>
+        </div>
 
         <section class="design-projects-container">
             <div class="project-bubble">
@@ -138,29 +237,6 @@
                                 <li>Market & Trend analysis</li>
                                 <li>Firebase serverless architecture</li>
                                 <li>Advanced data analysis</li>
-                            </ul>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="project-bubble">
-                <h3 class="project-title">Chess Rapid</h3>
-                <a href="projects/Chess-Rapid.html" style="text-decoration: none; display: block;">
-                    <div class="bubble-container" data-seed="chess-rapid">
-                        <div class="bubble-background">
-                            <div class="gradient-node"></div>
-                            <div class="gradient-node"></div>
-                            <div class="gradient-node"></div>
-                            <div class="gradient-node"></div>
-                            <div class="gradient-node"></div>
-                        </div>
-                        <div class="bubble-image"></div>
-                        <div class="bubble-details">
-                            <ul>
-                                <li>Chess.com rapid tracker</li>
-                                <li>Live API · rating history</li>
-                                <li>Game archive &amp; form</li>
                             </ul>
                         </div>
                     </div>

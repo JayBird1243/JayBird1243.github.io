@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Loss Tracking | Jack Buhr</title>
+    <meta name="description" content="End-to-end material-loss tracking tool for a production line: Beckhoff HMI, custom SQL stored procedures, PLC networking and operator training.">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="automation.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html" class="active">Projects</a></li>
+                <li><a href="../skills.html">Skills</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="content-wrapper" class="auto-page">
+        <section class="hero">
+            <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · Co-op <span class="idx">02 / 04</span></div>
+            <h1 class="auto-title">Material Loss Tracking</h1>
+            <p class="auto-deck">Material was going missing on a production line and nobody could say where. I built the tool that found out — HMI, database procedures, PLC networking and operator training, end to end.</p>
+            <ul class="auto-facts" aria-label="At a glance">
+                <li><span class="k">Role</span><span class="v">Owned end to end</span></li>
+                <li><span class="k">HMI</span><span class="v">TwinCAT HMI · custom screens</span></li>
+                <li><span class="k">Backend</span><span class="v">SQL stored procedures (written by me)</span></li>
+                <li><span class="k">Rollout</span><span class="v">Operator training sessions, run by me</span></li>
+            </ul>
+            <a href="../projects.html#automation" class="deep-dive-btn">&larr; All automation work</a>
+        </section>
+
+        <ul class="auto-highlights" aria-label="Highlights">
+            <li><span class="n">01</span><strong>Full-stack ownership.</strong> Designed the HMI, wrote the stored procedures, networked the panel to the main line PLC, and trained the operators who use it.</li>
+            <li><span class="n">02</span><strong>Turned "material is going missing" into data.</strong> Every loss is now logged with a reason, at the station where it happened, and is queryable by engineering.</li>
+            <li><span class="n">03</span><strong>Resilient by design.</strong> Database messaging queues and retries so a slow network never loses a report or freezes the screen.</li>
+        </ul>
+
+        <article class="auto-body">
+            <section class="auto-panel">
+                <h2>Problem <span class="tag">context</span></h2>
+                <p>Material was being lost along the line and the cause was unknown. Existing systems counted what came out; none recorded why something did not. Engineers needed structured, attributable data before they could improve the process.</p>
+            </section>
+
+            <div class="auto-grid-2">
+                <section class="auto-panel">
+                    <h2>What I built <span class="tag">scope</span></h2>
+                    <ol class="auto-steps">
+                        <li><strong>Reporting HMI.</strong> A low-friction flow: pick the loss reason and quantity in a few taps at the station where it happened. If reporting is slow, operators stop reporting, and the data is worthless.</li>
+                        <li><strong>Database layer.</strong> New SQL stored procedures for inserts and reporting, structured so engineering can slice losses by station, reason and shift.</li>
+                        <li><strong>PLC networking.</strong> Connected the HMI to the main line controller for station and context data; configured the network path between panel and PLC.</li>
+                        <li><strong>Resilient messaging.</strong> Queue-and-retry logic around every database send so the screen stays responsive and no report is dropped.</li>
+                        <li><strong>Training.</strong> Ran the operator sessions myself. Adoption was the success metric — a tool nobody uses finds nothing.</li>
+                    </ol>
+                </section>
+
+                <section class="auto-panel">
+                    <h2>Design decisions <span class="tag">why</span></h2>
+                    <ul>
+                        <li><strong>Report where the loss happens.</strong> Terminals sit at the station, not in an office, so the reason is captured while it is still obvious.</li>
+                        <li><strong>Reasons are a fixed list, not free text.</strong> Free text cannot be aggregated; a curated list can be graphed the same afternoon.</li>
+                        <li><strong>Same colour discipline as the rest of the line:</strong> no red or yellow on a non-safety screen, high-contrast primaries for mismatched monitors.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <section class="auto-panel">
+                <h2>Outcome <span class="tag">result</span></h2>
+                <p>Engineering gained a per-station, per-reason breakdown of material loss for the first time, replacing guesswork with a ranked list of causes to attack. The HMI became part of the standard operating procedure on the line.</p>
+            </section>
+
+            <div class="auto-grid-2">
+                <section class="auto-panel">
+                    <h2>What I took from it <span class="tag">practice</span></h2>
+                    <p>This project stretched furthest from pure programming: writing the database side myself, standing in front of operators to teach it, and designing for people who have thirty seconds and gloves on. The hardest requirement was not technical — it was making reporting effortless enough that the data could be trusted.</p>
+                </section>
+
+                <section class="auto-panel">
+                    <h2>Stack <span class="tag">tools</span></h2>
+                    <ul class="auto-stack">
+                        <li>TwinCAT HMI</li>
+                        <li>SQL Server</li>
+                        <li>Stored procedures</li>
+                        <li>PLC networking</li>
+                        <li>Structured Text</li>
+                        <li>Operator-first UX</li>
+                        <li>Operator training</li>
+                    </ul>
+                </section>
+            </div>
+        </article>
+
+        <aside class="auto-nda">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Screenshots, tag names and schema details are withheld under my employer's confidentiality agreement. I'm glad to walk through the architecture in conversation.</span>
+        </aside>
+
+        <nav class="auto-casenav" aria-label="Other automation case studies">
+            <a href="PLC-Database-Executor.html" class="prev"><span class="dir">&larr; Previous</span><span class="name">PLC Database Executor</span></a>
+            <a href="Ignition-Temperature-HMI.html" class="next"><span class="dir">Next &rarr;</span><span class="name">Line Temperature HMI</span></a>
+        </nav>
+    </main>
+
+    <footer id="site-footer">
+        <div class="footer-inner">
+            <div class="footer-field">
+                <span class="footer-label">seed</span>
+                <span id="footer-seed-val" class="footer-mono">—</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-field">
+                <span id="footer-stars-count" class="footer-num">—</span>
+                <span class="footer-label">stars</span>
+            </div>
+            <div class="footer-field">
+                <span id="footer-nodes-count" class="footer-num">—</span>
+                <span class="footer-label">nodes</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
+            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                new sky
+            </button>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Temperature HMI | Jack Buhr</title>
+    <meta name="description" content="Ignition SCADA screen for a GWK water temperature-control unit fed from a Siemens S7-300: live piping mimic, sequencer state, trends and manual heating control.">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="automation.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="background-container">
+        <div id="stars-container"></div>
+        <div id="nodes-container"></div>
+    </div>
+
+    <header>
+        <nav>
+            <div class="logo">JB</div>
+            <div id="seed-display" class="seed-display">Seed: </div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html" class="active">Projects</a></li>
+                <li><a href="../skills.html">Skills</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="content-wrapper" class="auto-page">
+        <section class="hero">
+            <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · Co-op <span class="idx">03 / 04</span></div>
+            <h1 class="auto-title">Line Temperature HMI</h1>
+            <p class="auto-deck">An Ignition screen that gives operators a live picture of a GWK water temperature-control unit — process temperatures, sequencer step and a colour-coded piping mimic — with data pulled from a Siemens S7-300.</p>
+            <ul class="auto-facts" aria-label="At a glance">
+                <li><span class="k">SCADA</span><span class="v">Inductive Automation Ignition</span></li>
+                <li><span class="k">PLC</span><span class="v">Siemens S7-300 (existing program)</span></li>
+                <li><span class="k">Equipment</span><span class="v">GWK water temperature controller</span></li>
+                <li><span class="k">Scope</span><span class="v">Screen design + tag integration</span></li>
+            </ul>
+            <a href="../projects.html#automation" class="deep-dive-btn">&larr; All automation work</a>
+        </section>
+
+        <ul class="auto-highlights" aria-label="Highlights">
+            <li><span class="n">01</span><strong>Machine state at a glance.</strong> A piping mimic whose lines recolour with live state, so an operator reads where the unit is in its program without reading a single number.</li>
+            <li><span class="n">02</span><strong>Trends beside the numbers.</strong> Temperature-over-time charts next to the sequencer step list, so drift is visible before it becomes an alarm.</li>
+            <li><span class="n">03</span><strong>Siemens-to-Ignition integration.</strong> I linked the S7-300 tags into Ignition for data acquisition; the PLC program itself was existing and not mine.</li>
+        </ul>
+
+        <article class="auto-body">
+            <section class="auto-panel">
+                <h2>Problem <span class="tag">context</span></h2>
+                <p>The GWK unit's state lived on its own small panel and inside the S7-300. Operators on the line had no consolidated view of the temperatures that mattered or which sequencer step the unit was in, and diagnosing a slow warm-up meant standing at the machine watching numbers.</p>
+            </section>
+
+            <div class="auto-grid-2">
+                <section class="auto-panel">
+                    <h2>What I built <span class="tag">Ignition</span></h2>
+                    <ol class="auto-steps">
+                        <li><strong>Tag integration.</strong> Connected Ignition to the S7-300 and mapped the temperature, state and sequencer tags the screen needed.</li>
+                        <li><strong>Piping mimic.</strong> A schematic of the unit with pipe segments bound to live tags, recolouring with state so the program position is legible from across the room.</li>
+                        <li><strong>Key values first.</strong> The handful of temperatures that decide whether the line runs sit largest, at the top; everything else is secondary.</li>
+                        <li><strong>Sequencer display.</strong> Current step and step list, so "where is it in the cycle" is answered without a manual.</li>
+                        <li><strong>Trends.</strong> Real-time temperature-over-time charts for spotting drift and confirming setpoint response.</li>
+                        <li><strong>Manual heating control.</strong> Available for setup and maintenance when needed, behind a confirmation.</li>
+                    </ol>
+                </section>
+
+                <section class="auto-panel">
+                    <h2>Design decisions <span class="tag">why</span></h2>
+                    <ul>
+                        <li><strong>Diagram for pattern recognition, trends for diagnosis.</strong> The mimic answers "is it normal?"; the charts answer "since when?".</li>
+                        <li><strong>Colour carries state, not decoration.</strong> Every colour change on the mimic maps to a real PLC state.</li>
+                        <li><strong>Honest scope.</strong> I did not write the PLC program; the value I added was the data path and the operator's view of it.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <div class="auto-grid-2">
+                <section class="auto-panel">
+                    <h2>What I took from it <span class="tag">practice</span></h2>
+                    <p>My first SCADA screen in production, and the project that taught me how much of HMI design is deciding what to leave off. It also meant working across vendors — Siemens on the controller, Ignition on top, GWK on the equipment — which is the normal shape of an integration job.</p>
+                </section>
+
+                <section class="auto-panel">
+                    <h2>Stack <span class="tag">tools</span></h2>
+                    <ul class="auto-stack">
+                        <li>Ignition SCADA</li>
+                        <li>Siemens S7-300</li>
+                        <li>Tag mapping</li>
+                        <li>Mimic / P&amp;ID display</li>
+                        <li>Real-time trending</li>
+                        <li>GWK temperature control</li>
+                    </ul>
+                </section>
+            </div>
+        </article>
+
+        <aside class="auto-nda">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Screenshots, tag names and schema details are withheld under my employer's confidentiality agreement. I'm glad to walk through the architecture in conversation.</span>
+        </aside>
+
+        <nav class="auto-casenav" aria-label="Other automation case studies">
+            <a href="Material-Tracking-HMI.html" class="prev"><span class="dir">&larr; Previous</span><span class="name">Material Loss Tracking</span></a>
+            <a href="Servo-Control-Cabinet.html" class="next"><span class="dir">Next &rarr;</span><span class="name">Servo Control Cabinet</span></a>
+        </nav>
+    </main>
+
+    <footer id="site-footer">
+        <div class="footer-inner">
+            <div class="footer-field">
+                <span class="footer-label">seed</span>
+                <span id="footer-seed-val" class="footer-mono">—</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-field">
+                <span id="footer-stars-count" class="footer-num">—</span>
+                <span class="footer-label">stars</span>
+            </div>
+            <div class="footer-field">
+                <span id="footer-nodes-count" class="footer-num">—</span>
+                <span class="footer-label">nodes</span>
+            </div>
+            <div class="footer-vr" aria-hidden="true"></div>
+            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
+            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                new sky
+            </button>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
