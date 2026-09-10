@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Builder Sandbox | Daemon Data</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23050505'/%3E%3Ctext x='50' y='68' font-size='60' text-anchor='middle' fill='%2300BFFF'%3E%3C/text%3E%3Ccircle cx='50' cy='50' r='28' fill='none' stroke='%2300BFFF' stroke-width='6'/%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<style>
+  :root{
+    --bg: #050505;
+    --glass-bg: rgba(20,20,20,0.6);
+    --glass-border: rgba(255,255,255,0.05);
+    --electric-blue: #00BFFF;
+    --magenta: #FF00FF;
+    --lime: #32CD32;
+    --font-heading: 'Orbitron', sans-serif;
+    --font-sub: 'Rajdhani', sans-serif;
+    --font-mono: 'Source Code Pro', monospace;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; }
+  body{
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(0,191,255,0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(255,0,255,0.05) 0%, transparent 40%);
+    color:#e5e7eb;
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{ font-family: var(--font-heading); text-transform:uppercase; letter-spacing:0.05em; }
+  h4,h5,.subhead{ font-family: var(--font-sub); font-weight:600; }
+  .font-mono-spec{ font-family: var(--font-mono); }
+
+  .bg-orb{ position:fixed; width:600px; height:600px; border-radius:50%; filter:blur(100px); z-index:-1; opacity:.15; pointer-events:none; }
+  .bg-orb-tl{ top:-220px; left:-220px; background: var(--electric-blue); }
+  .bg-orb-br{ bottom:-220px; right:-220px; background: var(--magenta); }
+
+  .glass-card{
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border:1px solid var(--glass-border);
+    border-radius:1.5rem;
+    position:relative;
+    overflow:hidden;
+    transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1), border-color .3s;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.06), transparent 40%);
+    opacity:0; transition:opacity .3s; pointer-events:none; z-index:1;
+  }
+  .glass-card:hover::before{ opacity:1; }
+  .glass-card.no-hover-lift:hover{ transform:none; }
+
+  @media (prefers-reduced-motion: no-preference){
+    .glass-card.hoverable:hover{ transform: translateY(-2px); box-shadow:0 10px 30px rgba(0,0,0,.4); border-color: rgba(255,255,255,.1); }
+  }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:#0a0a0a; }
+  ::-webkit-scrollbar-thumb{ background:#333; border-radius:4px; }
+  ::-webkit-scrollbar-thumb:hover{ background:#555; }
+
+  input, select, textarea{
+    background-color: rgba(10,10,10,0.8) !important;
+    border:1px solid rgba(255,255,255,0.12) !important;
+    border-radius:.5rem;
+    color:#e5e7eb;
+    padding:.5rem .75rem;
+    font-family:'Inter',sans-serif;
+    width:100%;
+  }
+  input:focus, select:focus, textarea:focus{
+    border-color: var(--electric-blue) !important;
+    box-shadow:0 0 0 3px rgba(0,191,255,0.2);
+    outline:none;
+  }
+  textarea.mono, input.mono{ font-family: var(--font-mono); font-size:.85rem; line-height:1.5; }
+
+  button{ font-family: var(--font-sub); }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--electric-blue);
+    outline-offset:2px;
+  }
+
+  .btn-primary{
+    font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+    background:rgba(0,191,255,0.1); border:1px solid var(--electric-blue); color:var(--electric-blue);
+    box-shadow:0 0 10px rgba(0,191,255,.15);
+    transition:all .25s ease;
+    border-radius:.6rem;
+  }
+  .btn-primary:hover{ background:var(--electric-blue); color:#000; box-shadow:0 0 20px rgba(0,191,255,.5); }
+  .btn-primary:disabled{ opacity:.35; cursor:not-allowed; box-shadow:none; }
+  .btn-primary:disabled:hover{ background:rgba(0,191,255,0.1); color:var(--electric-blue); }
+
+  .btn-ghost{
+    font-weight:600; text-transform:uppercase; letter-spacing:.05em; font-size:.8rem;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#cbd5e1;
+    border-radius:.6rem; transition:all .2s ease;
+  }
+  .btn-ghost:hover{ border-color:rgba(255,255,255,0.3); color:#fff; background:rgba(255,255,255,0.08); }
+
+  .btn-danger{
+    background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,.5); color:#f87171;
+    border-radius:.5rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; font-size:.8rem;
+    transition:all .2s ease;
+  }
+  .btn-danger:hover{ background:#ef4444; color:#fff; }
+
+  .palette-btn{
+    display:flex; align-items:center; gap:.6rem; width:100%;
+    padding:.65rem .75rem; border-radius:.65rem;
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+    color:#d1d5db; text-align:left; transition:all .2s ease; font-size:.85rem;
+  }
+  .palette-btn:hover:not(:disabled){ border-color: var(--electric-blue); background:rgba(0,191,255,0.06); color:#fff; }
+  .palette-btn:disabled{ opacity:.35; cursor:not-allowed; }
+  .palette-btn .pal-icon{ width:1.5rem; text-align:center; flex-shrink:0; }
+  .palette-count{ margin-left:auto; font-family:var(--font-mono); font-size:.7rem; color:#6b7280; }
+
+  .prompt-block{ cursor:pointer; padding:1rem 1.1rem; border-left:3px solid rgba(255,255,255,.15); }
+  .prompt-block.selected{ border-color: var(--electric-blue); box-shadow:0 0 0 1px rgba(0,191,255,.4) inset; }
+  .prompt-block.accent-bounds{ border-left-color: var(--electric-blue); }
+  .prompt-block.accent-prompt_body{ border-left-color: rgba(255,255,255,.35); }
+  .prompt-block.accent-post_title{ border-left-color: var(--lime); }
+  .prompt-block.accent-post_body{ border-left-color: #facc15; }
+  .prompt-block.accent-post_metadata{ border-left-color: var(--magenta); }
+  .prompt-block.accent-examples{ border-left-color: var(--magenta); }
+  .order-badge{
+    width:1.6rem; height:1.6rem; border-radius:9999px; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:.7rem; color:#9ca3af; flex-shrink:0;
+  }
+  .icon-badge{ width:2rem; text-align:center; color:#9ca3af; flex-shrink:0; }
+  .mini-icon-btn{
+    width:1.8rem; height:1.8rem; border-radius:.4rem; display:flex; align-items:center; justify-content:center;
+    color:#6b7280; transition:all .15s ease; flex-shrink:0;
+  }
+  .mini-icon-btn:hover:not(:disabled){ background:rgba(255,255,255,.08); color:#e5e7eb; }
+  .mini-icon-btn:disabled{ opacity:.25; cursor:not-allowed; }
+  .mini-icon-btn.danger:hover{ color:#f87171; background:rgba(239,68,68,.12); }
+  .drag-handle{ cursor:grab; color:#4b5563; }
+  .drag-handle:active{ cursor:grabbing; }
+  .sortable-ghost{ opacity:.35; }
+  .sortable-drag{ box-shadow:0 10px 30px rgba(0,0,0,.6) !important; }
+
+  .settings-panel{
+    transition: transform .3s ease, opacity .3s ease;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .settings-panel, .glass-card, .modal-overlay, .modal-card{ transition:none !important; }
+  }
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center; z-index:60;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .modal-overlay.show{ opacity:1; pointer-events:auto; }
+
+  .compiled-text{ font-family:var(--font-mono); font-size:.85rem; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
+  .ph{ color: var(--electric-blue); background:rgba(0,191,255,.1); padding:0 .15rem; border-radius:.2rem; }
+
+  .contract-tag{
+    font-family:var(--font-mono); font-size:.65rem; letter-spacing:.05em;
+    padding:.15rem .5rem; border-radius:.3rem; border:1px solid rgba(255,255,255,.15); color:#9ca3af;
+  }
+
+  .pill-sandbox{
+    font-family: var(--font-mono); font-size:.65rem; letter-spacing:.04em;
+    padding:.35rem .7rem; border-radius:9999px;
+    background:rgba(255,0,255,0.08); border:1px solid rgba(255,0,255,0.3); color:#f0abfc;
+    white-space:nowrap;
+  }
+
+  .layout-grid{ display:grid; grid-template-columns: 220px minmax(0,1fr); gap:1.25rem; align-items:start; }
+  @media (min-width:1024px){ .layout-grid{ grid-template-columns: 240px minmax(0,1fr) 360px; } }
+
+  .settings-col{ display:none; }
+  @media (min-width:1024px){
+    .settings-col{ display:block; position:sticky; top:1.25rem; }
+  }
+  .settings-mobile-panel{
+    position:fixed; top:0; right:0; height:100%; width:min(420px,100%);
+    background:#0a0a0a; border-left:1px solid rgba(255,255,255,.08);
+    z-index:70; transform:translateX(100%); transition:transform .3s ease;
+    overflow-y:auto;
+  }
+  .settings-mobile-panel.open{ transform:translateX(0); }
+  @media (min-width:1024px){ .settings-mobile-panel{ display:none !important; } }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="bg-orb bg-orb-tl"></div>
+<div class="bg-orb bg-orb-br"></div>
+
+<!-- Top bar -->
+<div class="flex items-center justify-between px-4 md:px-8 py-4">
+  <a href="Daemon-Data.html" class="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-2 subhead">
+    <i class="fa-solid fa-arrow-left"></i> Daemon Data
+  </a>
+  <span class="pill-sandbox"><i class="fa-solid fa-flask-vial mr-1"></i>SANDBOX &middot; NOTHING IS SAVED</span>
+</div>
+
+<main class="px-4 md:px-8 pb-16 max-w-[1400px] mx-auto">
+  <!-- Header card -->
+  <div class="glass-card hoverable p-6 md:p-8 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-5" id="headerCard">
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-0.5 rounded text-[10px] font-mono-spec bg-magenta/10 border" style="color:var(--magenta); border-color:rgba(255,0,255,.25);">MODULE PREVIEW</span>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight mb-1">Prompt Builder</h1>
+      <p class="text-gray-400 subhead text-base md:text-lg max-w-xl">Stack blocks, define a response contract, and compile a runnable model prompt, live in your browser.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 shrink-0">
+      <button id="resetBtn" class="btn-ghost px-4 py-2.5"><i class="fa-solid fa-rotate-left mr-2"></i>Reset</button>
+      <button id="loadExampleBtn" class="btn-ghost px-4 py-2.5"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Load Example</button>
+      <button id="compileBtn" class="btn-primary px-5 py-2.5"><i class="fa-solid fa-play mr-2"></i>Compile</button>
+    </div>
+  </div>
+
+  <div class="layout-grid">
+    <!-- Palette -->
+    <div class="glass-card no-hover-lift p-4" id="paletteCard">
+      <div class="text-xs uppercase tracking-widest text-gray-500 subhead font-bold mb-3">Add Block</div>
+      <div id="palette" class="flex flex-col gap-2"></div>
+      <div class="mt-4 pt-4 border-t border-white/5 text-[11px] text-gray-500 leading-relaxed">
+        Click a block to add it to the stack. Drag the <i class="fa-solid fa-grip-vertical"></i> handle to reorder, or use the arrows on each card.
+      </div>
+    </div>
+
+    <!-- Stack -->
+    <div>
+      <div id="promptStack" class="flex flex-col gap-3"></div>
+    </div>
+
+    <!-- Settings (desktop) -->
+    <div class="settings-col">
+      <div class="glass-card no-hover-lift p-5" id="settingsCardDesktop">
+        <div id="settingsEmptyDesktop" class="text-center py-10 text-gray-500 text-sm">
+          <i class="fa-solid fa-arrow-pointer text-2xl mb-3 block"></i>
+          Select a block to edit its settings.
+        </div>
+        <div id="settingsBodyDesktop" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base text-white tracking-wide" id="settingsTitleDesktop" style="font-family:var(--font-sub); font-weight:700; text-transform:uppercase; letter-spacing:.04em;"></h3>
+            <button class="mini-icon-btn" id="closeSettingsDesktop" aria-label="Close settings"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div id="settingsContentDesktop"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Mobile / tablet settings slide-in -->
+<div class="settings-mobile-panel" id="settingsMobilePanel" role="dialog" aria-modal="true" aria-label="Block settings">
+  <div class="p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base text-white tracking-wide" id="settingsTitleMobile" style="font-family:var(--font-sub); font-weight:700; text-transform:uppercase; letter-spacing:.04em;"></h3>
+      <button class="mini-icon-btn" id="closeSettingsMobile" aria-label="Close settings"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="settingsContentMobile"></div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="glass-card no-hover-lift modal-card p-6 max-w-sm w-full mx-4">
+    <h3 class="text-lg text-white mb-2" style="font-family:var(--font-sub); font-weight:700; text-transform:uppercase;">Remove block?</h3>
+    <p class="text-sm text-gray-400 mb-6">This block and its settings will be removed from the stack. This cannot be undone (but nothing here is saved anyway).</p>
+    <div class="flex justify-end gap-3">
+      <button class="btn-ghost px-4 py-2" id="cancelDeleteBtn">Cancel</button>
+      <button class="btn-danger px-4 py-2" id="confirmDeleteBtn">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- Compile output modal -->
+<div class="modal-overlay" id="compileModal">
+  <div class="glass-card no-hover-lift modal-card p-6 max-w-2xl w-full mx-4 max-h-[85vh] flex flex-col">
+    <div class="flex items-center justify-between mb-4 shrink-0">
+      <h3 class="text-lg text-white" style="font-family:var(--font-sub); font-weight:700; text-transform:uppercase; letter-spacing:.04em;" id="compileModalTitle">Compiled Prompt</h3>
+      <button class="mini-icon-btn" id="closeCompileModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="overflow-y-auto pr-1" style="flex:1;">
+      <div id="compileErrors" class="hidden mb-4 p-4 rounded-lg" style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.35);">
+        <div class="text-red-400 text-sm font-bold mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Cannot compile</div>
+        <ul id="compileErrorsList" class="text-red-300 text-sm list-disc pl-5 space-y-1"></ul>
+      </div>
+      <div id="compileSuccess" class="hidden">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs text-gray-500">Runtime variables are highlighted. They get substituted with real post data when the prompt runs.</p>
+          <button class="btn-ghost px-3 py-1.5 shrink-0 ml-3" id="copyCompiledBtn"><i class="fa-regular fa-copy mr-1.5"></i>Copy</button>
+        </div>
+        <div class="compiled-text bg-black/40 border border-white/10 rounded-lg p-4" id="compiledPromptDisplay"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Config ----------
+  const BLOCK_LIMITS = { bounds:1, prompt_body:50, post_title:1, post_body:1, post_metadata:1, examples:5 };
+  const BLOCK_TITLES = {
+    bounds: 'Response Contract',
+    prompt_body: 'Prompt Body',
+    post_title: 'Post Title Insert',
+    post_body: 'Post Body Insert',
+    post_metadata: 'Post Metadata',
+    examples: 'Few-Shot Example'
+  };
+  const BLOCK_ICONS = {
+    bounds: 'fa-shield-halved',
+    prompt_body: 'fa-terminal',
+    post_title: 'fa-heading',
+    post_body: 'fa-align-left',
+    post_metadata: 'fa-chart-simple',
+    examples: 'fa-list-check'
+  };
+  const RESPONSE_TYPE_LABELS = {
+    unbounded_string: 'Free Text / Paragraph',
+    bounded_string: 'Single Choice',
+    bounded_multiple_string: 'Multiple Choice',
+    unbounded_numeric: 'Number',
+    bounded_numeric: 'Bounded Number'
+  };
+  const TEMPLATES = {
+    types: {
+      unbounded_string: {
+        header: "You are analyzing a Reddit post. Write a free-form response of approximately {approximate-response-length} words that directly follows the instructions below.",
+        footer: "Respond in plain prose only, at approximately {approximate-response-length} words. Do not include headers, labels, disclaimers, or any text besides the response itself."
+      },
+      bounded_string: {
+        header: "You must classify the post below into exactly one of the following categories:\n{options}",
+        footer: "Respond with exactly one string from the list above ({options}) and nothing else. No punctuation, quotes, or explanation."
+      },
+      bounded_multiple_string: {
+        header: "You must select every category that applies to the post below, choosing only from this list:\n{options}",
+        footer: "Respond with a comma-separated list drawn only from: {options}. Include only the categories that apply, and nothing else."
+      },
+      unbounded_numeric: {
+        header: "You must respond with a single numeric value that reflects the instructions below.",
+        footer: "Respond with a single number and nothing else. No units, words, or punctuation."
+      },
+      bounded_numeric: {
+        header: "You must respond with a single number between {lower} and {upper} (inclusive) that reflects the instructions below.",
+        footer: "Respond with a single number between {lower} and {upper} and nothing else. Do not include units, words, or explanation."
+      }
+    },
+    exampleIntros: {
+      Intro: "Here is a worked example of how to respond:",
+      postTitle: "Post Title: {title}",
+      postBody: "Post Body: {post}",
+      upvoteCount: "Upvotes: {upvotes}",
+      commentCount: "Comments: {comments}",
+      expectedReturn: "Expected Response: {return}"
+    }
+  };
+
+  // ---------- State ----------
+  let blocks = {};       // order(int as string) -> block
+  let currentOpenSettings = null;
+  let pendingDeleteId = null;
+  let sortableInstance = null;
+
+  // ---------- Helpers ----------
+  function generateBlockId(){ return 'block-' + Date.now() + '-' + Math.random().toString(36).substr(2,9); }
+  function createBlock(type, config){ return { id: generateBlockId(), type, config: config || {} }; }
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+  function sortedEntries(){ return Object.entries(blocks).sort((a,b)=>parseInt(a[0])-parseInt(b[0])); }
+  function findBlockEntry(id){ return Object.entries(blocks).find(([_,b])=>b.id===id); }
+  function reindex(list){
+    const nb = {};
+    list.forEach((b,i)=>{ nb[i]=b; });
+    blocks = nb;
+  }
+
+  function getDefaultConfig(type){
+    switch(type){
+      case 'bounds': return { responseType: null, responseConfig: {} };
+      case 'examples': return { postTitle:'', postBody:'', upvotes:0, comments:0, expectedReturn:'' };
+      case 'prompt_body': return { text:'' };
+      case 'post_title': return {};
+      case 'post_body': return {};
+      case 'post_metadata': return { showUpvotes:true, showComments:true, showSubreddit:true };
+      default: return {};
+    }
+  }
+
+  function attachSpotlight(el){
+    el.addEventListener('mousemove', (e)=>{
+      const rect = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX-rect.left)+'px');
+      el.style.setProperty('--my', (e.clientY-rect.top)+'px');
+    });
+  }
+  document.querySelectorAll('.glass-card').forEach(attachSpotlight);
+
+  // ---------- Default / example state ----------
+  function resetToDefault(){
+    blocks = {
+      0: createBlock('bounds', { responseType:null, responseConfig:{} }),
+      1: createBlock('prompt_body', { text:'' })
+    };
+    currentOpenSettings = null;
+    closeSettingsPanels();
+    render();
+  }
+
+  function loadExample(){
+    blocks = {};
+    let i = 0;
+    blocks[i++] = createBlock('bounds', {
+      responseType: 'bounded_numeric',
+      responseConfig: { numericType:'integer', lower:0, upper:100 }
+    });
+    blocks[i++] = createBlock('prompt_body', {
+      text: "You are a market analyst reviewing a Reddit post from a finance-related subreddit. Assess how strongly this post signals bullish sentiment toward the asset it discusses. Weigh the tone of the title and body, the level of community engagement, and any concrete claims made. A score of 0 means strongly bearish or irrelevant; 100 means strongly bullish with credible supporting detail."
+    });
+    blocks[i++] = createBlock('post_title', {});
+    blocks[i++] = createBlock('post_body', {});
+    blocks[i++] = createBlock('post_metadata', { showUpvotes:true, showComments:true, showSubreddit:true });
+    blocks[i++] = createBlock('examples', {
+      postTitle: "Just went all-in on $NVDA calls, this earnings report is going to be insane",
+      postBody: "Every signal points to another beat and raise. Data center revenue is compounding faster than anyone modeled. I know it's risky but the setup is too clean to ignore.",
+      upvotes: 842,
+      comments: 231,
+      expectedReturn: "87"
+    });
+    currentOpenSettings = null;
+    closeSettingsPanels();
+    render();
+  }
+
+  // ---------- Rendering ----------
+  function render(){
+    renderPalette();
+    renderStack();
+    setupSortable();
+  }
+
+  function renderPalette(){
+    const el = document.getElementById('palette');
+    const counts = {};
+    Object.values(blocks).forEach(b=>{ counts[b.type] = (counts[b.type]||0)+1; });
+    el.innerHTML = Object.keys(BLOCK_LIMITS).map(type=>{
+      const count = counts[type]||0;
+      const limit = BLOCK_LIMITS[type];
+      const atLimit = count >= limit;
+      const title = BLOCK_TITLES[type];
+      const reason = atLimit ? `Maximum ${limit} ${title} block${limit>1?'s':''} allowed` : `Add ${title}`;
+      return `<button type="button" class="palette-btn" data-type="${type}" ${atLimit?'disabled':''} title="${escapeHtml(reason)}" aria-label="${escapeHtml(reason)}">
+        <span class="pal-icon"><i class="fa-solid ${BLOCK_ICONS[type]}"></i></span>
+        <span>${escapeHtml(title)}</span>
+        <span class="palette-count">${count}/${limit}</span>
+      </button>`;
+    }).join('');
+    el.querySelectorAll('.palette-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> addBlock(btn.dataset.type));
+    });
+  }
+
+  function addBlock(type){
+    const count = Object.values(blocks).filter(b=>b.type===type).length;
+    if (count >= BLOCK_LIMITS[type]) { renderPalette(); return; }
+    const entries = sortedEntries().map(e=>e[1]);
+    const block = createBlock(type, getDefaultConfig(type));
+    // bounds always goes to index 0
+    if (type === 'bounds') entries.unshift(block); else entries.push(block);
+    reindex(entries);
+    render();
+    openSettings(block.id);
+  }
+
+  function getBlockTitle(block){ return BLOCK_TITLES[block.type] || block.type; }
+
+  function getBlockPreview(block){
+    switch(block.type){
+      case 'bounds':
+        if (!block.config.responseType) return 'Configuration required, click to set up';
+        return `Type: ${RESPONSE_TYPE_LABELS[block.config.responseType] || block.config.responseType}`;
+      case 'examples':
+        return block.config.postTitle ? `Example: "${block.config.postTitle.substring(0,40)}${block.config.postTitle.length>40?'…':''}"` : 'No example content set';
+      case 'prompt_body':
+        return block.config.text ? (block.config.text.substring(0,70) + (block.config.text.length>70?'…':'')) : 'Empty, click to write instructions';
+      case 'post_title':
+        return 'Injects runtime variable {POST_TITLE}';
+      case 'post_body':
+        return 'Injects runtime variable {POST_BODY}';
+      case 'post_metadata': {
+        const f = [];
+        if (block.config.showUpvotes) f.push('Upvotes');
+        if (block.config.showComments) f.push('Comments');
+        if (block.config.showSubreddit) f.push('Subreddit');
+        return f.length ? `Included: ${f.join(', ')}` : 'No metadata selected';
+      }
+      default: return '';
+    }
+  }
+
+  function renderStack(){
+    const container = document.getElementById('promptStack');
+    container.innerHTML = '';
+    const entries = sortedEntries();
+    entries.forEach(([order, block], idx)=>{
+      const div = document.createElement('div');
+      const isBounds = block.type === 'bounds';
+      div.className = `prompt-block glass-card hoverable accent-${block.type}` + (isBounds ? ' static-block' : '') + (currentOpenSettings===block.id ? ' selected':'');
+      div.dataset.blockId = block.id;
+      div.setAttribute('role', 'button');
+      div.setAttribute('tabindex', '0');
+      div.setAttribute('aria-label', `${getBlockTitle(block)} block, open settings`);
+      attachSpotlight(div);
+
+      const isFirstMovable = idx === (entries[0][1].type==='bounds' ? 1 : 0);
+      const isLastMovable = idx === entries.length - 1;
+
+      div.innerHTML = `
+        <div class="flex items-center gap-3 relative z-10">
+          ${isBounds ? '' : '<span class="drag-handle" tabindex="-1" aria-hidden="true"><i class="fa-solid fa-grip-vertical"></i></span>'}
+          <span class="order-badge">${idx+1}</span>
+          <span class="icon-badge"><i class="fa-solid ${BLOCK_ICONS[block.type]}"></i></span>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-gray-100 text-base subhead tracking-wide truncate">${escapeHtml(getBlockTitle(block))}${block.type==='bounds' && !block.config.responseType ? ' <span class=\"text-red-400 text-xs align-middle\">&bull; required</span>' : ''}</div>
+            <div class="text-xs text-gray-400 font-mono-spec truncate">${escapeHtml(getBlockPreview(block))}</div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            ${isBounds ? '<span class="contract-tag">SYSTEM</span>' : `
+              <button type="button" class="mini-icon-btn move-up-btn" data-id="${block.id}" ${isFirstMovable?'disabled':''} aria-label="Move block up"><i class="fa-solid fa-chevron-up"></i></button>
+              <button type="button" class="mini-icon-btn move-down-btn" data-id="${block.id}" ${isLastMovable?'disabled':''} aria-label="Move block down"><i class="fa-solid fa-chevron-down"></i></button>
+              <button type="button" class="mini-icon-btn danger delete-btn" data-id="${block.id}" aria-label="Delete block"><i class="fa-solid fa-trash-alt"></i></button>
+            `}
+          </div>
+        </div>
+      `;
+
+      div.addEventListener('click', (e)=>{
+        if (e.target.closest('button')) return;
+        openSettings(block.id);
+      });
+      div.addEventListener('keydown', (e)=>{
+        if (e.target.closest('button')) return;
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+          e.preventDefault();
+          openSettings(block.id);
+        }
+      });
+      div.querySelectorAll('.delete-btn').forEach(b=> b.addEventListener('click',(e)=>{ e.stopPropagation(); showDeleteModal(block.id); }));
+      div.querySelectorAll('.move-up-btn').forEach(b=> b.addEventListener('click',(e)=>{ e.stopPropagation(); moveBlock(block.id,-1); }));
+      div.querySelectorAll('.move-down-btn').forEach(b=> b.addEventListener('click',(e)=>{ e.stopPropagation(); moveBlock(block.id,1); }));
+
+      container.appendChild(div);
+    });
+  }
+
+  function moveBlock(id, dir){
+    const entries = sortedEntries().map(e=>e[1]);
+    const idx = entries.findIndex(b=>b.id===id);
+    if (idx === -1) return;
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= entries.length) return;
+    if (entries[targetIdx].type === 'bounds' || entries[idx].type === 'bounds') return;
+    const tmp = entries[idx];
+    entries[idx] = entries[targetIdx];
+    entries[targetIdx] = tmp;
+    reindex(entries);
+    render();
+  }
+
+  function setupSortable(){
+    if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
+    const el = document.getElementById('promptStack');
+    if (!window.Sortable || !el) return;
+    sortableInstance = new Sortable(el, {
+      animation: 150,
+      handle: '.drag-handle',
+      filter: '.static-block',
+      ghostClass: 'sortable-ghost',
+      dragClass: 'sortable-drag',
+      onMove: function(evt){
+        if (evt.related && evt.related.classList.contains('static-block')) return false;
+        return true;
+      },
+      onEnd: function(evt){
+        if (evt.oldIndex !== evt.newIndex) handleReorder(evt.oldIndex, evt.newIndex);
+      }
+    });
+  }
+
+  function handleReorder(oldIndex, newIndex){
+    const entries = sortedEntries().map(e=>e[1]);
+    const [moved] = entries.splice(oldIndex,1);
+    entries.splice(newIndex,0,moved);
+    reindex(entries);
+    render();
+  }
+
+  // ---------- Delete ----------
+  function showDeleteModal(id){
+    pendingDeleteId = id;
+    document.getElementById('deleteModal').classList.add('show');
+  }
+  function hideDeleteModal(){
+    pendingDeleteId = null;
+    document.getElementById('deleteModal').classList.remove('show');
+  }
+  function performDelete(id){
+    const entries = sortedEntries().filter(([_,b])=>b.id!==id).map(e=>e[1]);
+    reindex(entries);
+    if (currentOpenSettings === id){ currentOpenSettings = null; closeSettingsPanels(); }
+    render();
+  }
+
+  // ---------- Settings ----------
+  function closeSettingsPanels(){
+    document.getElementById('settingsBodyDesktop').classList.add('hidden');
+    document.getElementById('settingsEmptyDesktop').classList.remove('hidden');
+    document.getElementById('settingsMobilePanel').classList.remove('open');
+  }
+
+  function openSettings(id){
+    const entry = findBlockEntry(id);
+    if (!entry) return;
+    const [, block] = entry;
+    currentOpenSettings = id;
+    const html = getSettingsHTML(block);
+    const title = getBlockTitle(block).toUpperCase();
+
+    // Desktop
+    document.getElementById('settingsEmptyDesktop').classList.add('hidden');
+    document.getElementById('settingsBodyDesktop').classList.remove('hidden');
+    document.getElementById('settingsTitleDesktop').textContent = title;
+    document.getElementById('settingsContentDesktop').innerHTML = html;
+
+    // Mobile
+    document.getElementById('settingsTitleMobile').textContent = title;
+    document.getElementById('settingsContentMobile').innerHTML = html;
+    if (window.innerWidth < 1024) document.getElementById('settingsMobilePanel').classList.add('open');
+
+    setupSettingsListeners(id, document.getElementById('settingsContentDesktop'));
+    setupSettingsListeners(id, document.getElementById('settingsContentMobile'));
+    renderStack();
+  }
+
+  function closeSettings(){
+    currentOpenSettings = null;
+    closeSettingsPanels();
+    renderStack();
+  }
+
+  function getSettingsHTML(block){
+    switch(block.type){
+      case 'bounds': return getBoundsSettingsHTML(block);
+      case 'examples': return getExamplesSettingsHTML(block);
+      case 'prompt_body': return getPromptBodySettingsHTML(block);
+      case 'post_title': return infoPanel('lime','This block injects the title of the analyzed post at runtime.','{POST_TITLE}');
+      case 'post_body': return infoPanel('#facc15','This block injects the body text of the analyzed post at runtime.','{POST_BODY}');
+      case 'post_metadata': return getPostMetadataSettingsHTML(block);
+      default: return '<p class="text-gray-400 text-sm">No settings available</p>';
+    }
+  }
+
+  function infoPanel(color, text, varName){
+    return `<div class="p-4 rounded-lg" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
+      <div class="flex items-start gap-3">
+        <i class="fa-solid fa-circle-info mt-1" style="color:${color==='lime'?'var(--lime)':color};"></i>
+        <div>
+          <p class="text-sm text-gray-300 mb-2">${escapeHtml(text)}</p>
+          <p class="text-xs text-gray-500 font-mono-spec">Runtime variable: <span style="color:${color==='lime'?'var(--lime)':color};">${varName}</span></p>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function getBoundsSettingsHTML(block){
+    const rt = block.config.responseType;
+    const cfg = block.config.responseConfig || {};
+    return `
+      <div class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Expected Response Type</label>
+          <select id="responseType">
+            <option value="">-- Select Type --</option>
+            <option value="unbounded_string" ${rt==='unbounded_string'?'selected':''}>Paragraph / Free Text</option>
+            <option value="bounded_string" ${rt==='bounded_string'?'selected':''}>Bounded String (Single Choice)</option>
+            <option value="bounded_multiple_string" ${rt==='bounded_multiple_string'?'selected':''}>Bounded Multiple Strings (Multi Choice)</option>
+            <option value="unbounded_numeric" ${rt==='unbounded_numeric'?'selected':''}>Unbounded Numeric</option>
+            <option value="bounded_numeric" ${rt==='bounded_numeric'?'selected':''}>Bounded Numeric</option>
+          </select>
+        </div>
+        <div id="typeSpecificSettings">${getBoundsTypeSpecificHTML(rt, cfg)}</div>
+      </div>
+    `;
+  }
+
+  function getBoundsTypeSpecificHTML(rt, cfg){
+    if (!rt) return '';
+    switch(rt){
+      case 'unbounded_string':
+        return `<div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Approximate Length (words)</label>
+          <input type="number" id="approxLength" value="${cfg.approximateLength!=null?cfg.approximateLength:100}" min="1" />
+        </div>`;
+      case 'bounded_string':
+      case 'bounded_multiple_string': {
+        const options = cfg.options || [];
+        return `<div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Options</label>
+          <div id="stringOptions" class="space-y-2 mb-3">
+            ${options.map((opt,i)=>`
+              <div class="flex gap-2">
+                <input type="text" class="flex-1 string-option" data-index="${i}" value="${escapeHtml(opt)}" />
+                <button type="button" class="mini-icon-btn danger remove-option" data-index="${i}" aria-label="Remove option"><i class="fa-solid fa-xmark"></i></button>
+              </div>`).join('')}
+          </div>
+          <input type="text" id="newOption" placeholder="Type and press Enter to add..." />
+        </div>`;
+      }
+      case 'unbounded_numeric':
+        return `<div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Numeric Type</label>
+          <select id="numericType">
+            <option value="integer" ${cfg.numericType==='integer'?'selected':''}>Integer</option>
+            <option value="real" ${cfg.numericType==='real'?'selected':''}>Float / Real</option>
+          </select>
+        </div>`;
+      case 'bounded_numeric':
+        return `<div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Numeric Type</label>
+            <select id="numericType">
+              <option value="integer" ${cfg.numericType==='integer'?'selected':''}>Integer</option>
+              <option value="real" ${cfg.numericType==='real'?'selected':''}>Float / Real</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Lower Bound</label>
+              <input type="number" id="lowerBound" value="${cfg.lower!==undefined?cfg.lower:0}" step="${cfg.numericType==='integer'?'1':'0.01'}" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Upper Bound</label>
+              <input type="number" id="upperBound" value="${cfg.upper!==undefined?cfg.upper:100}" step="${cfg.numericType==='integer'?'1':'0.01'}" />
+            </div>
+          </div>
+        </div>`;
+      default: return '';
+    }
+  }
+
+  function getExamplesSettingsHTML(block){
+    const cfg = block.config;
+    return `<div class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Post Title</label>
+        <input type="text" id="postTitle" value="${escapeHtml(cfg.postTitle||'')}" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Post Body</label>
+        <textarea id="postBody" rows="4">${escapeHtml(cfg.postBody||'')}</textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Upvotes</label>
+          <input type="number" id="upvotes" min="0" value="${cfg.upvotes||0}" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Comments</label>
+          <input type="number" id="comments" min="0" value="${cfg.comments||0}" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase mb-2 tracking-wide" style="color:var(--electric-blue);">Expected Model Response</label>
+        <textarea id="expectedReturn" rows="3">${escapeHtml(cfg.expectedReturn||'')}</textarea>
+        <div id="validationError" class="text-red-400 text-xs mt-2 hidden"></div>
+        <div id="validationHint" class="text-gray-500 text-xs mt-2"></div>
+      </div>
+    </div>`;
+  }
+
+  function getPromptBodySettingsHTML(block){
+    return `<div>
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wide">Prompt Instructions</label>
+      <textarea id="promptText" rows="14" class="mono" placeholder="Enter your system instructions or question here...">${escapeHtml(block.config.text||'')}</textarea>
+    </div>`;
+  }
+
+  function getPostMetadataSettingsHTML(block){
+    const cfg = block.config;
+    return `<div class="space-y-3">
+      <p class="text-gray-400 text-sm">Select metadata fields to include:</p>
+      <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+        <input type="checkbox" id="showUpvotes" ${cfg.showUpvotes?'checked':''} />
+        <span class="text-gray-200 text-sm">Upvote Count</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+        <input type="checkbox" id="showComments" ${cfg.showComments?'checked':''} />
+        <span class="text-gray-200 text-sm">Comment Count</span>
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+        <input type="checkbox" id="showSubreddit" ${cfg.showSubreddit?'checked':''} />
+        <span class="text-gray-200 text-sm">Source Subreddit</span>
+      </label>
+    </div>`;
+  }
+
+  // ---------- Settings listeners ----------
+  function setupSettingsListeners(id, root){
+    const entry = findBlockEntry(id);
+    if (!entry) return;
+    const [, block] = entry;
+    switch(block.type){
+      case 'bounds': setupBoundsListeners(id, root); break;
+      case 'examples': setupExamplesListeners(id, root); break;
+      case 'prompt_body': setupPromptBodyListeners(id, root); break;
+      case 'post_metadata': setupPostMetadataListeners(id, root); break;
+    }
+  }
+
+  function setupBoundsListeners(id, root){
+    const entry = findBlockEntry(id); if(!entry) return;
+    const [, block] = entry;
+    const sel = root.querySelector('#responseType');
+    if (sel){
+      sel.addEventListener('change', (e)=>{
+        block.config.responseType = e.target.value || null;
+        block.config.responseConfig = {};
+        root.querySelector('#typeSpecificSettings').innerHTML = getBoundsTypeSpecificHTML(block.config.responseType, {});
+        setupBoundsTypeSpecificListeners(id, root);
+        renderStack();
+      });
+      setupBoundsTypeSpecificListeners(id, root);
+    }
+  }
+
+  function setupBoundsTypeSpecificListeners(id, root){
+    const entry = findBlockEntry(id); if(!entry) return;
+    const [, block] = entry;
+    const rt = block.config.responseType;
+    switch(rt){
+      case 'unbounded_string': {
+        const inp = root.querySelector('#approxLength');
+        if (inp) inp.addEventListener('input', (e)=>{ block.config.responseConfig.approximateLength = parseInt(e.target.value)||0; renderStack(); });
+        break;
+      }
+      case 'bounded_string':
+      case 'bounded_multiple_string': {
+        root.querySelectorAll('.string-option').forEach((inp)=>{
+          inp.addEventListener('input', (e)=>{
+            const i = parseInt(e.target.dataset.index);
+            if (!block.config.responseConfig.options) block.config.responseConfig.options = [];
+            block.config.responseConfig.options[i] = e.target.value;
+            renderStack();
+          });
+        });
+        root.querySelectorAll('.remove-option').forEach((btn)=>{
+          btn.addEventListener('click', (e)=>{
+            const i = parseInt(e.currentTarget.dataset.index);
+            block.config.responseConfig.options.splice(i,1);
+            root.querySelector('#typeSpecificSettings').innerHTML = getBoundsTypeSpecificHTML(rt, block.config.responseConfig);
+            setupBoundsTypeSpecificListeners(id, root);
+            renderStack();
+          });
+        });
+        const newOpt = root.querySelector('#newOption');
+        if (newOpt){
+          newOpt.addEventListener('keypress', (e)=>{
+            if (e.key === 'Enter' && e.target.value.trim()){
+              if (!block.config.responseConfig.options) block.config.responseConfig.options = [];
+              block.config.responseConfig.options.push(e.target.value.trim());
+              e.target.value = '';
+              root.querySelector('#typeSpecificSettings').innerHTML = getBoundsTypeSpecificHTML(rt, block.config.responseConfig);
+              setupBoundsTypeSpecificListeners(id, root);
+              renderStack();
+            }
+          });
+        }
+        break;
+      }
+      case 'unbounded_numeric':
+      case 'bounded_numeric': {
+        const numType = root.querySelector('#numericType');
+        if (numType){
+          numType.addEventListener('change', (e)=>{
+            block.config.responseConfig.numericType = e.target.value;
+            const lb = root.querySelector('#lowerBound');
+            const ub = root.querySelector('#upperBound');
+            if (lb) lb.step = e.target.value==='integer' ? '1' : '0.01';
+            if (ub) ub.step = e.target.value==='integer' ? '1' : '0.01';
+          });
+        }
+        if (rt === 'bounded_numeric'){
+          const lb = root.querySelector('#lowerBound');
+          const ub = root.querySelector('#upperBound');
+          if (lb) lb.addEventListener('input', (e)=>{
+            const v = parseFloat(e.target.value);
+            block.config.responseConfig.lower = block.config.responseConfig.numericType==='integer' ? Math.floor(v) : v;
+            renderStack();
+          });
+          if (ub) ub.addEventListener('input', (e)=>{
+            const v = parseFloat(e.target.value);
+            block.config.responseConfig.upper = block.config.responseConfig.numericType==='integer' ? Math.floor(v) : v;
+            renderStack();
+          });
+        }
+        break;
+      }
+    }
+  }
+
+  function setupExamplesListeners(id, root){
+    const entry = findBlockEntry(id); if(!entry) return;
+    const [, block] = entry;
+    const fields = ['postTitle','postBody','upvotes','comments','expectedReturn'];
+    fields.forEach(field=>{
+      const inp = root.querySelector('#'+field);
+      if (!inp) return;
+      inp.addEventListener('input', (e)=>{
+        let value = e.target.value;
+        if (field==='upvotes' || field==='comments') value = parseInt(value)||0;
+        block.config[field] = value;
+        if (field === 'expectedReturn') validateExpectedReturn(root, value);
+        renderStack();
+      });
+    });
+    // show hint / run initial validation
+    validateExpectedReturn(root, block.config.expectedReturn || '', true);
+  }
+
+  function validateExpectedReturn(root, value, initial){
+    const boundsBlock = Object.values(blocks).find(b=>b.type==='bounds');
+    const errorDiv = root.querySelector('#validationError');
+    const hintDiv = root.querySelector('#validationHint');
+    if (!errorDiv) return true;
+
+    if (!boundsBlock || !boundsBlock.config.responseType){
+      errorDiv.classList.add('hidden');
+      if (hintDiv) hintDiv.textContent = 'Configure the Response Contract block to validate this example.';
+      return true;
+    }
+    const rt = boundsBlock.config.responseType;
+    const cfg = boundsBlock.config.responseConfig || {};
+    let isValid = true, msg = '', hint = '';
+
+    switch(rt){
+      case 'bounded_numeric':
+      case 'unbounded_numeric': {
+        const num = parseFloat(value);
+        if (value === '' ) { isValid = true; }
+        else if (isNaN(num)) { isValid = false; msg = 'Expected return must be a number.'; }
+        else if (rt === 'bounded_numeric'){
+          if (cfg.lower !== undefined && num < cfg.lower){ isValid=false; msg = `Number must be ≥ ${cfg.lower}.`; }
+          else if (cfg.upper !== undefined && num > cfg.upper){ isValid=false; msg = `Number must be ≤ ${cfg.upper}.`; }
+          else if (cfg.numericType === 'integer' && !Number.isInteger(num)){ isValid=false; msg = 'Number must be an integer.'; }
+        } else if (cfg.numericType === 'integer' && !isNaN(num) && !Number.isInteger(num)){ isValid=false; msg='Number must be an integer.'; }
+        hint = rt === 'bounded_numeric' ? `Contract expects a ${cfg.numericType||'integer'} between ${cfg.lower!==undefined?cfg.lower:0} and ${cfg.upper!==undefined?cfg.upper:100}.` : `Contract expects a ${cfg.numericType||'integer'} number.`;
+        break;
+      }
+      case 'bounded_string': {
+        const options = cfg.options || [];
+        if (value && !options.includes(value)){ isValid=false; msg = `Must be exactly one of: ${options.join(', ') || '(no options configured)'}`; }
+        hint = `Contract expects one of: ${options.join(', ') || '(no options configured yet)'}`;
+        break;
+      }
+      case 'bounded_multiple_string': {
+        const options = cfg.options || [];
+        if (value){
+          const parts = value.split(',').map(s=>s.trim()).filter(Boolean);
+          const bad = parts.filter(p=>!options.includes(p));
+          if (bad.length){ isValid=false; msg = `Not in the configured options: ${bad.join(', ')}`; }
+        }
+        hint = `Contract expects a comma-separated list from: ${options.join(', ') || '(no options configured yet)'}`;
+        break;
+      }
+      case 'unbounded_string': {
+        hint = `Contract expects free text (~${cfg.approximateLength||100} words).`;
+        break;
+      }
+    }
+
+    if (isValid){ errorDiv.classList.add('hidden'); errorDiv.textContent=''; }
+    else { errorDiv.classList.remove('hidden'); errorDiv.textContent = msg; }
+    if (hintDiv) hintDiv.textContent = hint;
+    return isValid;
+  }
+
+  function setupPromptBodyListeners(id, root){
+    const entry = findBlockEntry(id); if(!entry) return;
+    const [, block] = entry;
+    const ta = root.querySelector('#promptText');
+    if (ta) ta.addEventListener('input', (e)=>{ block.config.text = e.target.value; });
+  }
+
+  function setupPostMetadataListeners(id, root){
+    const entry = findBlockEntry(id); if(!entry) return;
+    const [, block] = entry;
+    ['showUpvotes','showComments','showSubreddit'].forEach(field=>{
+      const cb = root.querySelector('#'+field);
+      if (cb) cb.addEventListener('change', (e)=>{ block.config[field] = e.target.checked; renderStack(); });
+    });
+  }
+
+  // ---------- Validation & compile ----------
+  function validatePrompt(){
+    const errors = [];
+    const boundsBlock = Object.values(blocks).find(b=>b.type==='bounds');
+    if (!boundsBlock) errors.push('A Response Contract block is required.');
+    else if (!boundsBlock.config.responseType) errors.push('The Response Contract block must be configured with a response type.');
+
+    const promptBodyBlocks = Object.values(blocks).filter(b=>b.type==='prompt_body');
+    if (promptBodyBlocks.length === 0) errors.push('At least one Prompt Body block is required.');
+    if (promptBodyBlocks.some(b=>!b.config.text || !b.config.text.trim())) errors.push('All Prompt Body blocks must contain text.');
+
+    // Cross-check examples against the contract, if configured
+    if (boundsBlock && boundsBlock.config.responseType){
+      const rt = boundsBlock.config.responseType;
+      const cfg = boundsBlock.config.responseConfig || {};
+      Object.values(blocks).filter(b=>b.type==='examples').forEach((ex, i)=>{
+        const val = ex.config.expectedReturn;
+        if (!val) return;
+        if ((rt==='bounded_numeric'||rt==='unbounded_numeric') && isNaN(parseFloat(val))){
+          errors.push(`Example ${i+1}: expected response must be numeric.`);
+        } else if (rt==='bounded_numeric'){
+          const num = parseFloat(val);
+          if (cfg.lower!==undefined && num < cfg.lower) errors.push(`Example ${i+1}: expected response is below the lower bound (${cfg.lower}).`);
+          if (cfg.upper!==undefined && num > cfg.upper) errors.push(`Example ${i+1}: expected response is above the upper bound (${cfg.upper}).`);
+        } else if (rt==='bounded_string'){
+          const options = cfg.options || [];
+          if (options.length && !options.includes(val)) errors.push(`Example ${i+1}: expected response is not one of the configured options.`);
+        } else if (rt==='bounded_multiple_string'){
+          const options = cfg.options || [];
+          const parts = val.split(',').map(s=>s.trim()).filter(Boolean);
+          if (options.length && parts.some(p=>!options.includes(p))) errors.push(`Example ${i+1}: expected response contains a value outside the configured options.`);
+        }
+      });
+    }
+
+    return { isValid: errors.length===0, errors };
+  }
+
+  function compilePrompt(){
+    const boundsBlock = Object.values(blocks).find(b=>b.type==='bounds');
+    const rt = boundsBlock.config.responseType;
+    const responseConfig = boundsBlock.config.responseConfig || {};
+    const templates = TEMPLATES.types[rt] || {};
+
+    const sub = (str)=> (str||'')
+      .replace(/{lower}/g, responseConfig.lower!==undefined ? responseConfig.lower : '')
+      .replace(/{upper}/g, responseConfig.upper!==undefined ? responseConfig.upper : '')
+      .replace(/{options}/g, (responseConfig.options||[]).join(', '))
+      .replace(/{approximate-response-length}/g, responseConfig.approximateLength!=null ? responseConfig.approximateLength : '');
+
+    let compiled = sub(templates.header) + '\n\n';
+
+    sortedEntries()
+      .filter(([_,b])=>b.type!=='bounds')
+      .forEach(([_,b])=>{
+        const text = compileBlock(b);
+        if (text) compiled += text + '\n\n';
+      });
+
+    compiled += sub(templates.footer);
+    return compiled.trim();
+  }
+
+  function compileBlock(block){
+    switch(block.type){
+      case 'examples': return compileExampleBlock(block);
+      case 'prompt_body': return block.config.text || '';
+      case 'post_title': return 'Post Title: {POST_TITLE}';
+      case 'post_body': return 'Post Body: {POST_BODY}';
+      case 'post_metadata': return compileMetadataBlock(block);
+      default: return '';
+    }
+  }
+
+  function compileExampleBlock(block){
+    const intros = TEMPLATES.exampleIntros;
+    let text = '';
+    if (intros.Intro) text += intros.Intro + '\n';
+    if (block.config.postTitle) text += intros.postTitle.replace(/{title}/g, block.config.postTitle) + '\n';
+    if (block.config.postBody) text += intros.postBody.replace(/{post}/g, block.config.postBody) + '\n';
+    if (block.config.upvotes !== undefined) text += intros.upvoteCount.replace(/{upvotes}/g, block.config.upvotes) + '\n';
+    if (block.config.comments !== undefined) text += intros.commentCount.replace(/{comments}/g, block.config.comments) + '\n';
+    if (block.config.expectedReturn) text += intros.expectedReturn.replace(/{return}/g, block.config.expectedReturn) + '\n';
+    return text.trim();
+  }
+
+  function compileMetadataBlock(block){
+    const parts = [];
+    if (block.config.showUpvotes) parts.push('Upvotes: {POST_UPVOTES}');
+    if (block.config.showComments) parts.push('Comments: {POST_COMMENTS}');
+    if (block.config.showSubreddit) parts.push('Subreddit: {POST_SUBREDDIT}');
+    return parts.join('\n');
+  }
+
+  function highlightPlaceholders(text){
+    const escaped = escapeHtml(text);
+    return escaped.replace(/\{POST_[A-Z_]+\}/g, (m)=>`<span class="ph">${m}</span>`);
+  }
+
+  function showCompileModal(){
+    const validation = validatePrompt();
+    const modal = document.getElementById('compileModal');
+    const errBox = document.getElementById('compileErrors');
+    const errList = document.getElementById('compileErrorsList');
+    const successBox = document.getElementById('compileSuccess');
+
+    if (!validation.isValid){
+      errBox.classList.remove('hidden');
+      successBox.classList.add('hidden');
+      errList.innerHTML = validation.errors.map(e=>`<li>${escapeHtml(e)}</li>`).join('');
+    } else {
+      errBox.classList.add('hidden');
+      successBox.classList.remove('hidden');
+      const compiled = compilePrompt();
+      document.getElementById('compiledPromptDisplay').innerHTML = highlightPlaceholders(compiled);
+      document.getElementById('compiledPromptDisplay').dataset.raw = compiled;
+    }
+    modal.classList.add('show');
+  }
+
+  function hideCompileModal(){ document.getElementById('compileModal').classList.remove('show'); }
+
+  // ---------- Wiring ----------
+  document.getElementById('resetBtn').addEventListener('click', resetToDefault);
+  document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
+  document.getElementById('compileBtn').addEventListener('click', showCompileModal);
+  document.getElementById('closeCompileModal').addEventListener('click', hideCompileModal);
+  document.getElementById('compileModal').addEventListener('click', (e)=>{ if (e.target.id==='compileModal') hideCompileModal(); });
+  document.getElementById('deleteModal').addEventListener('click', (e)=>{ if (e.target.id==='deleteModal') hideDeleteModal(); });
+  document.getElementById('confirmDeleteBtn').addEventListener('click', ()=>{
+    if (pendingDeleteId){ performDelete(pendingDeleteId); pendingDeleteId=null; }
+    hideDeleteModal();
+  });
+  document.getElementById('cancelDeleteBtn').addEventListener('click', hideDeleteModal);
+  document.getElementById('closeSettingsDesktop').addEventListener('click', closeSettings);
+  document.getElementById('closeSettingsMobile').addEventListener('click', closeSettings);
+
+  document.getElementById('copyCompiledBtn').addEventListener('click', async ()=>{
+    const raw = document.getElementById('compiledPromptDisplay').dataset.raw || '';
+    const btn = document.getElementById('copyCompiledBtn');
+    try{
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(raw);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = raw; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const old = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i>Copied';
+      setTimeout(()=>{ btn.innerHTML = old; }, 1500);
+    } catch(err){
+      console.warn('Copy failed', err);
+    }
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('compileModal').classList.contains('show')) { hideCompileModal(); return; }
+    if (document.getElementById('deleteModal').classList.contains('show')) { hideDeleteModal(); return; }
+    if (document.getElementById('settingsMobilePanel').classList.contains('open')) { closeSettings(); return; }
+    if (currentOpenSettings) { closeSettings(); }
+  });
+
+  // Click outside a stack card (on the stack container background) closes settings on mobile only,
+  // but keep desktop settings persistent since it's a fixed sidebar.
+  document.getElementById('promptStack').addEventListener('click', (e)=>{
+    if (e.target.id === 'promptStack' && window.innerWidth < 1024) closeSettings();
+  });
+
+  // ---------- Init ----------
+  loadExample();
+})();
+</script>
+</body>
+</html>

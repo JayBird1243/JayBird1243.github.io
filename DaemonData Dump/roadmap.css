@@ -1,0 +1,333 @@
+/* Roadmap Specific Styles */
+:root {
+    --color-gold: #FFD700;
+    --color-silver: #C0C0C0;
+    --color-bronze: #CD7F32;
+    --color-glass: rgba(20, 20, 20, 0.6);
+    --color-glass-border: rgba(255, 255, 255, 0.05);
+    --color-neon-blue: #00BFFF;
+    --color-neon-magenta: #FF00FF;
+    --color-neon-lime: #32CD32;
+    --bg-dark: #050505;
+}
+
+body {
+    background-color: var(--bg-dark);
+    font-family: 'Inter', sans-serif;
+    color: #e5e7eb;
+}
+
+h1, h2, h3 {
+    font-family: 'Orbitron', sans-serif;
+}
+
+.font-rajdhani {
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* Glass Card Base */
+.glass-card {
+    background: var(--color-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Flashlight Effect */
+.glass-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+        rgba(255, 255, 255, 0.06), 
+        transparent 40%
+    );
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.glass-card:hover::before {
+    opacity: 1;
+}
+
+/* Roadmap Item Bar */
+.roadmap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    min-height: 100px;
+}
+
+.roadmap-item .content {
+    flex: 1;
+    margin-right: 2rem;
+    max-width: 80%;
+    z-index: 2;
+}
+
+.roadmap-item .title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.roadmap-item .description {
+    color: #9ca3af;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+}
+
+.roadmap-item .score-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.score-container .score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-width: 3ch;
+    text-align: center;
+}
+
+.vote-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0.25rem;
+}
+
+.vote-btn:hover {
+    color: white;
+    transform: scale(1.2);
+}
+
+.vote-btn.active.upvote {
+    color: var(--color-neon-lime);
+    text-shadow: 0 0 10px rgba(50, 205, 50, 0.5);
+}
+
+.vote-btn.active.downvote {
+    color: var(--color-neon-magenta); /* Using magenta/red for downvote */
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+/* Top 3 Styling */
+.roadmap-item.rank-1 {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, rgba(20, 20, 20, 0.6) 100%);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+}
+.roadmap-item.rank-1 .title { color: var(--color-gold); text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+
+.roadmap-item.rank-2 {
+    border-color: rgba(192, 192, 192, 0.3);
+    background: linear-gradient(90deg, rgba(192, 192, 192, 0.05) 0%, rgba(20, 20, 20, 0.6) 100%);
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.1);
+}
+.roadmap-item.rank-2 .title { color: var(--color-silver); text-shadow: 0 0 10px rgba(192, 192, 192, 0.3); }
+
+.roadmap-item.rank-3 {
+    border-color: rgba(205, 127, 50, 0.3);
+    background: linear-gradient(90deg, rgba(205, 127, 50, 0.05) 0%, rgba(20, 20, 20, 0.6) 100%);
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.1);
+}
+.roadmap-item.rank-3 .title { color: var(--color-bronze); text-shadow: 0 0 10px rgba(205, 127, 50, 0.3); }
+
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 1000px;
+    height: 90vh;
+    background: #0a0a0a;
+    border: 1px solid var(--color-glass-border);
+    border-radius: 1.5rem;
+    padding: 3rem;
+    position: relative;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.modal-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #fff, #9ca3af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.modal-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #9ca3af;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.9rem;
+}
+
+.modal-body {
+    flex: 1;
+}
+
+.section-label {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--color-neon-blue);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.text-block {
+    color: #e5e7eb;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.comments-section {
+    margin-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.comment-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border-left: 3px solid var(--color-neon-blue);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+.comment-author {
+    color: var(--color-neon-blue);
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.close-modal {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: white;
+}
+
+/* Create Suggestion Button */
+.create-btn {
+    background: linear-gradient(45deg, var(--color-neon-blue), #0088cc);
+    color: black;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 191, 255, 0.5);
+}
+
+/* Admin Suggestion Panel */
+.admin-panel {
+    background: rgba(255, 0, 255, 0.05);
+    border: 1px solid var(--color-neon-magenta);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    display: none; /* Hidden by default */
+}
+
+.admin-panel.visible {
+    display: block;
+}
+

@@ -5,24 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daemon Data | Jack Buhr</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;700&display=swap');
-
         .daemon-page {
             --daemon-ink: oklch(0.93 0.012 287);
-            --daemon-muted: oklch(0.76 0.025 287);
-            --daemon-faint: oklch(0.62 0.03 287);
+            --daemon-muted: oklch(0.78 0.025 287);
+            --daemon-faint: oklch(0.63 0.03 287);
             --daemon-panel: oklch(0.19 0.025 287 / 0.86);
             --daemon-panel-strong: oklch(0.23 0.04 287 / 0.92);
+            --daemon-line: oklch(0.39 0.06 287);
             --daemon-accent: oklch(0.72 0.19 316);
             --daemon-gold: oklch(0.82 0.16 82);
             --daemon-blue: oklch(0.75 0.13 233);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
             font-family: 'Atkinson Hyperlegible', sans-serif;
             color: var(--daemon-ink);
-        }
-
-        .daemon-page .hero {
-            margin-bottom: clamp(3rem, 10vw, 8rem);
         }
 
         .daemon-page h1,
@@ -33,9 +32,9 @@
             letter-spacing: 0.01em;
         }
 
-        .case-hero {
-            max-width: 980px;
-            margin: 0 auto;
+        .daemon-page .hero {
+            max-width: 1080px;
+            margin: 0 auto clamp(1.5rem, 4vw, 2.5rem);
             text-align: left;
         }
 
@@ -43,29 +42,30 @@
             color: var(--daemon-gold);
             font-family: 'Chakra Petch', sans-serif;
             font-size: 0.85rem;
-            letter-spacing: 0.16em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
         }
 
         .case-title {
-            font-size: clamp(3rem, 8vw, 6.8rem);
+            font-size: clamp(2.9rem, 8vw, 6rem);
             line-height: 0.9;
-            margin: 0.6rem 0 1rem;
+            margin: 0.5rem 0 1rem;
             color: var(--daemon-ink);
         }
 
         .case-deck {
-            max-width: 72ch;
+            max-width: 66ch;
             color: var(--daemon-muted);
-            font-size: clamp(1.05rem, 2vw, 1.35rem);
-            line-height: 1.65;
+            font-size: clamp(1.05rem, 2vw, 1.3rem);
+            line-height: 1.6;
+            margin: 0 0 1.4rem;
         }
 
         .case-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.75rem;
-            margin: 1.5rem 0 0;
+            gap: 0.6rem;
+            margin: 0 0 0.4rem;
         }
 
         .meta-pill,
@@ -74,128 +74,258 @@
             background: oklch(0.18 0.03 287 / 0.68);
             border-radius: 999px;
             color: var(--daemon-muted);
-            font-size: 0.85rem;
-            padding: 0.45rem 0.8rem;
+            font-size: 0.83rem;
+            padding: 0.4rem 0.8rem;
         }
 
         .case-shell {
+            max-width: 1080px;
+            margin: 0 auto;
             display: grid;
-            gap: clamp(1.5rem, 3vw, 2.25rem);
+            gap: clamp(1.1rem, 2.5vw, 1.75rem);
+            padding-bottom: clamp(2rem, 6vw, 4rem);
         }
 
         .case-section {
             background:
-                radial-gradient(circle at top right, oklch(0.45 0.12 316 / 0.16), transparent 38%),
+                radial-gradient(ellipse 70% 60% at 100% 0%, oklch(0.45 0.12 316 / 0.13), transparent 55%),
                 var(--daemon-panel);
-            border: 1px solid oklch(0.39 0.06 287);
-            border-radius: 24px;
-            padding: clamp(1.4rem, 3vw, 2.5rem);
-            box-shadow: 0 24px 80px oklch(0.04 0.02 287 / 0.36);
+            border: 1px solid var(--daemon-line);
+            border-radius: 20px;
+            padding: clamp(1.3rem, 3vw, 2.2rem);
         }
 
         .section-grid {
             display: grid;
-            grid-template-columns: minmax(180px, 0.72fr) minmax(0, 1.6fr);
-            gap: clamp(1rem, 4vw, 3rem);
+            grid-template-columns: minmax(160px, 0.62fr) minmax(0, 1.7fr);
+            gap: clamp(1rem, 4vw, 2.75rem);
             align-items: start;
         }
 
         .section-label {
             color: var(--daemon-gold);
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             letter-spacing: 0.16em;
             text-transform: uppercase;
         }
 
+        .feature-index {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 2.6rem;
+            line-height: 1;
+            color: oklch(0.42 0.09 287);
+            margin-bottom: 0.35rem;
+        }
+
         .case-section h2 {
-            margin: 0.35rem 0 0;
+            margin: 0.3rem 0 0;
             color: var(--daemon-ink);
-            font-size: clamp(1.7rem, 4vw, 2.7rem);
-            line-height: 1.05;
-        }
-
-        .case-section h3 {
-            color: var(--daemon-blue);
-            margin: 1.35rem 0 0.45rem;
-            font-size: 1.2rem;
-        }
-
-        .case-section p,
-        .case-section li {
-            color: var(--daemon-muted);
-            font-size: 1rem;
-            line-height: 1.72;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            line-height: 1.12;
         }
 
         .case-section p {
-            margin: 0 0 1rem;
+            color: var(--daemon-muted);
+            font-size: 1.02rem;
+            line-height: 1.68;
+            margin: 0 0 0.9rem;
+            max-width: 68ch;
         }
 
-        .case-section ul {
-            margin: 0.85rem 0 0;
-            padding-left: 1.25rem;
+        .case-section p:last-child {
+            margin-bottom: 0;
         }
 
-        .system-map,
-        .tech-grid {
+        .case-section code {
+            font-family: 'Chakra Petch', monospace;
+            background: oklch(0.14 0.02 287 / 0.8);
+            border: 1px solid oklch(0.32 0.05 287);
+            border-radius: 4px;
+            padding: 0.08em 0.35em;
+            font-size: 0.92em;
+            color: var(--daemon-blue);
+        }
+
+        /* Deep dive disclosure */
+        .dive {
+            margin-top: 1.15rem;
+            border-top: 1px solid oklch(0.34 0.05 287);
+        }
+
+        .dive > summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.85rem 0 0;
+            color: var(--daemon-blue);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .dive > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .dive > summary:hover,
+        .dive > summary:focus-visible {
+            color: var(--daemon-ink);
+            outline: none;
+        }
+
+        .dive > summary .chev {
+            display: inline-block;
+            transition: transform 0.25s var(--ease-out-expo);
+        }
+
+        .dive[open] > summary .chev {
+            transform: rotate(90deg);
+        }
+
+        .dive-body {
+            padding-top: 0.9rem;
+        }
+
+        .dive-body h3 {
+            color: var(--daemon-accent);
+            font-size: 0.95rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin: 1.3rem 0 0.5rem;
+        }
+
+        .dive-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .dive-body ul {
+            margin: 0 0 0.9rem;
+            padding-left: 1.15rem;
+        }
+
+        .dive-body li {
+            color: var(--daemon-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0.4rem;
+        }
+
+        .dive-body li strong {
+            color: var(--daemon-ink);
+        }
+
+        /* Sandbox call to action */
+        .sandbox-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 1.15rem;
+            padding: 0.72rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--daemon-accent);
+            background: oklch(0.4 0.15 316 / 0.18);
+            color: var(--daemon-ink);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 600;
+            font-size: 0.92rem;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            transition: background 0.25s ease, transform 0.25s var(--ease-out-expo);
+        }
+
+        .sandbox-cta:hover,
+        .sandbox-cta:focus-visible {
+            background: oklch(0.5 0.17 316 / 0.32);
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .sandbox-cta .cta-note {
+            color: var(--daemon-faint);
+            font-family: 'Atkinson Hyperlegible', sans-serif;
+            font-weight: 400;
+            font-size: 0.82rem;
+            letter-spacing: 0;
+        }
+
+        /* Pipeline diagram */
+        .pipeline-head {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-top: 1.3rem;
+            grid-template-columns: minmax(160px, 0.62fr) minmax(0, 1.7fr);
+            gap: clamp(1rem, 4vw, 2.75rem);
+            align-items: start;
+            margin-bottom: clamp(1.4rem, 3vw, 2.2rem);
         }
 
-        .system-card,
-        .tech-card {
+        .pipeline-head p {
+            margin: 0;
+        }
+
+        .pipeline-figure {
+            margin: 0;
+        }
+
+        .pipeline-figure svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .pipeline-fallback {
+            display: none;
+            margin: 0;
+            padding-left: 1.3rem;
+        }
+
+        .pipeline-fallback li {
+            color: var(--daemon-muted);
+            font-size: 0.98rem;
+            line-height: 1.55;
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-fallback strong {
+            color: var(--daemon-ink);
+            font-family: 'Chakra Petch', sans-serif;
+        }
+
+        /* Compact grid for the short closing sections */
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+            gap: 0.9rem;
+            margin-top: 0.4rem;
+        }
+
+        .mini-card {
             background: var(--daemon-panel-strong);
             border: 1px solid oklch(0.36 0.06 287);
-            border-radius: 18px;
-            padding: 1.1rem;
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
         }
 
-        .system-card h4,
-        .tech-card h4 {
+        .mini-card h4 {
             color: var(--daemon-ink);
-            margin: 0 0 0.45rem;
-            font-size: 1rem;
+            margin: 0 0 0.35rem;
+            font-size: 0.98rem;
         }
 
-        .system-card p,
-        .tech-card p {
+        .mini-card p {
             margin: 0;
             color: var(--daemon-faint);
-            font-size: 0.93rem;
-        }
-
-        .flow-list {
-            display: grid;
-            gap: 0.85rem;
-            margin-top: 1.2rem;
-            padding: 0;
-            list-style: none;
-        }
-
-        .flow-list li {
-            background: oklch(0.16 0.02 287 / 0.72);
-            border: 1px solid oklch(0.33 0.055 287);
-            border-radius: 16px;
-            padding: 1rem;
-        }
-
-        .flow-list strong {
-            color: var(--daemon-ink);
-        }
-
-        .todo-panel {
-            border-style: dashed;
-            background: oklch(0.17 0.04 287 / 0.74);
+            font-size: 0.92rem;
+            line-height: 1.55;
         }
 
         .tech-stack {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-top: 1rem;
+            gap: 0.55rem;
         }
 
         @media (max-width: 860px) {
@@ -203,8 +333,31 @@
                 max-width: 94%;
             }
 
-            .section-grid {
+            .section-grid,
+            .pipeline-head {
                 grid-template-columns: 1fr;
+                gap: 1.1rem;
+            }
+
+            .feature-index {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .pipeline-figure {
+                display: none;
+            }
+
+            .pipeline-fallback {
+                display: block;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sandbox-cta,
+            .dive > summary .chev {
+                transition: none;
             }
         }
     </style>
@@ -228,45 +381,283 @@
     </header>
 
     <main id="content-wrapper" class="daemon-page">
-        <section class="hero case-hero">
-            <div class="case-kicker">SaaS data infrastructure case study</div>
+        <section class="hero">
+            <div class="case-kicker">Solo build · Firebase &amp; Google Cloud</div>
             <h1 class="case-title">Daemon Data</h1>
-            <p class="case-deck">A Firebase and Google Cloud based system for collecting Reddit activity, sharing scrape effort across users, running AI analysis, and turning the results into configurable notifications. The project started as a personal market-signal experiment and grew into a hosted SaaS architecture designed around rate limits, multi-tenant data reuse, and user-defined automation.</p>
+            <p class="case-deck">A Reddit intelligence platform where users define what to watch and the backend collects it once for everyone who wants it. Scraped posts run through user-built LLM prompts, and the results feed a visual expression graph that decides when to send an alert.</p>
             <div class="case-meta">
-                <span class="meta-pill">Firebase Auth</span>
                 <span class="meta-pill">Firestore</span>
-                <span class="meta-pill">Cloud Functions</span>
-                <span class="meta-pill">Pub/Sub</span>
-                <span class="meta-pill">Cloud Scheduler</span>
+                <span class="meta-pill">Cloud Functions v2</span>
                 <span class="meta-pill">Cloud Tasks</span>
+                <span class="meta-pill">Pub/Sub</span>
                 <span class="meta-pill">Python + Node.js</span>
-                <span class="meta-pill">LLM APIs</span>
+                <span class="meta-pill">OpenAI · Anthropic · Gemini</span>
             </div>
-            <a href="../projects.html" class="deep-dive-btn">← Back to Projects</a>
+            <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
         </section>
 
         <div class="case-shell">
+            <section class="case-section pipeline-section">
+                <div class="pipeline-head">
+                    <div>
+                        <div class="section-label">The pipeline</div>
+                        <h2>Demand in, alerts out.</h2>
+                    </div>
+                    <p>Every stage is asynchronous and rate-aware. The interesting engineering sits in the seams: how demand from many users collapses into one scrape, how a scarce pool of Reddit accounts gets shared without collisions, and how LLM work is metered rather than fired off at once.</p>
+                </div>
+                <figure class="pipeline-figure">
+                            <svg viewBox="0 0 1150 250" role="img" aria-labelledby="pipeline-title pipeline-desc">
+                                <title id="pipeline-title">Daemon Data processing pipeline</title>
+                                <desc id="pipeline-desc">Workflows feed schedulers, which drive a leased bot pool, which writes to Firestore, which feeds metered LLM workers, whose results are evaluated by a notification graph.</desc>
+                                <defs>
+                                    <marker id="dd-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="oklch(0.55 0.07 287)"></path>
+                                    </marker>
+                                </defs>
+
+                                <g font-family="'Chakra Petch', sans-serif">
+                                    <!-- Stage 1 -->
+                                    <rect x="25" y="70" width="155" height="96" rx="12" fill="oklch(0.23 0.04 287 / 0.92)" stroke="oklch(0.42 0.06 287)"></rect>
+                                    <text x="42" y="58" font-size="13" letter-spacing="2" fill="oklch(0.55 0.07 287)">01</text>
+                                    <text x="42" y="103" font-size="17" font-weight="600" fill="oklch(0.93 0.012 287)">Workflows</text>
+                                    <text x="42" y="126" font-size="13" fill="oklch(0.68 0.03 287)">what each user</text>
+                                    <text x="42" y="143" font-size="13" fill="oklch(0.68 0.03 287)">asks to watch</text>
+
+                                    <!-- Stage 2 -->
+                                    <rect x="224" y="70" width="155" height="96" rx="12" fill="oklch(0.23 0.04 287 / 0.92)" stroke="oklch(0.42 0.06 287)"></rect>
+                                    <text x="241" y="58" font-size="13" letter-spacing="2" fill="oklch(0.55 0.07 287)">02</text>
+                                    <text x="241" y="103" font-size="17" font-weight="600" fill="oklch(0.82 0.16 82)">Schedulers</text>
+                                    <text x="241" y="126" font-size="13" fill="oklch(0.68 0.03 287)">one merged plan</text>
+                                    <text x="241" y="143" font-size="13" fill="oklch(0.68 0.03 287)">per subreddit</text>
+
+                                    <!-- Stage 3 -->
+                                    <rect x="423" y="70" width="155" height="96" rx="12" fill="oklch(0.23 0.04 287 / 0.92)" stroke="oklch(0.42 0.06 287)"></rect>
+                                    <text x="440" y="58" font-size="13" letter-spacing="2" fill="oklch(0.55 0.07 287)">03</text>
+                                    <text x="440" y="103" font-size="17" font-weight="600" fill="oklch(0.82 0.16 82)">Bot pool</text>
+                                    <text x="440" y="126" font-size="13" fill="oklch(0.68 0.03 287)">transactional</text>
+                                    <text x="440" y="143" font-size="13" fill="oklch(0.68 0.03 287)">account lease</text>
+
+                                    <!-- Stage 4 -->
+                                    <rect x="622" y="70" width="155" height="96" rx="12" fill="oklch(0.23 0.04 287 / 0.92)" stroke="oklch(0.42 0.06 287)"></rect>
+                                    <text x="639" y="58" font-size="13" letter-spacing="2" fill="oklch(0.55 0.07 287)">04</text>
+                                    <text x="639" y="103" font-size="17" font-weight="600" fill="oklch(0.93 0.012 287)">Firestore</text>
+                                    <text x="639" y="126" font-size="13" fill="oklch(0.68 0.03 287)">shared posts,</text>
+                                    <text x="639" y="143" font-size="13" fill="oklch(0.68 0.03 287)">deltas, queue</text>
+
+                                    <!-- Stage 5 -->
+                                    <rect x="821" y="70" width="155" height="96" rx="12" fill="oklch(0.23 0.04 287 / 0.92)" stroke="oklch(0.42 0.06 287)"></rect>
+                                    <text x="838" y="58" font-size="13" letter-spacing="2" fill="oklch(0.55 0.07 287)">05</text>
+                                    <text x="838" y="103" font-size="17" font-weight="600" fill="oklch(0.82 0.16 82)">LLM workers</text>
+                                    <text x="838" y="126" font-size="13" fill="oklch(0.68 0.03 287)">metered by</text>
+                                    <text x="838" y="143" font-size="13" fill="oklch(0.68 0.03 287)">Cloud Tasks</text>
+
+                                    <!-- Stage 6 -->
+                                    <rect x="1020" y="70" width="105" height="96" rx="12" fill="oklch(0.3 0.09 316 / 0.5)" stroke="oklch(0.62 0.15 316)"></rect>
+                                    <text x="1037" y="58" font-size="13" letter-spacing="2" fill="oklch(0.55 0.07 287)">06</text>
+                                    <text x="1037" y="103" font-size="17" font-weight="600" fill="oklch(0.93 0.012 287)">Graph</text>
+                                    <text x="1037" y="126" font-size="13" fill="oklch(0.72 0.05 316)">boolean</text>
+                                    <text x="1037" y="143" font-size="13" fill="oklch(0.72 0.05 316)">&#8594; alert</text>
+
+                                    <!-- Connectors -->
+                                    <line x1="182" y1="118" x2="219" y2="118" stroke="oklch(0.45 0.06 287)" stroke-width="1.5" marker-end="url(#dd-arrow)"></line>
+                                    <line x1="381" y1="118" x2="418" y2="118" stroke="oklch(0.45 0.06 287)" stroke-width="1.5" marker-end="url(#dd-arrow)"></line>
+                                    <line x1="580" y1="118" x2="617" y2="118" stroke="oklch(0.45 0.06 287)" stroke-width="1.5" marker-end="url(#dd-arrow)"></line>
+                                    <line x1="779" y1="118" x2="816" y2="118" stroke="oklch(0.45 0.06 287)" stroke-width="1.5" marker-end="url(#dd-arrow)"></line>
+                                    <line x1="978" y1="118" x2="1015" y2="118" stroke="oklch(0.45 0.06 287)" stroke-width="1.5" marker-end="url(#dd-arrow)"></line>
+
+                                    <!-- Feedback: results written back to Firestore -->
+                                    <path d="M 898 172 L 898 205 L 700 205 L 700 172" fill="none" stroke="oklch(0.4 0.05 287)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#dd-arrow)"></path>
+                                    <text x="712" y="225" font-size="12" fill="oklch(0.58 0.03 287)">analysis results written back per user</text>
+                                </g>
+                            </svg>
+                        </figure>
+                        <ol class="pipeline-fallback">
+                            <li><strong>Workflows</strong> capture what each user asks to watch.</li>
+                            <li><strong>Schedulers</strong> merge that demand into one plan per subreddit.</li>
+                            <li><strong>The bot pool</strong> leases a Reddit account transactionally to run the scrape.</li>
+                            <li><strong>Firestore</strong> holds shared posts, delta history, and the analysis queue.</li>
+                            <li><strong>LLM workers</strong> drain the queue under a per-user concurrency limit.</li>
+                            <li><strong>The graph evaluator</strong> turns the results into a boolean and fires the alert.</li>
+                </ol>
+            </section>
+
             <section class="case-section">
                 <div class="section-grid">
                     <div>
-                        <div class="section-label">Core Idea</div>
-                        <h2>Turn individual scraping requests into shared infrastructure.</h2>
+                        <div class="feature-index">01</div>
+                        <div class="section-label">Shared scrape layer</div>
                     </div>
                     <div>
-                        <p>Daemon Data is built around a central principle: if two users want overlapping Reddit data, the system should collect it once, store it once, and distribute the value many times. Instead of treating each workflow as an isolated job, workflows feed shared scheduler documents that combine user demand into one scrape plan per subreddit.</p>
-                        <p>That design reduced duplicate Reddit API calls, made Firestore storage more efficient, and created a cleaner separation between shared facts and private user data. Central post documents hold canonical Reddit state, while each user keeps a lightweight record of which posts belong to their workflows and what analysis was produced for them.</p>
-                        <div class="system-map">
-                            <div class="system-card">
-                                <h4>Shared data layer</h4>
-                                <p>Canonical post documents and daily delta histories are readable to authenticated users, avoiding redundant copies of the same Reddit post.</p>
+                        <h2>One scrape plan per subreddit, however many users want it.</h2>
+                        <p>A workflow is a request for data, not a job to run. The backend folds every overlapping request into a single scheduler document per subreddit holding the fastest interval, the largest post count, and the widest age window anyone asked for. One scrape satisfies all of them.</p>
+                        <p>The payoff is a clean split between shared facts and private state. Reddit posts exist once, readable by any authenticated user. What a user owns is a thin record of which posts belong to their workflows and what their prompts said about them.</p>
+
+                        <details class="dive">
+                            <summary><span class="chev">&#9656;</span> Deep dive</summary>
+                            <div class="dive-body">
+                                <h3>Aggregation</h3>
+                                <p>Saving a workflow snapshots the relevant settings into <code>schedulers/{subreddit}</code>, which keeps the per-field maxima across every subscriber plus the union of selected prompt IDs and active notification IDs. If the aggregate changes, the Cloud Scheduler job is recreated with a fresh embedded payload.</p>
+                                <p>Unsubscribing is the harder direction. Stop and expiry both run cleanup tasks that remove the user's entry and recompute the aggregate from whoever is left, so a single heavy user leaving does not silently keep everyone else on their cadence.</p>
+
+                                <h3>Write paths</h3>
+                                <ul>
+                                    <li><strong>Heavy writes</strong> update the canonical post document: title, body, author, permalink, flair, score, comment count, and content fields.</li>
+                                    <li><strong>Delta writes</strong> append time-series points for upvotes and comments under daily subdocuments, with first and second derivatives once there is enough history. This path is batched and deliberately light, because it runs far more often than the heavy one.</li>
+                                    <li><strong>Queue writes</strong> only happen when the workflow enables AI, the flair is eligible, prompts are selected, and the user has credit.</li>
+                                </ul>
+
+                                <h3>Cadence</h3>
+                                <p>Listings are pulled in fixed pages of 100, which is why the user-facing post quantity control snaps to 100-post steps between 100 and 1000. Exposing a control that cannot map onto the underlying call is a good way to make a product feel unpredictable.</p>
                             </div>
-                            <div class="system-card">
-                                <h4>User ownership layer</h4>
-                                <p>User post records track workflow ownership, first-seen statistics, selected prompts, and private AI analysis results.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="case-section">
+                <div class="section-grid">
+                    <div>
+                        <div class="feature-index">02</div>
+                        <div class="section-label">Bot leasing</div>
+                    </div>
+                    <div>
+                        <h2>Reddit accounts as a transactionally leased resource pool.</h2>
+                        <p>A single Reddit account tops out near 100 posts per minute. That ceiling, not compute, is the real constraint on the whole system, so accounts are modelled as leasable resources rather than configuration.</p>
+                        <p>Each account is a Firestore document with an <code>available_at</code> timestamp. A worker samples the pool, picks a candidate, then opens a transaction that re-reads <code>available_at</code> and writes the lease only if the account is still free. Two scrapes starting in the same second cannot land on the same account.</p>
+
+                        <details class="dive">
+                            <summary><span class="chev">&#9656;</span> Deep dive</summary>
+                            <div class="dive-body">
+                                <h3>Release is a state machine, not a finally block</h3>
+                                <ul>
+                                    <li><strong>Success:</strong> <code>available_at</code> moves back to now and the account rejoins the pool immediately.</li>
+                                    <li><strong>Rate limited:</strong> <code>available_at</code> is pushed into the future and the lease is not released. The account cools down on its own instead of being handed straight to the next worker.</li>
+                                    <li><strong>Auth failure or repeated 403:</strong> a long lockout, which stops the system from hammering a dead credential or a private subreddit on every cycle.</li>
+                                </ul>
+                                <p>Advanced scraping splits a user's subreddit list across time and a chosen account budget using Cloud Tasks. When no account is free, the task reschedules around the earliest recovery time with jitter, so fifty tasks waiting on the same account do not all wake up together.</p>
+
+                                <h3>The scaling plan I did not ship</h3>
+                                <p>Growing past the pool meant more accounts, and I had a design for getting them. Run the scrape workers across every Firebase Functions region so requests leave from unrelated egress ranges, and provision each account from the region it would later be used from, behind a matching VPN exit, so no two accounts shared an origin.</p>
+                                <p>I scoped it out. Leasing and cooling down a pool is a legitimate response to a rate limit. Deliberately engineering accounts to be hard to associate is account farming, and Reddit's terms are not vague about it. The shipped system stays under the ceiling and queues the overflow, which is slower and defensible.</p>
                             </div>
-                            <div class="system-card">
-                                <h4>Automation layer</h4>
-                                <p>Schedulers, Pub/Sub messages, and Cloud Tasks coordinate recurring scrapes, cleanup, analysis, and notification evaluation.</p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="case-section">
+                <div class="section-grid">
+                    <div>
+                        <div class="feature-index">03</div>
+                        <div class="section-label">Notification graph</div>
+                    </div>
+                    <div>
+                        <h2>Users draw a boolean expression. The backend compiles and evaluates it.</h2>
+                        <p>Metrics, analysis results, constants, arithmetic, and comparisons connect into a graph with one output node. The evaluator walks backward from that output, resolves only the subgraph that actually reaches it, and returns a single boolean.</p>
+                        <p>That backward walk is what makes the feature cheap. A user can leave half-built branches on the canvas and the evaluator never touches them.</p>
+
+                        <a class="sandbox-cta" href="daemon-notification-sandbox.html">
+                            Open the notification builder
+                            <span class="cta-note">live sandbox, nothing saves</span>
+                        </a>
+
+                        <details class="dive">
+                            <summary><span class="chev">&#9656;</span> Deep dive</summary>
+                            <div class="dive-body">
+                                <h3>Two evaluation modes</h3>
+                                <p>Single-post mode publishes as soon as one post satisfies the condition. Time-horizon mode groups values into half-hour buckets, maintains rolling sums across the selected window, and only evaluates the final boolean once enough history has accumulated. A debounce on the tracking key stops the same signal alerting repeatedly.</p>
+
+                                <h3>Firing exactly once</h3>
+                                <p>Analysis runs in batches, and a notification cannot be evaluated until the whole batch has left the queued and processing states. The check therefore runs when each worker finishes, which means several workers can reach it at nearly the same moment.</p>
+                                <p>A transaction-backed lock on the batch document resolves it: the first worker to observe a fully drained batch claims the right to publish the evaluation message, and the rest see the claim and drop it. Delivery on top of that is idempotent, so a redelivered Pub/Sub message produces no second alert.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="case-section">
+                <div class="section-grid">
+                    <div>
+                        <div class="feature-index">04</div>
+                        <div class="section-label">Prompt builder</div>
+                    </div>
+                    <div>
+                        <h2>Prompts are typed contracts, not strings.</h2>
+                        <p>A prompt is an ordered stack of blocks with a response contract attached: bounded numeric, unbounded numeric, single choice, multiple choice, or free text. The builder compiles the stack into the text sent to the model, and the same contract tells the worker how to parse what comes back.</p>
+                        <p>One definition drives both sides. A user who changes the bounds changes the instruction the model receives and the parser that reads its answer, in one edit, without either drifting from the other.</p>
+
+                        <a class="sandbox-cta" href="daemon-prompt-sandbox.html">
+                            Open the prompt builder
+                            <span class="cta-note">live sandbox, nothing saves</span>
+                        </a>
+
+                        <details class="dive">
+                            <summary><span class="chev">&#9656;</span> Deep dive</summary>
+                            <div class="dive-body">
+                                <h3>Blocks</h3>
+                                <p>The contract block supplies the header and footer that wrap everything else. Between them sit instruction text, post title and body injectors, a metadata block, and up to five few-shot examples. Compilation resolves the whole stack into one string with <code>{POST_TITLE}</code>-style placeholders that the analysis worker substitutes per post.</p>
+
+                                <h3>Examples validate against the contract</h3>
+                                <p>A few-shot example whose expected answer violates the response contract is a silent quality problem, because the model will happily imitate it. The builder checks each example's expected return against the configured bounds or option list and refuses to compile until it matches.</p>
+
+                                <h3>What gets stored</h3>
+                                <p>Each result lands on the user's post document keyed by prompt, alongside provider, model, timing, token counts, credits charged, the parsed value, and the bounds it was parsed against. Reanalysis resets prompt completion so a bad result can be overwritten without refetching the post.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="case-section">
+                <div class="section-grid">
+                    <div>
+                        <div class="feature-index">05</div>
+                        <div class="section-label">Metered LLM pipeline</div>
+                    </div>
+                    <div>
+                        <h2>The queue holds the work. Cloud Tasks meters it out.</h2>
+                        <p>Scraping never calls a model. It writes queue documents and publishes one kickoff message for the batch. The dispatcher then creates tasks only up to each user's concurrency capacity, and every worker enqueues the next queued item as it finishes.</p>
+                        <p>The queue stays saturated without ever exceeding the limit, and a burst of a thousand posts costs the same steady throughput as a burst of ten.</p>
+
+                        <details class="dive">
+                            <summary><span class="chev">&#9656;</span> Deep dive</summary>
+                            <div class="dive-body">
+                                <h3>Provider routing</h3>
+                                <p>The worker infers the provider from the model ID and dispatches to OpenAI, Anthropic, or Gemini, with keys held in Secret Manager and never exposed to the client. Users pick a model per workflow or per manual run.</p>
+
+                                <h3>Billing that survives retries</h3>
+                                <p>Token usage converts to credits through a pricing table and is deducted transactionally, logged by day and by minute. Billing is tracked per prompt rather than per post, so a task that retries after completing three of five prompts is not charged twice for the three.</p>
+                                <p>The credit gate is checked twice: before tasks are created, and again inside the worker before further model calls. Checking only at dispatch would let a long batch spend well past zero.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="case-section">
+                <div class="section-grid">
+                    <div>
+                        <div class="section-label">Also in the build</div>
+                        <h2>The rest of the surface area.</h2>
+                    </div>
+                    <div>
+                        <div class="mini-grid">
+                            <div class="mini-card">
+                                <h4>Two providers, one account</h4>
+                                <p>Google via Firebase Auth, Discord via a custom OAuth exchange that mints a Firebase token. A Discord login on an existing email links to that account rather than creating a duplicate, and Discord IDs are enforced one-to-one.</p>
+                            </div>
+                            <div class="mini-card">
+                                <h4>Rules as the client boundary</h4>
+                                <p>Firestore rules govern what the browser can touch. Credits, subscription state, and protected profile fields are readable but server-written only, so product limits cannot be edited from a console.</p>
+                            </div>
+                            <div class="mini-card">
+                                <h4>Stripe reconciliation</h4>
+                                <p>Subscription state is mirrored onto the user document, with plan limits enforced transactionally at creation time so per-user counters stay accurate under concurrent writes.</p>
+                            </div>
+                            <div class="mini-card">
+                                <h4>Heartbeats over hot writes</h4>
+                                <p>Scrape runs report progress through a periodic heartbeat document rather than writing on every post, which keeps the dashboard live without creating a contended document.</p>
                             </div>
                         </div>
                     </div>
@@ -276,181 +667,23 @@
             <section class="case-section">
                 <div class="section-grid">
                     <div>
-                        <div class="section-label">Authorization</div>
-                        <h2>One account model across Google and Discord.</h2>
+                        <div class="section-label">Stack</div>
+                        <h2>Built with.</h2>
                     </div>
                     <div>
-                        <p>Users can sign in with Google through Firebase Auth or with Discord through a custom OAuth flow. The Discord path exchanges the OAuth code server-side, fetches the verified Discord profile, resolves the correct Firebase user, and returns a Firebase custom token for the browser to complete sign-in.</p>
-                        <p>The important design choice is account continuity. If a Discord login uses the same email as an existing Google account, Daemon Data links the Discord identity to that existing user instead of creating a duplicate. The reverse path is also supported through a linking flow from the profile area. Discord IDs are enforced as one-to-one mappings, so one Discord account cannot silently attach to multiple users.</p>
-                        <ul class="flow-list">
-                            <li><strong>Existing Discord link:</strong> find the user document with that Discord ID and mint a custom token for that Firebase UID.</li>
-                            <li><strong>Matching email:</strong> connect Discord fields to the existing Firebase account and mark the provider-verified email as verified.</li>
-                            <li><strong>New Discord user:</strong> create a custom Firebase Auth user with a stable <code>discord:{id}</code> UID and initialize their Firestore defaults.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Workflows</div>
-                        <h2>User settings become scheduler demand.</h2>
-                    </div>
-                    <div>
-                        <p>A workflow is the user's reusable data-collection recipe. It can include selected subreddits, selected flairs, AI prompt selections, notification selections, scrape cadence, post age window, run duration, and how many posts to retrieve. Post quantity is normalized to 100-post steps between 100 and 1000 because Reddit listing calls are naturally collected in pages of 100.</p>
-                        <p>Customizable workflow settings include selected subreddits and flairs, runtime type, scrape frequency, finite duration, post age window, max retrieved posts, AI enabled state, selected model, selected prompts, per-flair analysis toggles, notification choices, and comment settings such as whether comments are included, top-level comment count, replies per comment, and depth. Advanced scheduling adds admin-gated controls for bot selection, usage budget, frequency, delta duration, and per-user advanced scheduler state.</p>
-                        <p>When a workflow runs, the backend snapshots the user's relevant settings into shared scheduler documents. For normal recurring runs, each <code>schedulers/{subreddit}</code> document aggregates all users interested in that subreddit. It keeps the fastest requested interval, largest requested post quantity, widest post age window, latest end date, comment maxima, selected prompt IDs, and active notification IDs. If those aggregate settings change, the Cloud Scheduler job is recreated with a fresh embedded payload; when users stop or expire, cleanup tasks remove their workflow entry and recompute the aggregate from remaining subscribers.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Data Collection</div>
-                        <h2>Block-based scraping with light and heavy write paths.</h2>
-                    </div>
-                    <div>
-                        <p>The scraper pulls Reddit listings in fixed pages of 100 posts. Each page is evaluated against the workflow's post age window and post quantity limit, then written through three coordinated paths: the central post collection, the user's post collection, and the user's analysis queue.</p>
-                        <p>Heavy writes update the canonical post document with fields like subreddit, title, body, author, permalink, flair, score, comment count, scrape time, and the post's detailed content fields. Delta writes record time-series points for upvotes and comment counts under daily subdocuments, including first and second derivative fields when enough history exists. The delta path is intentionally lighter and batched, because it may run repeatedly to track movement over time.</p>
-                        <p>The user post collection stays intentionally small: it records that a user/workflow owns a post, stores the first-seen metadata needed by the dashboard, and later holds analysis results keyed by prompt. The analysis queue is only populated when the workflow enables AI, the relevant prompt IDs are selected, the flair is eligible for analysis, and the user is not blocked by billing state.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Bot Pool</div>
-                        <h2>Transactions protect scarce Reddit capacity.</h2>
-                    </div>
-                    <div>
-                        <p>Reddit's practical limit of roughly 100 posts per minute per bot shaped the scraper architecture. Daemon Data treats each bot as a leased resource in Firestore. Scrape workers randomly sample bot pools, query currently available bots, and claim a candidate inside a Firestore transaction. The transaction reads <code>available_at</code> and only writes the lease if the bot is still available, preventing two concurrent scrapes from racing onto the same bot.</p>
-                        <p>Successful scrapes release the bot by moving <code>available_at</code> back to the present. Rate-limited bots are handled differently: the worker moves <code>available_at</code> into the future and does not immediately release it, letting the bot cool down on its own. Authentication failures and repeated forbidden responses can create longer lockouts, protecting the system from repeatedly hammering a bad credential or private subreddit.</p>
-                        <p>Advanced scraping uses Cloud Tasks to split a user's subreddit list across time and a selected bot budget. If a bot is unavailable, the task is rescheduled around that bot's recovery time with jitter, avoiding thundering-herd retries when many tasks are waiting for the same resource.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">AI Analysis</div>
-                        <h2>Prompt results are queued, billed, and chained.</h2>
-                    </div>
-                    <div>
-                        <p>Analysis means AI-generated replies to user-defined prompts. Scraping does not call the model directly. It writes queue documents and publishes a kickoff message for the batch. The analysis dispatcher then creates Cloud Tasks only up to each user's concurrency capacity, and each worker chains the next queued item when it finishes. This keeps LLM usage controlled without leaving the queue idle.</p>
-                        <p>Users select their desired model in workflow settings or in manual analysis. The worker detects the provider from the model ID and can call OpenAI, Anthropic, or Gemini using keys stored in Secret Manager. Token usage is converted into credits with a pricing table, deducted transactionally, and logged by day and minute. If a user runs out of credits, analysis is blocked before new tasks are created and again inside the worker before model calls continue.</p>
-                        <p>Automated analysis happens during scraping when workflow AI settings and per-flair gates allow it. Manual analysis can be triggered later for selected posts and selected prompts. In reanalysis mode, the queue resets prompt completion so a new result can overwrite previous erroneous analysis while reusing the same post data.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Prompts</div>
-                        <h2>A block builder turns user intent into structured model calls.</h2>
-                    </div>
-                    <div>
-                        <p>Prompts are stored as block-based documents rather than plain text alone. A prompt has a name, description, response type, compiled prompt, and ordered blocks. The response type tells the worker how to parse the model's answer: bounded or unbounded numeric, bounded string, bounded multiple string, or unbounded string. Bounds and options are extracted from the prompt blocks and carried into workflow references.</p>
-                        <p>When an analysis worker runs, it loads the selected prompt documents, inserts the current post's title, body, subreddit, upvotes, and comment count into the compiled prompt, calls the chosen model, parses the response according to the response type, and stores the result in the user's post document. The analysis output includes provider, model, timing, token usage, credits charged, parsed value, and bounds where relevant.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Notifications</div>
-                        <h2>A graph evaluator turns analysis and metrics into alerts.</h2>
-                    </div>
-                    <div>
-                        <p>Notifications are built as expression graphs. Users connect input blocks, analysis blocks, primitive values, arithmetic functions, boolean comparisons, and output blocks. The evaluator walks backward from the output node, computes the dependency graph, and decides whether a notification should trigger.</p>
-                        <p>The system supports both single-post triggers and time-horizon triggers. Single-post mode can publish immediately when a post satisfies the condition. Time-horizon mode groups values into half-hour buckets, maintains rolling sums over the selected horizon, and evaluates the final boolean once enough data has accumulated. Debounce checks prevent repeated alerts for the same tracking key.</p>
-                        <p>Analysis batches publish notification evaluation only after the full batch has left queued or processing states. A transaction-backed lock on the batch document prevents duplicate notification evaluation messages, even when multiple workers finish near the same time. Delivery currently includes idempotent in-app notifications, with email and SMS left as planned channel implementations.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Security</div>
-                        <h2>Rules protect user data while server functions enforce product limits.</h2>
-                    </div>
-                    <div>
-                        <p>Firestore security rules are used as the client-facing access boundary. Admins can access administrative data, users can read and write their own workflow, post, prompt, aggregator, notification, and statistics documents, and authenticated users can read shared post data and deltas. Sensitive fields such as credits, email, Discord identifiers, subscription state, and protected profile fields are readable where appropriate but server-managed for writes.</p>
-                        <p>Some settings are intentionally saved through Cloud Functions instead of direct client writes. Workflow saving, run control, aggregator creation, billing reconciliation, and account linking all happen server-side so the backend can validate roles, reject admin-only advanced settings, enforce subscription limits, maintain counters transactionally, and keep protected Firestore fields out of the client's write surface.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Supporting Systems</div>
-                        <h2>Billing, aggregators, cleanup, and observability complete the loop.</h2>
-                    </div>
-                    <div>
-                        <p>Stripe reconciliation keeps subscription state mirrored onto the user document, while analysis billing tracks credit spend at the prompt level so retries do not double-charge completed prompts. Aggregator creation and deletion use transactions to enforce plan limits and keep per-user counters accurate.</p>
-                        <p>Cleanup is handled with deterministic Cloud Task IDs so workflow stop and expiration can be rescheduled safely. Scrape runs also write heartbeat documents with progress, pending delta count, heavy write count, analysis queue count, and bulk write error counts so the dashboard can show activity without creating a hot document on every post.</p>
-                        <div class="tech-grid">
-                            <div class="tech-card">
-                                <h4>Cloud Functions</h4>
-                                <p>Node.js functions coordinate workflow configuration, analysis, billing, notifications, and admin operations. Python functions handle Reddit scraping and Discord OAuth.</p>
-                            </div>
-                            <div class="tech-card">
-                                <h4>Pub/Sub + Cloud Tasks</h4>
-                                <p>Pub/Sub starts broad asynchronous work; Cloud Tasks provides controlled HTTP workers, deterministic task IDs, retries, queue pausing, and delayed cleanup.</p>
-                            </div>
-                            <div class="tech-card">
-                                <h4>Firestore</h4>
-                                <p>Used as product database, shared cache, scheduler registry, bot lease table, queue store, billing ledger, and per-user access boundary.</p>
-                            </div>
-                            <div class="tech-card">
-                                <h4>Secret Manager</h4>
-                                <p>Stores Discord, Reddit, and LLM credentials outside the codebase and loads them only from server-side functions.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section todo-panel">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">TODO</div>
-                        <h2>Interactive portfolio demos.</h2>
-                    </div>
-                    <div>
-                        <p>Add two no-save sandbox demos later: one for building a notification flow with draggable blocks and connections, and one for building a prompt stack with draggable prompt blocks. Each should open from a clear "Try it out" button and discard state on refresh or navigation.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="case-section">
-                <div class="section-grid">
-                    <div>
-                        <div class="section-label">Technology Summary</div>
-                        <h2>What this project demonstrates.</h2>
-                    </div>
-                    <div>
-                        <p>Daemon Data demonstrates multi-provider authentication, serverless orchestration, multi-tenant Firestore modeling, transactional resource leasing, rate-limit-aware scraping, queue-based LLM processing, credit billing, Firestore security rules, and graph-based automation design.</p>
                         <div class="tech-stack">
-                            <span class="tech-pill">Firebase Auth</span>
-                            <span class="tech-pill">Firebase Hosting</span>
                             <span class="tech-pill">Firestore</span>
                             <span class="tech-pill">Firestore Security Rules</span>
+                            <span class="tech-pill">Firebase Auth</span>
+                            <span class="tech-pill">Firebase Hosting</span>
                             <span class="tech-pill">Cloud Functions v2</span>
-                            <span class="tech-pill">Python</span>
-                            <span class="tech-pill">Node.js</span>
-                            <span class="tech-pill">PRAW</span>
+                            <span class="tech-pill">Cloud Tasks</span>
                             <span class="tech-pill">Cloud Scheduler</span>
                             <span class="tech-pill">Pub/Sub</span>
-                            <span class="tech-pill">Cloud Tasks</span>
                             <span class="tech-pill">Secret Manager</span>
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">PRAW</span>
+                            <span class="tech-pill">Node.js</span>
                             <span class="tech-pill">Stripe</span>
                             <span class="tech-pill">OpenAI</span>
                             <span class="tech-pill">Anthropic</span>
@@ -466,15 +699,15 @@
         <div class="footer-inner">
             <div class="footer-field">
                 <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
+                <span id="footer-seed-val" class="footer-mono">&#8212;</span>
             </div>
             <div class="footer-vr" aria-hidden="true"></div>
             <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
+                <span id="footer-stars-count" class="footer-num">&#8212;</span>
                 <span class="footer-label">stars</span>
             </div>
             <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
+                <span id="footer-nodes-count" class="footer-num">&#8212;</span>
                 <span class="footer-label">nodes</span>
             </div>
             <div class="footer-vr" aria-hidden="true"></div>

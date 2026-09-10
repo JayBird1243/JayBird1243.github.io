@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard • Notifications</title>
+  <link rel="icon" type="image/png" href="/images/Site Logo.png">
+  <link rel="shortcut icon" type="image/png" href="/images/Site Logo.png">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Design Spec Overrides */
+    :root {
+      --bg-dark-spec: #050505;
+      --card-bg-spec: rgba(20, 20, 20, 0.6);
+      --card-border-spec: rgba(255, 255, 255, 0.05);
+      --electric-blue: #00BFFF;
+      --magenta: #FF00FF;
+      --lime: #32CD32;
+    }
+
+    body {
+      background-color: var(--bg-dark-spec);
+      font-family: 'Inter', sans-serif;
+      color: #e5e7eb;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    h4, h5, .card-title {
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .font-tech {
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    .font-display {
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Glass Card Spec */
+    .glass-card-spec {
+      background: var(--card-bg-spec);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border-spec);
+      border-radius: 1.5rem; /* 24px */
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card-spec:hover {
+      transform: translateY(-2px) scale(1.005);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Mouse Spotlight Effect */
+    .glass-card-spec::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .glass-card-spec:hover::before {
+      opacity: 1;
+    }
+
+    /* Background Decor */
+    .bg-decor-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: -1;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .bg-glow-tl { top: -200px; left: -200px; background: var(--electric-blue); }
+    .bg-glow-br { bottom: -200px; right: -200px; background: var(--magenta); }
+
+    /* Custom Button */
+    .btn-spec {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(0, 191, 255, 0.1);
+      border: 1px solid var(--electric-blue);
+      color: var(--electric-blue);
+      box-shadow: 0 0 10px rgba(0, 191, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .btn-spec:hover {
+      background: var(--electric-blue);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.6);
+    }
+
+    /* Edit/Action Button */
+    .btn-action {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #9ca3af;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 0, 255, 0.1);
+      border-color: rgba(255, 0, 255, 0.3);
+      color: var(--magenta);
+    }
+
+    /* Layout tweaks */
+    .vertical-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem; /* 24px */
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-200 overflow-x-hidden selection:bg-electric-blue selection:text-black">
+  <div class="bg-decor-glow bg-glow-tl"></div>
+  <div class="bg-decor-glow bg-glow-br"></div>
+
+  <!-- Navbar handled by navbar.js -->
+  <script type="module" src="/js/navbar.js"></script>
+
+  <main class="pt-28 pb-12 px-6 lg:px-12 max-w-[1200px] mx-auto">
+    <div class="space-y-8">
+      <!-- Header Section -->
+      <div class="glass-card-spec p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-visible">
+        <!-- Decorative colored orb behind header -->
+        <div class="absolute -top-20 -left-20 w-64 h-64 bg-magenta/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <div class="relative z-10">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-tech bg-magenta/10 text-magenta border border-magenta/20">MODULE ACTIVE</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-tech bg-gray-800 text-gray-400 border border-gray-700">v1.0</span>
+          </div>
+          <h1 class="text-4xl font-black text-white tracking-tight mb-2">Notifications</h1>
+          <p class="text-gray-400 font-display text-lg max-w-xl">Manage your notification rules and alerts.</p>
+        </div>
+        <button id="create-btn" class="btn-spec px-8 py-3 rounded-lg flex items-center gap-3 relative z-10 group">
+          <i class="fa-solid fa-plus text-lg group-hover:rotate-90 transition-transform duration-300"></i>
+          <span>Create New</span>
+        </button>
+      </div>
+
+      <!-- Notifications List -->
+      <div id="notifications-list" class="flex flex-col gap-4">
+        <!-- Loading State -->
+        <div id="loading-state" class="glass-card-spec p-12 text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-electric-blue mx-auto"></div>
+          <p class="text-gray-400 mt-4 font-display">Loading notifications...</p>
+        </div>
+      </div>
+      
+      <!-- Empty State (Hidden by default) -->
+      <template id="empty-state-template">
+        <div class="glass-card-spec p-16 flex flex-col items-center justify-center text-center">
+          <div class="w-24 h-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+            <i class="fa-solid fa-bell-slash text-4xl text-gray-600"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-2 font-display">No Notifications Found</h3>
+          <p class="text-gray-400 mb-8 max-w-md mx-auto">Create your first notification rule to get started.</p>
+        </div>
+      </template>
+
+    </div>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Auth + App bootstrap -->
+  <script type="module">
+    import { initializeFirebase } from '/firebase-config.js';
+
+    // Simple toast helpers
+    function showToast(message, type = 'info') {
+      const wrap = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-600',
+        error: 'bg-rose-600',
+        info: 'bg-sky-600'
+      };
+      el.className = `${colors[type] || colors.info} text-white px-4 py-2 rounded shadow-lg flex items-center gap-2 animate-fade-in font-display tracking-wide`;
+      el.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-triangle':'fa-info-circle'}"></i><span>${message}</span>`;
+      wrap.appendChild(el);
+      setTimeout(() => { el.remove(); }, 3500);
+    }
+
+    window.showMessage = (msg, type) => showToast(msg, type);
+    window.showSuccess = (msg) => showToast(msg, 'success');
+    window.showError = (msg) => showToast(msg, 'error');
+
+    // Initialize
+    await initializeFirebase();
+    const { auth, onAuthStateChanged } = window.firebase;
+    
+    // Auth Check
+    const user = await new Promise((resolve) => {
+      const unsub = onAuthStateChanged(auth, (u) => { unsub && unsub(); resolve(u || null); });
+    });
+
+    if (!user) {
+      const qp = new URLSearchParams({ redirect: '/dashboard/notifications' }).toString();
+      window.location.href = `/auth?${qp}`;
+    } else {
+      // Logic
+      const listEl = document.getElementById('notifications-list');
+      const createBtn = document.getElementById('create-btn');
+      const { httpsCallable, collection, onSnapshot, query, orderBy } = window.firebase;
+      const db = window.db;
+      const uid = user.uid;
+
+      // Handle Create
+      const func = httpsCallable(window.firebase.functions, 'generateNotificationGuid');
+      createBtn.addEventListener('click', async () => {
+        try {
+          createBtn.disabled = true;
+          createBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creating...';
+          const res = await func({});
+          const id = res?.data?.id;
+          if (!id) throw new Error('No GUID returned');
+          window.location.href = `/dashboard/notifications/builder/${id}`;
+        } catch (e) {
+          window.showError?.('Failed to create notification');
+          console.error(e);
+          createBtn.disabled = false;
+          createBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Create New';
+        }
+      });
+
+      // Handle List
+      const colRef = collection(db, 'users', uid, 'notifications');
+      const q = query(colRef, orderBy('updatedAt', 'desc'));
+      
+      onSnapshot(q, (snap) => {
+        listEl.innerHTML = '';
+        if (snap.empty) {
+          const tmpl = document.getElementById('empty-state-template');
+          listEl.appendChild(tmpl.content.cloneNode(true));
+          return;
+        }
+
+        snap.forEach((doc) => {
+          const n = doc.data() || {};
+          const card = document.createElement('div');
+          // Base classes + Mouse effect handler
+          card.className = 'glass-card-spec flex flex-col md:flex-row items-start md:items-center gap-6 p-6 cursor-pointer group hover:border-magenta/50 transition-colors';
+          
+          const title = n.title || doc.id;
+          const isActive = n.meta?.isActive !== false;
+          const scopeStr = n.scope?.singlePost ? 'Single Post' : `${n.scope?.horizon?.value || 24}${n.scope?.horizon?.unit || 'H'}`;
+          
+          const statusClass = isActive 
+            ? 'bg-lime/10 text-lime border-lime/20' 
+            : 'bg-gray-800 text-gray-400 border-gray-700';
+
+          card.innerHTML = `
+            <!-- Icon -->
+            <div class="hidden md:flex shrink-0 w-12 h-12 rounded-xl bg-magenta/5 border border-magenta/10 items-center justify-center">
+              <i class="fa-solid fa-satellite-dish text-magenta/50 group-hover:text-magenta transition-colors"></i>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0 w-full">
+              <div class="flex flex-wrap items-center gap-3 mb-2">
+                <h3 class="text-lg font-bold text-white group-hover:text-magenta transition-colors truncate font-display tracking-wide">
+                  ${escapeHtml(title)}
+                </h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-tech border uppercase tracking-wider shrink-0 ${statusClass}">
+                  ${isActive ? 'ACTIVE' : 'PAUSED'}
+                </span>
+              </div>
+              
+              <div class="flex flex-wrap gap-4 text-sm text-gray-400 font-display">
+                 <div class="flex items-center gap-1">
+                   <i class="fa-solid fa-clock-rotate-left text-xs text-electric-blue"></i>
+                   <span>Scope: ${scopeStr}</span>
+                 </div>
+                 <div class="flex items-center gap-1">
+                   <i class="fa-solid fa-filter text-xs text-electric-blue"></i>
+                   <span>Debounce: ${n.debounce?.maxPerHour || 5}/hr</span>
+                 </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-white/5 pt-4 md:pt-0 mt-2 md:mt-0">
+               <div class="text-right hidden lg:block">
+                 <div class="text-[10px] text-gray-500 font-tech uppercase tracking-wider">Updated</div>
+                 <div class="text-sm text-gray-300 font-display font-semibold">
+                   ${n.updatedAt ? formatDate(n.updatedAt) : 'Recently'}
+                 </div>
+               </div>
+
+               <a href="/dashboard/notifications/builder/${doc.id}" 
+                  class="btn-action h-10 px-6 rounded-lg flex items-center gap-2 text-sm font-bold tracking-wide no-underline group-hover:bg-magenta/10 group-hover:text-magenta group-hover:border-magenta/20">
+                  <span>CONFIGURE</span>
+                  <i class="fa-solid fa-chevron-right text-xs transition-transform group-hover:translate-x-1"></i>
+               </a>
+            </div>
+          `;
+
+          // Mouse spotlight effect
+          card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+          });
+          
+          // Make whole card clickable to go to edit (optional, but good UX)
+          card.addEventListener('click', (e) => {
+             // Don't trigger if clicked on link/button explicitly
+             if (e.target.closest('a') || e.target.closest('button')) return;
+             window.location.href = `/dashboard/notifications/builder/${doc.id}`;
+          });
+
+          listEl.appendChild(card);
+        });
+      });
+      
+      // Initialize shared UI (Modal)
+      const notifScript = document.createElement('script');
+      notifScript.src = '/js/notifications-ui.js';
+      notifScript.onload = () => {
+        if (window.NotificationsUI && user) {
+          const notifUI = new window.NotificationsUI();
+          notifUI.initialize(user.uid);
+          window.notificationsUI = notifUI;
+        }
+      };
+      document.head.appendChild(notifScript);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return '';
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  </script>
+</body>
+</html>
