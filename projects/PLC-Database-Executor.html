@@ -33,7 +33,7 @@
         <section class="hero">
             <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · Co-op <span class="idx">01 / 04</span></div>
             <h1 class="auto-title">PLC Database Executor</h1>
-            <p class="auto-deck">A TwinCAT 3 Structured Text application written from a blank project: it turns live PLC data into validated SQL transactions, and a role-aware Beckhoff HMI lets operators see and recover from every result.</p>
+            <p class="auto-deck">A TwinCAT 3 Structured Text application incorporated into the existing production line program: it turns live PLC data into validated SQL transactions, and a role-aware Beckhoff HMI lets operators see and recover from every result.</p>
             <ul class="auto-facts" aria-label="At a glance">
                 <li><span class="k">Controller</span><span class="v">Beckhoff CX51xx · TwinCAT 3</span></li>
                 <li><span class="k">Language</span><span class="v">Structured Text (IEC 61131-3)</span></li>
@@ -45,34 +45,34 @@
 
         <ul class="auto-highlights" aria-label="Highlights">
             <li><span class="n">01</span><strong>Wrote the entire PLC program from scratch</strong> — payload builder, transaction handler, response validation and error routing, all hand-written Structured Text.</li>
-            <li><span class="n">02</span><strong>CASE-based state machines throughout,</strong> so a fault is located by reading the current step on the HMI rather than stepping through logic online.</li>
-            <li><span class="n">03</span><strong>Operators read, engineers write.</strong> Custom HMI controls expose DB status, error codes and raw responses; retries and manual stored-procedure calls sit behind an elevated login.</li>
+            <li><span class="n">02</span><strong>CASE-based state machines throughout,</strong> Faults are located by reading the current sequencer step on the HMI, identifying the erroring step before opening the live sequence.</li>
+            <li><span class="n">03</span><strong>Operator & Engineer elevation segregration.</strong> Custom HMI controls expose DB status, error codes and raw responses; retries and manual stored-procedure calls sit behind an elevated login.</li>
         </ul>
 
         <article class="auto-body">
             <section class="auto-panel">
                 <h2>Problem <span class="tag">context</span></h2>
-                <p>The production database already existed — schema, stored procedures, and the XML structure they expected. Nothing on the controller side could talk to it. Process data lived in PLC variables and needed to be inserted reliably, with a clear path for operators to handle failures without waiting for an engineer.</p>
+                <p>The production database already existed — schema, stored procedures, and the expected XML message structure. The line was being newly comissioned, and data needed to be reliably collected, stored, and analyzed. Operators needed HMI visualization with obvious error codes and easy-to-handle-failures.</p>
             </section>
 
             <div class="auto-grid-2">
                 <section class="auto-panel">
                     <h2>PLC program <span class="tag">TwinCAT 3 · ST</span></h2>
                     <ol class="auto-steps">
-                        <li><strong>Build the payload.</strong> Map PLC variables into the exact XML structure the stored procedures expect, including string assembly and type formatting in ST.</li>
-                        <li><strong>Send and wait.</strong> Issue the insert, hold on the response with a timeout, and never block the rest of the machine while waiting.</li>
+                        <li><strong>Payload Crafting.</strong> Triggered by the main sequence, PLC variables are mapped into the exact XML structure the stored procedures expect, including string assembly and type formatting in ST.</li>
+                        <li><strong>Send and wait.</strong> Issue the insert, hold on the response with a timeout, and block the machine when db confirmation is necessary.</li>
                         <li><strong>Validate.</strong> Parse the response, confirm success, and record the result against the transaction.</li>
-                        <li><strong>Route errors.</strong> Failures raise typed error codes to the HMI with the raw database response attached, so the screen says what to do, not just that something broke.</li>
+                        <li><strong>Route errors.</strong> Failures raise typed error codes to the HMI with the raw database response attached, indicating the next steps for the operator.</li>
                     </ol>
                 </section>
 
                 <section class="auto-panel">
                     <h2>Operator HMI <span class="tag">TwinCAT HMI</span></h2>
                     <ul>
-                        <li><strong>Custom user controls</strong> for connection status, last transaction, active error code and response text — built as reusable components, not one-off screens.</li>
+                        <li><strong>Custom user controls</strong> for connection status, last transaction, active error code and response text — built as reusable modular components.</li>
                         <li><strong>Elevation-aware:</strong> operators get read-only visibility; an elevated login unlocks retry-message and run-stored-procedure actions.</li>
                         <li><strong>Safety-aware colour.</strong> Red and yellow were left to the E-stop and safety monitor so nothing on screen competes with a real alarm.</li>
-                        <li><strong>Monitor-proof palette.</strong> Status colours use only fully saturated channel values (255 / 0) so they render the same on mismatched shop-floor monitors.</li>
+                        <li><strong>Monitor-proof palette.</strong> Status colours use only fully saturated channel values (255 / 0) so they render the same on mismatched shop-floor monitors for consistent visibility.</li>
                     </ul>
                 </section>
             </div>
@@ -80,16 +80,16 @@
             <section class="auto-panel">
                 <h2>Architecture decisions <span class="tag">how it's built</span></h2>
                 <ul>
-                    <li><strong>Smart-machine boundaries.</strong> Each subsystem runs as its own program and coordinates with its neighbours through handshake bits, rather than one monolithic codebase. A change in one machine cannot silently break another.</li>
-                    <li><strong>State machines as the debugging tool.</strong> Every function block is a CASE step machine with explicit idle, busy, done and fault states. The current step is always visible, which turned most support calls into a one-line answer.</li>
-                    <li><strong>Modularity and comments as deliverables.</strong> Written to be maintained by the next engineer or technician, not just to run.</li>
+                    <li><strong>Smart-machine boundaries.</strong> Each subsystem runs as its own program and coordinates with its neighbours through handshake bits, rather than one monolithic codebase, allowing for independent development and maintenance, and greater modularity.</li>
+                    <li><strong>State machines as the debugging tool.</strong> Every function block is a CASE step machine with explicit idle, busy, done and fault states. The current step is always visible, and faults are easily identified by reading the current sequencer step on the HMI.</li>
+                    <li><strong>Modularity and comments as deliverables.</strong> Written to be maintained by the next engineer or technician.</li>
                 </ul>
             </section>
 
             <div class="auto-grid-2">
                 <section class="auto-panel">
                     <h2>What I took from it <span class="tag">practice</span></h2>
-                    <p>This was a year of working alongside senior technicians, professional engineers and system integrators, and the habits stuck: design the interface bits before the logic, comment for the reader on night shift, and keep each machine responsible for itself. Everything was hand-written and referenced against Beckhoff InfoSys — no code generation, no AI assistance.</p>
+                    <p>This was a year of working alongside senior technicians, professional engineers and system integrators. Maintainability, modularity, smart-machine boundaries and keeping each machine responsible for itself were the key takeaways. All of my code was hand-written and referenced against Beckhoff InfoSys — no AI-assisted code generation.</p>
                 </section>
 
                 <section class="auto-panel">

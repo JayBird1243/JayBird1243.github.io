@@ -44,15 +44,15 @@
         </section>
 
         <ul class="auto-highlights" aria-label="Highlights">
-            <li><span class="n">01</span><strong>Machine state at a glance.</strong> A piping mimic whose lines recolour with live state, so an operator reads where the unit is in its program without reading a single number.</li>
-            <li><span class="n">02</span><strong>Trends beside the numbers.</strong> Temperature-over-time charts next to the sequencer step list, so drift is visible before it becomes an alarm.</li>
+            <li><span class="n">01</span><strong>Machine state at a glance.</strong> A piping mimic whose lines recolour with live state, so an operator reads where the unit is in its program without reading the sequencer.</li>
+            <li><span class="n">02</span><strong>Trends beside the numbers.</strong> Temperature-over-time charts next to the sequencer step list, for easy temperature validation.</li>
             <li><span class="n">03</span><strong>Siemens-to-Ignition integration.</strong> I linked the S7-300 tags into Ignition for data acquisition; the PLC program itself was existing and not mine.</li>
         </ul>
 
         <article class="auto-body">
             <section class="auto-panel">
                 <h2>Problem <span class="tag">context</span></h2>
-                <p>The GWK unit's state lived on its own small panel and inside the S7-300. Operators on the line had no consolidated view of the temperatures that mattered or which sequencer step the unit was in, and diagnosing a slow warm-up meant standing at the machine watching numbers.</p>
+                <p>The GWK unit was set up with obsolete monitors. I was tasked with programming a new HMI to replace them, and integrate with the existing PLC program.</p>
             </section>
 
             <div class="auto-grid-2">
@@ -60,9 +60,8 @@
                     <h2>What I built <span class="tag">Ignition</span></h2>
                     <ol class="auto-steps">
                         <li><strong>Tag integration.</strong> Connected Ignition to the S7-300 and mapped the temperature, state and sequencer tags the screen needed.</li>
-                        <li><strong>Piping mimic.</strong> A schematic of the unit with pipe segments bound to live tags, recolouring with state so the program position is legible from across the room.</li>
-                        <li><strong>Key values first.</strong> The handful of temperatures that decide whether the line runs sit largest, at the top; everything else is secondary.</li>
-                        <li><strong>Sequencer display.</strong> Current step and step list, so "where is it in the cycle" is answered without a manual.</li>
+                        <li><strong>Piping mimic.</strong> A schematic of the unit with pipe segments bound to live tags, recolouring with system state.</li>
+                        <li><strong>Sequencer display.</strong> Current step and step list for easy program validation.</li>
                         <li><strong>Trends.</strong> Real-time temperature-over-time charts for spotting drift and confirming setpoint response.</li>
                         <li><strong>Manual heating control.</strong> Available for setup and maintenance when needed, behind a confirmation.</li>
                     </ol>
@@ -72,8 +71,8 @@
                     <h2>Design decisions <span class="tag">why</span></h2>
                     <ul>
                         <li><strong>Diagram for pattern recognition, trends for diagnosis.</strong> The mimic answers "is it normal?"; the charts answer "since when?".</li>
-                        <li><strong>Colour carries state, not decoration.</strong> Every colour change on the mimic maps to a real PLC state.</li>
-                        <li><strong>Honest scope.</strong> I did not write the PLC program; the value I added was the data path and the operator's view of it.</li>
+                        <li><strong>Colour carries state</strong> Every colour change on the mimic maps to a real PLC state.</li>
+                        <li><strong>Scope.</strong> I did not write the PLC program; the value I added was the data path and the operator's view of it.</li>
                     </ul>
                 </section>
             </div>
@@ -81,7 +80,7 @@
             <div class="auto-grid-2">
                 <section class="auto-panel">
                     <h2>What I took from it <span class="tag">practice</span></h2>
-                    <p>My first SCADA screen in production, and the project that taught me how much of HMI design is deciding what to leave off. It also meant working across vendors — Siemens on the controller, Ignition on top, GWK on the equipment — which is the normal shape of an integration job.</p>
+                    <p>The project taught me how much of HMI design is deciding what to leave off. This was my first experience with Ignition, and I was surprised by the amount of flexibility and customization that was available.</p>
                 </section>
 
                 <section class="auto-panel">

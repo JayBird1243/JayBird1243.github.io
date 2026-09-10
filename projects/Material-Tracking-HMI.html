@@ -36,8 +36,8 @@
             <p class="auto-deck">Material was going missing on a production line and nobody could say where. I built the tool that found out — HMI, database procedures, PLC networking and operator training, end to end.</p>
             <ul class="auto-facts" aria-label="At a glance">
                 <li><span class="k">Role</span><span class="v">Owned end to end</span></li>
-                <li><span class="k">HMI</span><span class="v">TwinCAT HMI · custom screens</span></li>
-                <li><span class="k">Backend</span><span class="v">SQL stored procedures (written by me)</span></li>
+                <li><span class="k">HMI</span><span class="v">TwinCAT HMI · Linux based kiosk</span></li>
+                <li><span class="k">Backend</span><span class="v">SQL stored procedures</span></li>
                 <li><span class="k">Rollout</span><span class="v">Operator training sessions, run by me</span></li>
             </ul>
             <a href="../projects.html#automation" class="deep-dive-btn">&larr; All automation work</a>
@@ -52,26 +52,26 @@
         <article class="auto-body">
             <section class="auto-panel">
                 <h2>Problem <span class="tag">context</span></h2>
-                <p>Material was being lost along the line and the cause was unknown. Existing systems counted what came out; none recorded why something did not. Engineers needed structured, attributable data before they could improve the process.</p>
+                <p>Valualbe material was being lost along the line for unknown reasons. Existing systems simply recorded 'scrapped' statuseswith no reason code. The engineers needed traceable data to improve the process.</p>
             </section>
 
             <div class="auto-grid-2">
                 <section class="auto-panel">
                     <h2>What I built <span class="tag">scope</span></h2>
                     <ol class="auto-steps">
-                        <li><strong>Reporting HMI.</strong> A low-friction flow: pick the loss reason and quantity in a few taps at the station where it happened. If reporting is slow, operators stop reporting, and the data is worthless.</li>
-                        <li><strong>Database layer.</strong> New SQL stored procedures for inserts and reporting, structured so engineering can slice losses by station, reason and shift.</li>
+                        <li><strong>Reporting HMI.</strong> A low-friction flow: pick the loss reason in two taps. If reporting is cumbersome, operators stop reporting, and the data is worthless.</li>
+                        <li><strong>Database layer.</strong> Corresponded with IT to create new SQL stored procedures for inserts and reporting, structured so engineering can query losses by station, reason and shift.</li>
                         <li><strong>PLC networking.</strong> Connected the HMI to the main line controller for station and context data; configured the network path between panel and PLC.</li>
                         <li><strong>Resilient messaging.</strong> Queue-and-retry logic around every database send so the screen stays responsive and no report is dropped.</li>
-                        <li><strong>Training.</strong> Ran the operator sessions myself. Adoption was the success metric — a tool nobody uses finds nothing.</li>
+                        <li><strong>Training.</strong> I ran planned and ran the operator training sessions to get them acquainted with the tool.</li>
                     </ol>
                 </section>
 
                 <section class="auto-panel">
                     <h2>Design decisions <span class="tag">why</span></h2>
                     <ul>
-                        <li><strong>Report where the loss happens.</strong> Terminals sit at the station, not in an office, so the reason is captured while it is still obvious.</li>
-                        <li><strong>Reasons are a fixed list, not free text.</strong> Free text cannot be aggregated; a curated list can be graphed the same afternoon.</li>
+                        <li><strong>Report where the loss happens.</strong> Terminals sit at the station, for easy operator access.</li>
+                        <li><strong>Reasons are a fixed list, not free text.</strong> Free text cannot be aggregated; a curated list can be easily queried and analyzed.</li>
                         <li><strong>Same colour discipline as the rest of the line:</strong> no red or yellow on a non-safety screen, high-contrast primaries for mismatched monitors.</li>
                     </ul>
                 </section>
@@ -79,13 +79,13 @@
 
             <section class="auto-panel">
                 <h2>Outcome <span class="tag">result</span></h2>
-                <p>Engineering gained a per-station, per-reason breakdown of material loss for the first time, replacing guesswork with a ranked list of causes to attack. The HMI became part of the standard operating procedure on the line.</p>
+                <p>Engineering was able to identify the most common reasons for material loss, and improve the process to reduce losses. Material loss was reduced by 30% post optimization.</p>
             </section>
 
             <div class="auto-grid-2">
                 <section class="auto-panel">
                     <h2>What I took from it <span class="tag">practice</span></h2>
-                    <p>This project stretched furthest from pure programming: writing the database side myself, standing in front of operators to teach it, and designing for people who have thirty seconds and gloves on. The hardest requirement was not technical — it was making reporting effortless enough that the data could be trusted.</p>
+                    <p>I was given the opportunity to own the entire project from start to finish, which provided a valuable leanring experience in project management. I was able to interface with people I normally wouldn't connect with, and got to manage parts of the project that I normally wouldn't be involved in.</p>
                 </section>
 
                 <section class="auto-panel">
