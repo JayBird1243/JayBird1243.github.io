@@ -91,8 +91,8 @@
                     <div class="stats sky-stats">
                         <div class="stat stat--accent"><span class="stat-num" id="out-stars">–</span><span class="stat-label">Stars</span></div>
                         <div class="stat"><span class="stat-num" id="out-nodes">–</span><span class="stat-label">Nebula nodes</span></div>
-                        <div class="stat"><span class="stat-num" id="out-mean">–</span><span class="stat-label">Expected count for this canvas size</span></div>
-                        <div class="stat"><span class="stat-num" id="out-big">–</span><span class="stat-label">Largest star behind this page</span></div>
+                        <div class="stat"><span class="stat-num" id="out-mean">–</span><span class="stat-label">Expected stars shown at this canvas size</span></div>
+                        <div class="stat"><span class="stat-num" id="out-big">–</span><span class="stat-label">Largest star in this sky</span></div>
                     </div>
                 </div>
 
@@ -102,7 +102,7 @@
                         <line class="axis" x1="30" y1="140" x2="392" y2="140"/>
                         <g id="hist-bars"></g>
                     </svg>
-                    <p class="hist-cap">Sizes 1 to 5 are normal with mean 2, rounded down, so everything under 2 lands in size 1 (about half the stars). Sizes 6 to 10 are rare and drawn in colour. This preview is a different size from the page background, so the two skies share a seed but not every star.</p>
+                    <p class="hist-cap">Sizes 1 to 5 are normal with mean 2, rounded down, so everything under 2 lands in size 1 (about half the stars). Sizes 6 to 10 are rare and drawn in colour. This preview and the page background show the same big stars. A smaller canvas just shows fewer of the ordinary ones.</p>
                 </div>
             </div>
         </figure>
@@ -181,7 +181,7 @@ var starRng  = prng(seed, 2);</code></pre>
             <div class="hw-step">
                 <div>
                     <h3><span class="num">Step 2</span>Uniform to normal</h3>
-                    <p>The generator gives uniform numbers. The Box–Muller transform turns two of them into one normally distributed number. Ordinary star sizes (1 to 5) use mean 2 and standard deviation 1.426. The star count is normal too, around a mean that grows with the canvas area.</p>
+                    <p>The generator gives uniform numbers. The Box–Muller transform turns two of them into one normally distributed number. Ordinary star sizes (1 to 5) use mean 2 and standard deviation 1.426. The star count is normal too: every seed has a full sky of about 600 stars, and each canvas draws the share of them that fits its size.</p>
                 </div>
 <pre><code>function normal(rng, mean, sd) {
   var u = 0, v = 0;               // two uniform samples
@@ -191,32 +191,32 @@ var starRng  = prng(seed, 2);</code></pre>
        * Math.cos(2 * Math.PI * v) * sd + mean;
 }
 size  = clamp(floor(normal(starRng, 2, 1.426)), 1, 5);
-count = normal(countRng, density * area,
-                         density * 0.27 * sqrt(area));</code></pre>
+base  = normal(countRng, 600, 132);        // stars in the full sky
+shown = base * (density * area) / 600;     // share this canvas draws</code></pre>
             </div>
 
             <div class="hw-step" id="odds">
                 <div>
                     <h3><span class="num">Step 3</span>Big stars</h3>
-                    <p>Sizes 6 to 10 are rare. They are drawn in colour with a glow, and sizes 8 and up get spikes. Every star rolls once for a big size. The chance per star is set from the expected star count, so the average per sky is the same on a phone and on a desktop. Each star rolls on its own, so one sky can have several.</p>
+                    <p>Sizes 6 to 10 are rare. They are drawn in colour with a glow, and sizes 8 and up get spikes. Each of the 600 or so stars in the full sky rolls once for a big size, with a fixed chance per star. A seed has the same big stars on every screen, and because each star rolls on its own, one sky can have several.</p>
                     <p>A sky with a size 8 or bigger star shows a small note when the star is on screen.</p>
                     <table class="table odds-table">
-                        <thead><tr><th>Size</th><th>On average</th><th class="num">Per star, this screen</th></tr></thead>
+                        <thead><tr><th>Size</th><th>On average</th><th class="num">Chance per star</th></tr></thead>
                         <tbody id="odds-rows">
-                            <tr><td><i style="background:#fcd34d"></i>6</td><td>1 every 2 skies</td><td class="num">1 in 1,154</td></tr>
-                            <tr><td><i style="background:#f0705f"></i>7</td><td>1 every 15 skies</td><td class="num">1 in 8,655</td></tr>
-                            <tr><td><i style="background:#a78bfa"></i>8</td><td>1 every 100 skies</td><td class="num">1 in 57,700</td></tr>
-                            <tr><td><i style="background:#6ea8fe"></i>9</td><td>1 every 500 skies</td><td class="num">1 in 288,500</td></tr>
-                            <tr><td><i style="background:#c4b5fd"></i>10</td><td>1 every 1,000 skies</td><td class="num">1 in 577,000</td></tr>
+                            <tr><td><i style="background:#fcd34d"></i>6</td><td>1 every 2 skies</td><td class="num">1 in 1,200</td></tr>
+                            <tr><td><i style="background:#f0705f"></i>7</td><td>1 every 15 skies</td><td class="num">1 in 9,000</td></tr>
+                            <tr><td><i style="background:#a78bfa"></i>8</td><td>1 every 100 skies</td><td class="num">1 in 60,000</td></tr>
+                            <tr><td><i style="background:#6ea8fe"></i>9</td><td>1 every 500 skies</td><td class="num">1 in 300,000</td></tr>
+                            <tr><td><i style="background:#c4b5fd"></i>10</td><td>1 every 1,000 skies</td><td class="num">1 in 600,000</td></tr>
                         </tbody>
                     </table>
                 </div>
 <pre><code>// skies per star of each size, on average
 var odds = { 6: 2, 7: 15, 8: 100, 9: 500, 10: 1000 };
 
-// chance per star = (1 / odds) / expected star count
+// chance per star = (1 / odds) / stars in a full sky
 function chance(size) {
-  return (1 / odds[size]) / (density * area);
+  return (1 / odds[size]) / 600;
 }
 
 var roll = starRng();             // one roll per star
@@ -327,6 +327,10 @@ document.addEventListener('DOMContentLoaded', function () {
         outStars.textContent = stats.stars.toLocaleString();
         outNodes.textContent = stats.nodes;
         outMean.textContent = Math.round(stats.mean) + ' ± ' + Math.round(stats.sd);
+        var largest = 1;
+        for (var k = 1; k <= 10; k++) if (stats.sizes[k]) largest = k;
+        outBig.textContent = 'size ' + largest;
+        outBig.style.color = STAR_COLORS[largest] || '';
         drawHist(stats.sizes);
     }
 
@@ -380,27 +384,19 @@ document.addEventListener('DOMContentLoaded', function () {
         t = setTimeout(function () { show(Sky.render(canvases[front], seed, opts(canvases[front]))); }, 150);
     });
 
-    // Odds table: the per-star chance for the sky behind this page, on this screen.
-    function drawOdds() {
-        if (!Sky.site || !Sky.site.stats || !Sky.site.stats.chances) return;
-        var largest = 1;
-        for (var k = 1; k <= 10; k++) if (Sky.site.stats.sizes[k]) largest = k;
-        outBig.textContent = 'size ' + largest;
-        outBig.style.color = STAR_COLORS[largest] || '';
+    // Odds table, filled from the same constants the renderer uses.
+    (function () {
+        if (!Sky.chances) return;
         var rows = document.getElementById('odds-rows');
-        var chances = Sky.site.stats.chances.slice().reverse();   // size 6 first
         rows.textContent = '';
-        chances.forEach(function (c) {
+        Sky.chances.slice().reverse().forEach(function (c) {   // size 6 first
             var tr = document.createElement('tr');
-            var odds = Sky.odds[c.size];
             tr.innerHTML = '<td><i style="background:' + Sky.colors[c.size] + '"></i>' + c.size + '</td>' +
-                '<td>1 every ' + odds.toLocaleString() + ' skies</td>' +
+                '<td>1 every ' + Sky.odds[c.size].toLocaleString() + ' skies</td>' +
                 '<td class="num">1 in ' + Math.round(1 / c.p).toLocaleString() + '</td>';
             rows.appendChild(tr);
         });
-    }
-    drawOdds();
-    document.addEventListener('sky:change', drawOdds);
+    })();
 
     var fromHash = location.hash.replace(/^#/, '');
     // Arriving at a section link such as #odds: leave the hash alone and go there.

@@ -231,6 +231,9 @@
         var STAR_COLORS = { 6: '#fcd34d', 7: '#f0705f', 8: '#a78bfa', 9: '#6ea8fe', 10: '#c4b5fd' };
         // On average, one star of this size per N skies.
         var RARE_ODDS = { 6: 2, 7: 15, 8: 100, 9: 500, 10: 1000 };
+        // The full sky for a seed: star count is normal around this.
+        var BASE_COUNT = 600;
+        var BASE_SD = 132;
 
         function randomSeed() {
             var hex = '0123456789abcdef';
@@ -274,21 +277,22 @@
             return Math.max(1, Math.min(5, Math.floor(normal(rng, 2, 1.426))));
         }
 
-        // Big stars (sizes 6 to 10). RARE_ODDS says how many skies it takes, on
-        // average, to see one star of that size. Each star rolls for it, so the
-        // per-star chance is (1 / odds) / expected star count. Scaling by the
-        // expected count keeps the per-sky average the same on any screen
-        // size, and a sky can still get two or three of the same size.
-        function bigChances(expectedCount) {
+        // Big stars (sizes 6 to 10). Every sky is a base set of about
+        // BASE_COUNT stars, and each of those rolls once for a big size.
+        // RARE_ODDS says how many skies it takes, on average, to see one star
+        // of that size, so the chance per star is (1 / odds) / BASE_COUNT.
+        // That is a fixed number: a seed has the same big stars on every
+        // screen, and a sky can still get two or three of the same size.
+        var CHANCES = (function () {
             var out = [];
             var cum = 0;
             for (var size = 10; size >= 6; size--) {
-                var p = (1 / RARE_ODDS[size]) / Math.max(1, expectedCount);
+                var p = (1 / RARE_ODDS[size]) / BASE_COUNT;
                 cum += p;
                 out.push({ size: size, p: p, upTo: cum });
             }
             return out;   // rarest first; `upTo` is the cumulative threshold
-        }
+        })();
 
         // Nebula colours come straight from pairs of seed digits.
         function nebulaColor(seed, i) {
@@ -365,13 +369,18 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            // Ordinary stars: count is normally distributed around a mean that scales with area.
+            // The base sky has `base` stars. A canvas draws a share of the
+            // ordinary ones that matches its size (`shown`), and every big one.
+            // Screens that want more than the base sky get extra ordinary stars.
             var area = (w * h) / 1e6;
-            var mean = density * area;
-            var sd = density * 0.27 * Math.sqrt(area);
-            var count = Math.max(Math.floor(mean * 0.1), Math.floor(normal(countRng, mean, sd)));
+            var share = (density * area) / BASE_COUNT;
+            var mean = BASE_COUNT * share;
+            var sd = BASE_SD * share;
+            var base = Math.max(Math.floor(BASE_COUNT * 0.1), Math.floor(normal(countRng, BASE_COUNT, BASE_SD)));
+            var shown = Math.max(1, Math.round(base * share));
             var sizes = new Array(11).fill(0);
             var stars = [];
+            var big = [];
             function add(x, y, s) {
                 sizes[s]++;
                 var star = { x: x, y: y, s: s, r: Math.max(0.5, (s * scale) / 2), c: STAR_COLORS[s] || '#ffffff' };
@@ -379,25 +388,27 @@
                 drawStar(ctx, x, y, s, star.r, star.c);
                 return star;
             }
-            var chances = bigChances(mean);
-            var big = [];
-            for (var i = 0; i < count; i++) {
+            var total = Math.max(base, shown);
+            for (var i = 0; i < total; i++) {
                 var x = starRng() * w;
                 var y = starRng() * h;
                 var roll = starRng();          // one roll per star for a big size
                 var s = starSize(starRng);     // otherwise an ordinary size, 1 to 5
-                for (var c = 0; c < chances.length; c++) {
-                    if (roll < chances[c].upTo) { s = chances[c].size; break; }
+                if (i < base) {
+                    for (var c = 0; c < CHANCES.length; c++) {
+                        if (roll < CHANCES[c].upTo) { s = CHANCES[c].size; break; }
+                    }
                 }
+                if (s < 6 && i >= shown) continue;   // ordinary star this canvas has no room for
                 var star = add(x, y, s);
                 if (s >= 6) big.push({ size: s, x: star.x, y: star.y, color: star.c, odds: RARE_ODDS[s] });
             }
             ctx.globalAlpha = 1;
 
-            return { seed: seed, stars: stars.length, nodes: nodes, sizes: sizes, mean: mean, sd: sd, big: big, chances: chances, list: stars, width: w, height: h };
+            return { seed: seed, stars: stars.length, nodes: nodes, sizes: sizes, mean: mean, sd: sd, base: base, big: big, chances: CHANCES, list: stars, width: w, height: h };
         }
 
-        return { randomSeed: randomSeed, isSeed: isSeed, prng: prng, normal: normal, starSize: starSize, bigChances: bigChances,
+        return { randomSeed: randomSeed, isSeed: isSeed, prng: prng, normal: normal, starSize: starSize, chances: CHANCES, baseCount: BASE_COUNT,
                  odds: RARE_ODDS, colors: STAR_COLORS, render: render };
     })();
     window.Sky = Sky;
@@ -498,7 +509,7 @@
             ensureToast();
             toast.querySelector('.sky-toast-dot').style.background = found.color;
             toast.querySelector('.sky-toast-what').textContent =
-                'This sky has a size ' + found.size + ' star. About 1 in ' + found.odds + ' do.';
+                'This sky has a size ' + found.size + ' star. About 1 in ' + found.odds.toLocaleString('en') + ' do.';
             showTimer = setTimeout(function () {
                 placeRing(found);
                 toast.classList.add('is-on');
