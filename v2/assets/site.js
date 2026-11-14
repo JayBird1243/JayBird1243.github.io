@@ -229,6 +229,8 @@
     // options: { density: stars per 1000x1000 css px (mean), scale: star size multiplier }
     var Sky = (function () {
         var STAR_COLORS = { 6: '#fcd34d', 7: '#f0705f', 8: '#a78bfa', 9: '#6ea8fe', 10: '#c4b5fd' };
+        // On average, one star of this size per N skies.
+        var RARE_ODDS = { 6: 2, 7: 15, 8: 100, 9: 500, 10: 1000 };
 
         function randomSeed() {
             var hex = '0123456789abcdef';
@@ -267,8 +269,25 @@
             return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) * sd + mean;
         }
 
+        // Ordinary stars are sizes 1 to 5, normally distributed around 2.
         function starSize(rng) {
-            return Math.max(1, Math.min(10, Math.floor(normal(rng, 2, 1.426))));
+            return Math.max(1, Math.min(5, Math.floor(normal(rng, 2, 1.426))));
+        }
+
+        // Big stars (sizes 6 to 10). RARE_ODDS says how many skies it takes, on
+        // average, to see one star of that size. Each star rolls for it, so the
+        // per-star chance is (1 / odds) / expected star count. Scaling by the
+        // expected count keeps the per-sky average the same on any screen
+        // size, and a sky can still get two or three of the same size.
+        function bigChances(expectedCount) {
+            var out = [];
+            var cum = 0;
+            for (var size = 10; size >= 6; size--) {
+                var p = (1 / RARE_ODDS[size]) / Math.max(1, expectedCount);
+                cum += p;
+                out.push({ size: size, p: p, upTo: cum });
+            }
+            return out;   // rarest first; `upTo` is the cumulative threshold
         }
 
         // Nebula colours come straight from pairs of seed digits.
@@ -277,10 +296,42 @@
             var b = parseInt(seed.substr((i * 5 + 7) % 30, 2), 16);
             var c = parseInt(seed.substr((i * 7 + 13) % 30, 2), 16);
             var hue = [38, 215, 265, 12][(a + b * (i + 1)) % 4] + (c % 24) - 12;
-            var sat = 35 + (b % 30);
-            var light = 16 + (c % 12);
-            var alpha = 0.18 + (a % 40) / 200;
+            var sat = 45 + (b % 36);
+            var light = 17 + (c % 13);
+            var alpha = 0.22 + (a % 40) / 170;
             return 'hsla(' + hue + ',' + sat + '%,' + light + '%,' + alpha.toFixed(3) + ')';
+        }
+
+        function drawStar(ctx, x, y, size, r, color) {
+            if (size >= 6) {
+                // Soft halo, wider for the rarest sizes.
+                var hr = r * (size >= 8 ? 7 : 4.5);
+                var halo = ctx.createRadialGradient(x, y, 0, x, y, hr);
+                halo.addColorStop(0, color);
+                halo.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.globalAlpha = size >= 8 ? 0.4 : 0.28;
+                ctx.fillStyle = halo;
+                ctx.beginPath();
+                ctx.arc(x, y, hr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            if (size >= 8) {
+                // Four thin spikes.
+                var len = r * 6;
+                ctx.globalAlpha = 0.55;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = Math.max(0.6, r * 0.28);
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(x - len, y); ctx.lineTo(x + len, y);
+                ctx.moveTo(x, y - len); ctx.lineTo(x, y + len);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = size <= 1 ? 0.55 : size <= 3 ? 0.8 : 0.95;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         function render(canvas, seed, options) {
@@ -314,37 +365,45 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            // Stars: count is normally distributed around a mean that scales with area.
+            // Ordinary stars: count is normally distributed around a mean that scales with area.
             var area = (w * h) / 1e6;
             var mean = density * area;
             var sd = density * 0.27 * Math.sqrt(area);
             var count = Math.max(Math.floor(mean * 0.1), Math.floor(normal(countRng, mean, sd)));
             var sizes = new Array(11).fill(0);
             var stars = [];
-            for (var i = 0; i < count; i++) {
-                var x = starRng() * w;
-                var y = starRng() * h;
-                var s = starSize(starRng);
+            function add(x, y, s) {
                 sizes[s]++;
                 var star = { x: x, y: y, s: s, r: Math.max(0.5, (s * scale) / 2), c: STAR_COLORS[s] || '#ffffff' };
                 stars.push(star);
-                ctx.globalAlpha = s <= 1 ? 0.55 : s <= 3 ? 0.8 : 0.95;
-                ctx.fillStyle = star.c;
-                ctx.beginPath();
-                ctx.arc(x, y, star.r, 0, Math.PI * 2);
-                ctx.fill();
+                drawStar(ctx, x, y, s, star.r, star.c);
+                return star;
+            }
+            var chances = bigChances(mean);
+            var big = [];
+            for (var i = 0; i < count; i++) {
+                var x = starRng() * w;
+                var y = starRng() * h;
+                var roll = starRng();          // one roll per star for a big size
+                var s = starSize(starRng);     // otherwise an ordinary size, 1 to 5
+                for (var c = 0; c < chances.length; c++) {
+                    if (roll < chances[c].upTo) { s = chances[c].size; break; }
+                }
+                var star = add(x, y, s);
+                if (s >= 6) big.push({ size: s, x: star.x, y: star.y, color: star.c, odds: RARE_ODDS[s] });
             }
             ctx.globalAlpha = 1;
 
-            return { seed: seed, stars: count, nodes: nodes, sizes: sizes, mean: mean, sd: sd, list: stars, width: w, height: h };
+            return { seed: seed, stars: stars.length, nodes: nodes, sizes: sizes, mean: mean, sd: sd, big: big, chances: chances, list: stars, width: w, height: h };
         }
 
-        return { randomSeed: randomSeed, isSeed: isSeed, prng: prng, normal: normal, starSize: starSize, render: render };
+        return { randomSeed: randomSeed, isSeed: isSeed, prng: prng, normal: normal, starSize: starSize, bigChances: bigChances,
+                 odds: RARE_ODDS, colors: STAR_COLORS, render: render };
     })();
     window.Sky = Sky;
 
     // ── Site-wide sky ──────────────────────────────────────────────
-    // One fixed canvas behind every page. The seed is kept for the visit
+    // One fixed sky behind every page. The seed is kept for the visit
     // (sessionStorage), so the same sky follows you from page to page.
     //   Sky.site.seed            current seed
     //   Sky.site.set(seed)       draw a given seed everywhere
@@ -352,24 +411,109 @@
     // A 'sky:change' event fires on document with the render stats.
     function initSiteSky() {
         var KEY = 'sky-seed';
+        var SEEN = 'sky-rare-seen';
+        var wrap = document.createElement('div');
+        wrap.className = 'site-sky';
+        wrap.setAttribute('aria-hidden', 'true');
         var canvas = document.createElement('canvas');
-        canvas.className = 'site-sky';
-        canvas.setAttribute('aria-hidden', 'true');
-        document.body.insertBefore(canvas, document.body.firstChild);
+        wrap.appendChild(canvas);
+        document.body.insertBefore(wrap, document.body.firstChild);
 
-        var seed = null;
-        try { seed = window.sessionStorage.getItem(KEY); } catch (e) { /* storage blocked */ }
+        function store(key, value) {
+            try {
+                if (value === undefined) return window.sessionStorage.getItem(key);
+                window.sessionStorage.setItem(key, value);
+            } catch (e) { /* storage blocked */ }
+            return null;
+        }
+
+        var seed = store(KEY);
         if (!Sky.isSeed(seed)) seed = Sky.randomSeed();
 
         var site = { seed: seed, stats: null };
 
         function draw() {
-            site.stats = Sky.render(canvas, site.seed, { density: 340, scale: 0.55 });
-            canvas.classList.add('is-on');
-            try { window.sessionStorage.setItem(KEY, site.seed); } catch (e) { /* storage blocked */ }
+            site.stats = Sky.render(canvas, site.seed, { density: 385, scale: 0.55 });
+            wrap.classList.add('is-on');
+            store(KEY, site.seed);
             var ev;
             try { ev = new CustomEvent('sky:change', { detail: site.stats }); } catch (e) { ev = null; }
             if (ev) document.dispatchEvent(ev);
+            rareNote();
+        }
+
+        // ── Rare star note ──
+        // A size 8+ star gets a small note, once per seed per visit, and a
+        // ring around the star while the note is up.
+        var toast = null, ring = null, hideTimer = null, showTimer = null;
+
+        function clearRare() {
+            clearTimeout(hideTimer);
+            clearTimeout(showTimer);
+            if (toast) { toast.classList.remove('is-on'); }
+            if (ring) { ring.parentNode.removeChild(ring); ring = null; }
+        }
+
+        function placeRing(star) {
+            if (ring) ring.parentNode.removeChild(ring);
+            ring = document.createElement('span');
+            ring.className = 'sky-ring';
+            ring.style.left = star.x + 'px';
+            ring.style.top = star.y + 'px';
+            ring.style.color = star.color;
+            wrap.appendChild(ring);
+        }
+
+        var pending = [];   // size 8+ stars of this sky, rarest first
+
+        function ensureToast() {
+            if (toast) return;
+            toast = document.createElement('div');
+            toast.className = 'sky-toast';
+            toast.setAttribute('role', 'status');
+            toast.innerHTML =
+                '<span class="sky-toast-dot"></span>' +
+                '<p><strong>You found a rare star.</strong> <span class="sky-toast-what"></span> ' +
+                '<a href="' + root + 'projects/Starry-Sky.html#odds">See the odds →</a></p>' +
+                '<button type="button" aria-label="Dismiss">×</button>';
+            document.body.appendChild(toast);
+            toast.querySelector('button').addEventListener('click', clearRare);
+            toast.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+            toast.addEventListener('mouseleave', function () { hideTimer = setTimeout(clearRare, 4000); });
+        }
+
+        // The sky is taller than the screen and drifts, so a star only
+        // counts as found once it is inside the visible part of the page.
+        function checkRare() {
+            if (!pending.length) return;
+            var top = wrap.getBoundingClientRect().top;
+            var found = null;
+            for (var i = 0; i < pending.length; i++) {
+                var y = top + pending[i].y;
+                if (y > 70 && y < window.innerHeight - 20) { found = pending[i]; break; }
+            }
+            if (!found) return;
+            pending = [];
+            store(SEEN, site.seed);
+            ensureToast();
+            toast.querySelector('.sky-toast-dot').style.background = found.color;
+            toast.querySelector('.sky-toast-what').textContent =
+                'This sky has a size ' + found.size + ' star. About 1 in ' + found.odds + ' do.';
+            showTimer = setTimeout(function () {
+                placeRing(found);
+                toast.classList.add('is-on');
+                hideTimer = setTimeout(clearRare, 12000);
+            }, 900);
+        }
+
+        function rareNote() {
+            clearRare();
+            pending = [];
+            if (store(SEEN) === site.seed) return;   // already shown for this sky
+            pending = (site.stats.big || [])
+                .filter(function (b) { return b.size >= 8; })
+                .sort(function (a, b) { return b.size - a.size; });
+            checkRare();
         }
 
         site.set = function (next) {
@@ -377,8 +521,9 @@
             next = next.toLowerCase();
             if (next === site.seed && site.stats) return true;
             site.seed = next;
+            clearRare();
             if (reduced) { draw(); return true; }
-            canvas.classList.remove('is-on');
+            wrap.classList.remove('is-on');
             setTimeout(draw, 350);
             return true;
         };
@@ -398,7 +543,7 @@
             timer = setTimeout(draw, 200);
         });
 
-        // Slow drift as the page scrolls: the canvas is taller than the
+        // Slow drift as the page scrolls: the sky is taller than the
         // viewport and slides up by the extra height over the full scroll.
         if (reduced) return;
         var ticking = false;
@@ -406,8 +551,9 @@
             ticking = false;
             var max = document.documentElement.scrollHeight - window.innerHeight;
             var p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-            var extra = canvas.offsetHeight - window.innerHeight;
-            canvas.style.transform = 'translate3d(0,' + (-p * Math.max(0, extra)).toFixed(1) + 'px,0)';
+            var extra = wrap.offsetHeight - window.innerHeight;
+            wrap.style.transform = 'translate3d(0,' + (-p * Math.max(0, extra)).toFixed(1) + 'px,0)';
+            checkRare();
         }
         window.addEventListener('scroll', function () {
             if (ticking) return;

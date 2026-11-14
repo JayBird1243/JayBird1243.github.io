@@ -131,6 +131,60 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
     will-change: transform;
 }
 .site-sky.is-on { opacity: 0.9; }
+.site-sky canvas { display: block; width: 100%; height: 100%; max-width: none; }
+
+/* Ring around a rare star while its note is showing. */
+.sky-ring {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    margin: -23px 0 0 -23px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0.7;
+    animation: sky-ring 2.4s ease-out infinite;
+}
+@keyframes sky-ring {
+    0% { transform: scale(0.45); opacity: 0.9; }
+    80%, 100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Small note when a sky has a size 8+ star. */
+.sky-toast {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 70;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    max-width: min(330px, calc(100vw - 2rem));
+    padding: 0.7rem 0.75rem 0.75rem 0.85rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--text-2);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s var(--ease), visibility 0s linear 0.3s;
+}
+.sky-toast.is-on { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.sky-toast p { margin: 0; }
+.sky-toast-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; margin-top: 0.42em; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08); }
+.sky-toast button {
+    flex: none;
+    background: none;
+    border: 0;
+    padding: 0 0.15rem;
+    color: var(--text-3);
+    font-size: 1.05rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+.sky-toast button:hover { color: var(--text); }
 
 /* ---------- Layout ---------- */
 .wrap {
@@ -806,11 +860,12 @@ details.more > .more-body h4:first-child { margin-top: 0; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .js [data-reveal] { opacity: 1; transform: none; }
     .site-sky.is-on { opacity: 0.9; }
+    .sky-ring { opacity: 0.7; }
     .js .dg .draw { stroke-dashoffset: 0; }
     .js .dg .pop { opacity: 1; }
 }
 
 @media print {
-    .site-nav, .site-footer, .site-sky { display: none; }
+    .site-nav, .site-footer, .site-sky, .sky-toast { display: none; }
     body { padding-top: 0; background: #fff; color: #000; }
 }
