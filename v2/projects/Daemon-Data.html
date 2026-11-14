@@ -194,37 +194,37 @@
                     <text x="20" y="41" class="t-dim t-mid">01</text>
                     <rect x="40" y="10" width="296" height="52" rx="6" class="box"/>
                     <text x="56" y="32" class="t-strong">Workflows</text>
-                    <text x="56" y="50" class="t-dim">what each user wants watched</text>
+                    <text x="56" y="50" class="t-dim" style="font-size:12px">what each user wants watched</text>
 
                     <text x="20" y="117" class="t-dim t-mid">02</text>
                     <rect x="40" y="86" width="296" height="52" rx="6" class="box"/>
                     <text x="56" y="108" class="t-strong">Schedulers</text>
-                    <text x="56" y="126" class="t-dim">one plan per subreddit</text>
+                    <text x="56" y="126" class="t-dim" style="font-size:12px">one plan per subreddit</text>
 
                     <text x="20" y="193" class="t-dim t-mid">03</text>
                     <rect x="40" y="162" width="296" height="52" rx="6" class="box"/>
                     <text x="56" y="184" class="t-strong">Bot pool</text>
-                    <text x="56" y="202" class="t-dim">leased accounts, ~100 posts/min each</text>
+                    <text x="56" y="202" class="t-dim" style="font-size:12px">leased accounts, ~100 posts/min each</text>
 
                     <text x="20" y="269" class="t-dim t-mid">04</text>
                     <rect x="40" y="238" width="296" height="52" rx="6" class="box"/>
                     <text x="56" y="260" class="t-strong">Firestore</text>
-                    <text x="56" y="278" class="t-dim">posts stored once, shared</text>
+                    <text x="56" y="278" class="t-dim" style="font-size:12px">posts stored once, shared</text>
 
                     <text x="20" y="345" class="t-dim t-mid">05</text>
                     <rect x="40" y="314" width="296" height="52" rx="6" class="box"/>
                     <text x="56" y="336" class="t-strong">LLM workers</text>
-                    <text x="56" y="354" class="t-dim">metered by Cloud Tasks</text>
+                    <text x="56" y="354" class="t-dim" style="font-size:12px">metered by Cloud Tasks</text>
 
                     <text x="20" y="421" class="t-dim t-mid">06</text>
                     <rect x="40" y="390" width="296" height="52" rx="6" class="box box--accent"/>
                     <text x="56" y="412" class="t-strong">Notification graph</text>
-                    <text x="56" y="430" class="t-dim">boolean rule with one output</text>
+                    <text x="56" y="430" class="t-dim" style="font-size:12px">boolean rule with one output</text>
 
                     <text x="20" y="497" class="t-dim t-mid">07</text>
                     <rect x="40" y="466" width="296" height="52" rx="6" class="box box--ok"/>
                     <text x="56" y="488" class="t-strong">Alert</text>
-                    <text x="56" y="506" class="t-dim">idempotent delivery</text>
+                    <text x="56" y="506" class="t-dim" style="font-size:12px">idempotent delivery</text>
                 </g>
                 <line x1="188" y1="64" x2="188" y2="83" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
                 <line x1="188" y1="140" x2="188" y2="159" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
@@ -250,7 +250,7 @@
                 <p class="dim">A workflow is one user's request: which subreddits, how often and how far back to scrape, whether to run AI analysis, which prompts to use and which model runs them.</p>
             </div>
             <figure class="fig">
-                <img src="../assets/img/data-collection.jpg" alt="Daemon Data workflow settings: runtime type, duration, scrape frequency, max posts and max post age; a list of subreddits; an AI analysis toggle with prompt list; and model cards for Gemini, Claude and ChatGPT." width="1400" height="1155" loading="lazy">
+                <a href="../assets/img/data-collection.jpg" title="Open full size"><img src="../assets/img/data-collection.jpg" alt="Daemon Data workflow settings: runtime type, duration, scrape frequency, max posts and max post age; a list of subreddits; an AI analysis toggle with prompt list; and model cards for Gemini, Claude and ChatGPT." width="1400" height="1155" loading="lazy"></a>
                 <figcaption>Workflow settings in the product: runtime and scrape frequency, subreddits, analysis prompts, and the model choice across Gemini, Claude and ChatGPT.</figcaption>
             </figure>
         </div>
@@ -511,12 +511,12 @@
 
                     <rect x="0" y="88" width="190" height="118" rx="6" class="box"/>
                     <text x="10" y="106" class="t-dim">PROMPT TEXT</text>
-                    <text x="10" y="124" class="t-accent" style="font-size:10.5px">You must respond with a</text>
-                    <text x="10" y="138" class="t-accent" style="font-size:10.5px">number between 1 and 10.</text>
-                    <text x="10" y="152" style="font-size:10.5px">Rate how bullish this is.</text>
-                    <text x="10" y="166" style="font-size:10.5px">{POST_TITLE} {POST_BODY}</text>
-                    <text x="10" y="180" class="t-accent" style="font-size:10.5px">Respond with a single</text>
-                    <text x="10" y="194" class="t-accent" style="font-size:10.5px">number between 1 and 10.</text>
+                    <text x="10" y="124" class="t-accent" style="font-size:11px">You must respond with a</text>
+                    <text x="10" y="138" class="t-accent" style="font-size:11px">number between 1 and 10.</text>
+                    <text x="10" y="152" style="font-size:11px">Rate how bullish this is.</text>
+                    <text x="10" y="166" style="font-size:11px">{POST_TITLE} {POST_BODY}</text>
+                    <text x="10" y="180" class="t-accent" style="font-size:11px">Respond with a single</text>
+                    <text x="10" y="194" class="t-accent" style="font-size:11px">number between 1 and 10.</text>
 
                     <rect x="210" y="88" width="190" height="118" rx="6" class="box"/>
                     <text x="220" y="106" class="t-dim">PARSER</text>
