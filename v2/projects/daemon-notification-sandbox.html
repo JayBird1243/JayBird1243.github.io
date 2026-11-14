@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Notification Builder Sandbox | Daemon Data</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --bg:#050505;
+    --glass:rgba(20,20,20,0.6);
+    --glass-border:rgba(255,255,255,0.05);
+    --blue:#00BFFF;
+    --magenta:#FF00FF;
+    --lime:#32CD32;
+  }
+  *{box-sizing:border-box;}
+  html,body{background:var(--bg);color:#e5e7eb;font-family:'Inter',sans-serif;margin:0;min-height:100%;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:#0a0a0a;}
+  ::-webkit-scrollbar-thumb{background:#333;border-radius:4px;}
+  ::-webkit-scrollbar-thumb:hover{background:#555;}
+  h1,h2,h3{font-family:'Orbitron',sans-serif;text-transform:uppercase;letter-spacing:.05em;}
+  .font-disp{font-family:'Rajdhani',sans-serif;}
+  .font-tech{font-family:'Source Code Pro',monospace;}
+  .bg-orb{position:fixed;width:600px;height:600px;border-radius:50%;filter:blur(100px);z-index:-1;opacity:.15;pointer-events:none;}
+  .orb-tl{top:-200px;left:-200px;background:var(--blue);}
+  .orb-br{bottom:-200px;right:-200px;background:var(--magenta);}
+  .glass{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:1.5rem;}
+  .btn-tech{font-family:'Rajdhani',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;border-radius:.5rem;transition:all .2s ease;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;}
+  .btn-tech:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+  .btn-primary{background:rgba(0,191,255,.1);border:1px solid var(--blue);color:var(--blue);}
+  .btn-primary:hover{background:var(--blue);color:#000;box-shadow:0 0 18px rgba(0,191,255,.55);}
+  .btn-secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#d1d5db;}
+  .btn-secondary:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.1);color:#9ca3af;}
+  .btn-ghost:hover{border-color:var(--magenta);color:var(--magenta);}
+  input,select{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.12);color:#fff;font-family:'Source Code Pro',monospace;border-radius:.4rem;padding:.3rem .5rem;font-size:.8rem;}
+  input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 8px rgba(0,191,255,.25);outline:none;}
+  input[type=range]{padding:0;accent-color:var(--magenta);}
+  .pill{font-family:'Source Code Pro',monospace;font-size:10px;letter-spacing:.05em;}
+
+  /* ---- Canvas ---- */
+  #viewport{position:relative;overflow:hidden;touch-action:none;background:#08080a;border-radius:1.25rem;border:1px solid rgba(255,255,255,.06);}
+  #world{position:absolute;top:0;left:0;width:2400px;height:1500px;transform-origin:0 0;}
+  #grid-bg{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px);background-size:26px 26px;pointer-events:none;}
+  #edge-svg{position:absolute;top:0;left:0;width:2400px;height:1500px;overflow:visible;pointer-events:none;}
+  #edge-svg .edge-hit{pointer-events:stroke;cursor:pointer;}
+  #edge-svg .edge-x{pointer-events:all;cursor:pointer;}
+
+  .node{position:absolute;width:212px;border-radius:14px;background:rgba(15,15,17,.88);border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 24px rgba(0,0,0,.45);user-select:none;}
+  .node.unreached{opacity:.32;filter:grayscale(.5);}
+  .node.dragging{box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:50;}
+  .node-header{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px 10px;border-radius:14px 14px 0 0;cursor:grab;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,.08);}
+  .node-header:active{cursor:grabbing;}
+  .node.type-metric .node-header{background:rgba(0,191,255,.14);border-left:3px solid var(--blue);}
+  .node.type-analysis .node-header{background:rgba(255,0,255,.16);border-left:3px solid var(--magenta);}
+  .node.type-analysis{border-color:rgba(255,0,255,.18);background:rgba(30,10,28,.75);}
+  .node.type-constant .node-header{background:rgba(255,255,255,.07);border-left:3px solid var(--blue);}
+  .node.type-arithmetic .node-header{background:rgba(0,191,255,.1);border-left:3px solid var(--blue);}
+  .node.type-comparison .node-header{background:linear-gradient(90deg,rgba(0,191,255,.12),rgba(255,0,255,.12));border-left:3px solid var(--magenta);}
+  .node.type-logic .node-header{background:rgba(255,0,255,.1);border-left:3px solid var(--magenta);}
+  .node.type-output .node-header{background:rgba(50,205,50,.12);border-left:3px solid var(--lime);}
+  .node-close{width:18px;height:18px;border-radius:5px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.3);color:#9ca3af;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .node-close:hover{background:rgba(255,0,90,.2);border-color:#ff4757;color:#ff4757;}
+  .node-body{padding:9px 10px 11px;display:flex;flex-direction:column;gap:7px;}
+  .io-row{position:relative;display:flex;align-items:center;gap:6px;min-height:20px;font-size:11px;}
+  .io-label{color:#9ca3af;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em;font-size:11px;}
+  .io-val{margin-left:auto;font-family:'Source Code Pro',monospace;font-size:11.5px;color:#e5e7eb;white-space:nowrap;}
+  .io-val.dim{color:#6b7280;}
+  .out-row{justify-content:flex-end;padding-top:2px;border-top:1px dashed rgba(255,255,255,.08);}
+  .port{position:absolute;width:11px;height:11px;border-radius:50%;background:#0a0a0a;box-shadow:0 0 0 2px rgba(0,0,0,.5);cursor:crosshair;z-index:5;}
+  .port.number{border:2px solid var(--blue);}
+  .port.boolean{border:2px solid var(--magenta);}
+  .port.port-in{left:-14px;}
+  .port.port-out{right:-14px;}
+  .port:hover{transform:scale(1.35);box-shadow:0 0 10px currentColor;}
+  .port.filled::after{content:"";position:absolute;inset:2px;border-radius:50%;background:currentColor;}
+  .port.number.filled{color:var(--blue);}
+  .port.boolean.filled{color:var(--magenta);}
+  select.node-select, input.node-input{width:100%;font-size:11px;padding:4px 6px;}
+  .node-fires{font-family:'Orbitron',sans-serif;font-weight:900;font-size:20px;text-align:center;letter-spacing:.06em;padding:6px 0 2px;}
+  .not-evaluated-tag{font-size:9px;color:#6b7280;font-family:'Source Code Pro',monospace;text-align:right;}
+
+  .palette-btn{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;color:#d1d5db;cursor:pointer;transition:all .15s;}
+  .palette-btn:hover{border-color:var(--blue);color:var(--blue);background:rgba(0,191,255,.06);}
+  .palette-swatch{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+
+  .trace-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.03);font-size:11.5px;border-left:2px solid rgba(255,255,255,.15);}
+  .trace-idx{font-family:'Source Code Pro',monospace;color:#6b7280;width:16px;flex-shrink:0;}
+  .trace-name{font-family:'Rajdhani',sans-serif;font-weight:600;color:#d1d5db;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .trace-val{font-family:'Source Code Pro',monospace;font-size:11px;flex-shrink:0;}
+
+  .reject-toast{position:absolute;pointer-events:none;background:rgba(40,0,10,.92);border:1px solid #ff4757;color:#ff8a97;font-family:'Source Code Pro',monospace;font-size:11px;padding:5px 9px;border-radius:8px;z-index:80;box-shadow:0 4px 16px rgba(0,0,0,.5);white-space:nowrap;}
+
+  .mobile-note{display:none;}
+  @media (max-width:900px){
+    .mobile-note{display:flex;}
+    .side-col{width:100% !important;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+  .scope-radio{accent-color:var(--blue);width:14px;height:14px;}
+  .rollup-badge{display:none;margin:6px 0 2px;padding:2px 6px;border-radius:4px;font-size:9.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--blue);background:rgba(0,191,255,.09);border:1px solid rgba(0,191,255,.25);}
+  .scope-horizon .node.type-metric .rollup-badge{display:block;}
+
+  /* =====================================================================
+     PHONE LAYER — every rule below is scoped to a phone-sized viewport.
+     Desktop (>= 769px wide and taller than 540px) is deliberately
+     untouched. This page does not load the site-wide style.css, so the
+     global responsive layer is re-stated here at the same breakpoints.
+     ===================================================================== */
+
+  @media (max-width: 768px){
+
+    /* --- Top bar: the sandbox pill nearly filled the row at 375px. --- */
+    body > .flex.items-center.justify-between{ padding:.55rem .8rem; }
+    body > .flex.items-center.justify-between .pill{ font-size:9px; padding:.2rem .5rem; }
+    body > .flex.items-center.justify-between a{ font-size:.78rem; }
+
+    /* --- Header card: desktop padding/type pushed Auto-Layout onto its
+           own row. Trim so all three actions share one line. --- */
+    main > .glass.p-6{ padding:1rem; border-radius:1rem; gap:.85rem; }
+    main > .glass.p-6 h1{ font-size:1.35rem; line-height:1.1; }
+    main > .glass.p-6 p{ font-size:.8rem; line-height:1.35; }
+    main > .glass.p-6 > .flex.flex-wrap{ width:100%; gap:.4rem; }
+    main > .glass.p-6 .btn-tech{
+      padding:.42rem .4rem; font-size:.62rem; letter-spacing:.04em;
+      flex:1 1 0; min-width:0; white-space:nowrap;
+    }
+
+    /* --- Tighten the gaps between the stacked sections. --- */
+    main > .flex.gap-5{ gap:.85rem; }
+    .mobile-note.glass{ padding:.6rem .8rem; font-size:10.5px; line-height:1.35; border-radius:.9rem; gap:.55rem; }
+    .side-col.glass{ padding:.9rem; border-radius:1rem; }
+
+    /* --- Palette: six full-width rows ate a whole screen of scroll.
+           Reflow them into two compact columns. --- */
+    #palette{ display:grid; grid-template-columns:1fr 1fr; gap:.4rem; }
+    .palette-btn{ padding:.45rem .5rem; font-size:11.5px; gap:6px; border-radius:8px; }
+    .palette-swatch{ width:8px; height:8px; }
+    .side-col.glass > .mt-4{ margin-top:.7rem; padding-top:.6rem; font-size:9.5px; }
+
+    /* --- Canvas: 620px of viewport is most of a phone screen. The world
+           is pannable, so a shorter window loses nothing. --- */
+    #viewport{ height:360px !important; border-radius:.9rem; }
+    /* pan/zoom hint + zoom stepper row */
+    .font-tech.text-gray-500.items-center{ font-size:9.5px; line-height:1.25; }
+    #zoom-in, #zoom-out{ width:1.7rem; height:1.7rem; }
+    #zoom-label{ width:2.4rem; font-size:9.5px; }
+    /* Connection-rejected toast had white-space:nowrap and could run past
+       the canvas edge; let it wrap inside the viewport instead. */
+    .reject-toast{ max-width:calc(100% - 16px); white-space:normal; font-size:10px; line-height:1.3; overflow-wrap:anywhere; }
+
+    /* --- Controls column: inline max-height:680px + overflow-y:auto made
+           a nested scroll region, and the Evaluation Trace at the bottom
+           was unreachable/clipped. Let it grow with the page instead. --- */
+    .side-col.flex{ max-height:none !important; overflow-y:visible !important; gap:1.05rem; }
+    /* same reason: no second nested scroller inside the first */
+    #trace-list{ max-height:none; padding-right:0; }
+
+    /* --- Control widgets: phone-scale --- */
+    .side-col.flex h3{ font-size:11px; margin-bottom:.5rem; }
+    .side-col.flex input, .side-col.flex select{ font-size:11px; padding:.25rem .4rem; }
+    .side-col.flex input[type=range]{ padding:0; }
+    .side-col.flex .pt-4{ padding-top:.8rem; }
+    .trace-item{ padding:4px 6px; font-size:10.5px; gap:6px; }
+    .trace-val{ font-size:10px; }
+    #output-banner{ font-size:12px; padding:.4rem .7rem; }
+
+    /* Long unbreakable strings must never widen the page. */
+    .trace-name, .io-val, .io-label{ overflow-wrap:anywhere; }
+  }
+
+  /* --- Extra trims for the narrowest phones. --- */
+  @media (max-width: 480px){
+    main > .glass.p-6 h1{ font-size:1.25rem; }
+    main > .glass.p-6 p{ font-size:.76rem; }
+    #viewport{ height:330px !important; }
+    .palette-btn{ font-size:11px; }
+  }
+
+  /* --- Phone held sideways: width is fine, height is the scarce
+         resource, so shrink the canvas and drop the nested scrollers. --- */
+  @media (orientation: landscape) and (max-height: 540px){
+    main > .glass.p-6{ padding:.9rem 1rem; }
+    main > .glass.p-6 h1{ font-size:1.4rem; line-height:1.1; }
+    main > .glass.p-6 p{ font-size:.8rem; line-height:1.35; }
+    main > .glass.p-6 .btn-tech{ padding:.4rem .7rem; font-size:.65rem; }
+    #viewport{ height:300px !important; }
+    .side-col.flex{ max-height:none !important; overflow-y:visible !important; }
+    #trace-list{ max-height:none; }
+    .reject-toast{ max-width:calc(100% - 16px); white-space:normal; font-size:10px; overflow-wrap:anywhere; }
+  }
+
+  /* --- Touch devices: neutralise hover-only affordances (they latch "on"
+         after a tap) and grow the connector ports' hit area, which are
+         only 11px of visual dot. --- */
+  @media (hover: none){
+    .btn-primary:hover{ background:rgba(0,191,255,.1); color:var(--blue); box-shadow:none; }
+    .btn-secondary:hover{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12); color:#d1d5db; }
+    .btn-ghost:hover{ border-color:rgba(255,255,255,.1); color:#9ca3af; }
+    .palette-btn:hover{ background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.07); color:#d1d5db; }
+    .node-close:hover{ background:rgba(0,0,0,.3); border-color:rgba(255,255,255,.15); color:#9ca3af; }
+    .port:hover{ transform:none; box-shadow:0 0 0 2px rgba(0,0,0,.5); }
+    .port::before{ content:""; position:absolute; inset:-7px; border-radius:50%; }
+  }
+</style>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+<div class="bg-orb orb-tl"></div>
+<div class="bg-orb orb-br"></div>
+
+<!-- Top bar -->
+<div class="flex items-center justify-between px-5 py-3 border-b border-white/5">
+  <a href="Daemon-Data.html" class="font-disp font-semibold text-sm text-gray-400 hover:text-electric-blue flex items-center gap-2" style="text-decoration:none;">
+    <span aria-hidden="true">&larr;</span> Back to Daemon Data
+  </a>
+  <span class="pill px-3 py-1 rounded-full border border-magenta/30 text-magenta bg-magenta/5">SANDBOX · NOTHING IS SAVED</span>
+</div>
+
+<main class="px-4 md:px-8 py-6 max-w-[1500px] mx-auto space-y-5">
+
+  <!-- Header card -->
+  <div class="glass p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 relative overflow-hidden">
+    <div class="absolute -top-16 -left-16 w-56 h-56 rounded-full blur-[70px] pointer-events-none" style="background:rgba(255,0,255,.18);"></div>
+    <div class="relative z-10">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="pill px-2 py-0.5 rounded bg-magenta/10 text-magenta border border-magenta/20">DEMO MODULE</span>
+        <span class="pill px-2 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700">v1.0</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-black text-white mb-1">Notification Builder</h1>
+      <p class="text-gray-400 font-disp text-base max-w-2xl">Wire raw metrics and AI-derived signals into a boolean expression graph. The evaluator walks backward from <span class="text-lime font-semibold">Output</span> and only resolves what it depends on. Everything else never runs.</p>
+    </div>
+    <div class="flex flex-wrap gap-2 relative z-10">
+      <button id="btn-reset" class="btn-tech btn-secondary px-4 py-2 text-xs"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+      <button id="btn-example" class="btn-tech btn-secondary px-4 py-2 text-xs"><i class="fa-solid fa-diagram-project"></i> Load Example</button>
+      <button id="btn-autolayout" class="btn-tech btn-primary px-4 py-2 text-xs"><i class="fa-solid fa-arrows-left-right"></i> Auto-Layout</button>
+    </div>
+  </div>
+
+  <div class="mobile-note glass items-center gap-3 px-4 py-3 text-xs text-gray-400 font-disp">
+    <i class="fa-solid fa-desktop text-electric-blue"></i>
+    This builder is best on a wider screen. You can still pan the canvas and edit values below.
+  </div>
+
+  <!-- Main 3 column layout -->
+  <div class="flex flex-col lg:flex-row gap-5 items-stretch">
+
+    <!-- Palette -->
+    <div class="side-col glass p-4" style="width:200px;flex-shrink:0;">
+      <h3 class="text-xs text-gray-300 mb-3 flex items-center gap-2"><i class="fa-solid fa-shapes text-electric-blue"></i>Add Node</h3>
+      <div class="flex flex-col gap-2" id="palette"></div>
+      <div class="mt-4 pt-3 border-t border-white/5 text-[10.5px] text-gray-500 font-tech leading-relaxed">
+        Drag output → input to connect. Click an edge to select, then × or Delete to remove.
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="flex-1 min-w-0 flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-[11px] font-tech text-gray-500">
+          <i class="fa-solid fa-arrows-up-down-left-right"></i> Drag empty space to pan · scroll to zoom
+        </div>
+        <div class="flex items-center gap-1">
+          <button id="zoom-out" class="btn-tech btn-ghost w-8 h-8 !p-0 text-sm">−</button>
+          <span id="zoom-label" class="font-tech text-[11px] text-gray-400 w-12 text-center">100%</span>
+          <button id="zoom-in" class="btn-tech btn-ghost w-8 h-8 !p-0 text-sm">+</button>
+        </div>
+      </div>
+      <div id="viewport" style="height:620px;">
+        <div id="world">
+          <div id="grid-bg"></div>
+          <svg id="edge-svg"></svg>
+          <div id="nodes-layer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="side-col glass p-4 flex flex-col gap-5 overflow-y-auto" style="width:360px;flex-shrink:0;max-height:680px;">
+
+      <div>
+        <h3 class="text-xs text-gray-300 mb-3 flex items-center gap-2"><i class="fa-solid fa-vial text-electric-blue"></i>Test Post</h3>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <label class="flex flex-col gap-1 text-gray-400">Upvotes
+            <input type="number" id="tp-upvotes" class="node-input" value="120">
+          </label>
+          <label class="flex flex-col gap-1 text-gray-400">Comments
+            <input type="number" id="tp-comments" class="node-input" value="34">
+          </label>
+          <label class="flex flex-col gap-1 text-gray-400">Upvote vel. (Δ/hr)
+            <input type="number" id="tp-upvel" class="node-input" value="62">
+          </label>
+          <label class="flex flex-col gap-1 text-gray-400">Comment vel. (Δ/hr)
+            <input type="number" id="tp-comvel" class="node-input" value="8">
+          </label>
+          <label class="flex flex-col gap-1 text-gray-400 col-span-2">Post age (hrs)
+            <input type="number" id="tp-age" class="node-input" value="3.5" step="0.1">
+          </label>
+        </div>
+        <div class="flex flex-col gap-3 mt-3 pt-3 border-t border-white/5">
+          <label class="text-[11px] text-magenta/90 flex justify-between font-disp font-semibold">Market signal strength <span id="tp-market-val" class="font-tech text-gray-300">72</span></label>
+          <input type="range" id="tp-market" min="0" max="100" value="72" class="w-full">
+          <label class="text-[11px] text-magenta/90 flex justify-between font-disp font-semibold">Sentiment (-1 to 1) <span id="tp-sentiment-val" class="font-tech text-gray-300">0.40</span></label>
+          <input type="range" id="tp-sentiment" min="-1" max="1" step="0.05" value="0.4" class="w-full">
+          <label class="text-[11px] text-magenta/90 flex justify-between font-disp font-semibold">Urgency (1-5) <span id="tp-urgency-val" class="font-tech text-gray-300">3</span></label>
+          <input type="range" id="tp-urgency" min="1" max="5" step="1" value="3" class="w-full">
+          <label class="text-[11px] text-magenta/90 flex justify-between font-disp font-semibold">Relevance (0-100) <span id="tp-relevance-val" class="font-tech text-gray-300">55</span></label>
+          <input type="range" id="tp-relevance" min="0" max="100" value="55" class="w-full">
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-white/5">
+        <h3 class="text-xs text-gray-300 mb-3 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-electric-blue"></i>Scope</h3>
+        <div class="flex gap-4 text-[12px] font-disp font-semibold">
+          <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="scope" value="single" class="scope-radio" checked> Single post</label>
+          <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="scope" value="horizon" class="scope-radio"> Time horizon</label>
+        </div>
+        <div id="horizon-controls" class="mt-3 hidden">
+          <div class="flex items-center gap-2">
+            <input type="number" id="horizon-value" value="6" min="1" class="node-input" style="width:70px;">
+            <select id="horizon-unit" class="node-select" style="width:80px;">
+              <option value="H">Hours</option>
+              <option value="D">Days</option>
+            </select>
+          </div>
+          <p class="text-[10.5px] text-gray-500 font-tech mt-2 leading-relaxed">Values land in 30-min buckets and roll as sums across the horizon before the boolean is evaluated. Metric nodes switch from a point-in-time reading to the total accumulated over the window.</p>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-white/5">
+        <h3 class="text-xs text-gray-300 mb-2 flex items-center gap-2"><i class="fa-solid fa-filter text-electric-blue"></i>Debounce</h3>
+        <label class="flex items-center gap-2 text-[11px] text-gray-400">Max alerts / hour
+          <input type="number" id="debounce-max" value="5" min="1" class="node-input" style="width:70px;">
+        </label>
+        <p class="text-[10.5px] text-gray-500 font-tech mt-2 leading-relaxed">Repeat alerts sharing the same tracking key are suppressed once this cap is hit.</p>
+      </div>
+
+      <div class="pt-4 border-t border-white/5">
+        <h3 class="text-xs text-gray-300 mb-3 flex items-center gap-2"><i class="fa-solid fa-route text-lime"></i>Evaluation Trace</h3>
+        <div id="trace-list" class="flex flex-col gap-1.5 max-h-56 overflow-y-auto pr-1"></div>
+        <div id="output-banner" class="mt-3 rounded-xl border px-3 py-2 flex items-center justify-between font-disp font-bold text-sm">
+          <span>OUTPUT</span><span id="output-state" class="font-tech"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================= STATE ============================= */
+const WORLD_W = 2400, WORLD_H = 1500;
+let uidCounter = 1;
+const uid = (p) => p + '_' + (uidCounter++);
+
+const state = {
+  nodes: [],       // {id,type,x,y,config:{}}
+  edges: [],       // {id, from:{node,port}, to:{node,port}}
+  pan: {x:0,y:0},
+  zoom: 1,
+  connecting: null, // {fromNode,fromPort,type,x,y}
+  selectedEdge: null,
+  dragNode: null,
+  panDrag: null,
+  testPost: {
+    upvotes:120, comments:34, upvel:62, comvel:8, age:3.5,
+    market:72, sentiment:0.4, urgency:3, relevance:55
+  },
+  scope: { mode:'single', horizonValue:6, horizonUnit:'H' },
+  debounceMax: 5,
+  evalCache: {},      // nodeId -> value
+  reached: new Set(),
+  trace: []
+};
+
+const METRIC_OPTS = [
+  ['upvotes','Upvotes'],
+  ['comments','Comments'],
+  ['upvel','Upvote velocity (Δ/hr)'],
+  ['comvel','Comment velocity (Δ/hr)'],
+  ['age','Post age (hrs)'],
+  ['score','Score'],
+];
+const ANALYSIS_OPTS = [
+  ['market','Market signal strength (0-100)'],
+  ['sentiment','Sentiment (-1 to 1)'],
+  ['urgency','Urgency (1-5)'],
+  ['relevance','Relevance (0-100)'],
+];
+const ARITH_OPTS = [['+','+'],['-','−'],['*','×'],['/','÷'],['min','min'],['max','max']];
+const COMPARE_OPTS = [['>','>'],['>=','≥'],['<','<'],['<=','≤'],['==','='],['!=','≠']];
+const LOGIC_OPTS = [['AND','AND'],['OR','OR'],['NOT','NOT']];
+
+/* ============================= DOM refs ============================= */
+const viewportEl = document.getElementById('viewport');
+const worldEl = document.getElementById('world');
+const nodesLayer = document.getElementById('nodes-layer');
+const svg = document.getElementById('edge-svg');
+const zoomLabel = document.getElementById('zoom-label');
+
+/* ============================= Node factory ============================= */
+function makeNode(type, x, y, extra){
+  const base = {id: uid('n'), type, x, y};
+  switch(type){
+    case 'metric': base.config = {metric:'upvotes'}; break;
+    case 'analysis': base.config = {prompt:'market'}; break;
+    case 'constant': base.config = {value:50}; break;
+    case 'arithmetic': base.config = {op:'+'}; break;
+    case 'comparison': base.config = {op:'>'}; break;
+    case 'logic': base.config = {op:'AND'}; break;
+    case 'output': base.config = {}; break;
+  }
+  Object.assign(base, extra||{});
+  return base;
+}
+
+function nodeTitle(type){
+  return ({metric:'Metric Input',analysis:'Analysis',constant:'Constant',arithmetic:'Arithmetic',comparison:'Comparison',logic:'Logic',output:'Output / Trigger'})[type];
+}
+function nodeOutputType(node){
+  if(node.type==='output') return null;
+  if(node.type==='comparison' || node.type==='logic') return 'boolean';
+  return 'number';
+}
+
+/* ============================= Graph helpers ============================= */
+function getNode(id){ return state.nodes.find(n=>n.id===id); }
+function edgesInto(nodeId, port){ return state.edges.filter(e=>e.to.node===nodeId && (port?e.to.port===port:true)); }
+function edgeInto(nodeId, port){ return state.edges.find(e=>e.to.node===nodeId && e.to.port===port); }
+function outputNode(){ return state.nodes.find(n=>n.type==='output'); }
+
+function wouldCycle(fromNodeId, toNodeId){
+  if(fromNodeId===toNodeId) return true;
+  // does toNodeId already reach fromNodeId via existing forward edges (from->to)?
+  const seen = new Set();
+  const stack=[toNodeId];
+  while(stack.length){
+    const cur = stack.pop();
+    if(cur===fromNodeId) return true;
+    if(seen.has(cur)) continue;
+    seen.add(cur);
+    state.edges.filter(e=>e.from.node===cur).forEach(e=>stack.push(e.to.node));
+  }
+  return false;
+}
+
+/* ============================= Example graph ============================= */
+function loadExample(resetViewport){
+  state.nodes = [];
+  state.edges = [];
+  const m1 = makeNode('metric', 90, 70, {config:{metric:'upvel'}});
+  const c1 = makeNode('constant', 90, 210, {config:{value:50}});
+  const a1 = makeNode('analysis', 90, 350, {config:{prompt:'market'}});
+  const c2 = makeNode('constant', 90, 490, {config:{value:60}});
+  const orphan = makeNode('analysis', 90, 630, {config:{prompt:'sentiment'}});
+  const cmp1 = makeNode('comparison', 420, 110, {config:{op:'>'}});
+  const cmp2 = makeNode('comparison', 420, 420, {config:{op:'>='}});
+  const logic1 = makeNode('logic', 720, 260, {config:{op:'AND'}});
+  const out = makeNode('output', 1000, 260, {});
+  state.nodes.push(m1,c1,a1,c2,orphan,cmp1,cmp2,logic1,out);
+  state.edges.push(
+    {id:uid('e'), from:{node:m1.id,port:'out'}, to:{node:cmp1.id,port:'a'}},
+    {id:uid('e'), from:{node:c1.id,port:'out'}, to:{node:cmp1.id,port:'b'}},
+    {id:uid('e'), from:{node:a1.id,port:'out'}, to:{node:cmp2.id,port:'a'}},
+    {id:uid('e'), from:{node:c2.id,port:'out'}, to:{node:cmp2.id,port:'b'}},
+    {id:uid('e'), from:{node:cmp1.id,port:'out'}, to:{node:logic1.id,port:'a'}},
+    {id:uid('e'), from:{node:cmp2.id,port:'out'}, to:{node:logic1.id,port:'b'}},
+    {id:uid('e'), from:{node:logic1.id,port:'out'}, to:{node:out.id,port:'a'}}
+  );
+  if(resetViewport){ state.pan={x:40,y:20}; state.zoom=0.85; applyTransform(); }
+  renderAll();
+}
+
+function resetTestPost(){
+  state.testPost = {upvotes:120, comments:34, upvel:62, comvel:8, age:3.5, market:72, sentiment:0.4, urgency:3, relevance:55};
+  state.scope = {mode:'single', horizonValue:6, horizonUnit:'H'};
+  state.debounceMax = 5;
+  syncControlInputs();
+}
+
+function fullReset(){
+  resetTestPost();
+  loadExample(true);
+}
+
+/* ============================= Rendering ============================= */
+function fmtVal(val, type){
+  if(val===null || val===undefined) return '–';
+  if(type==='boolean') return val ? 'TRUE' : 'FALSE';
+  if(typeof val==='number'){
+    if(Object.is(val,-0)) val = 0;
+    return (Math.round(val*100)/100).toLocaleString(undefined,{maximumFractionDigits:2});
+  }
+  return String(val);
+}
+
+function renderAll(){
+  renderNodes();
+  renderEdges();
+  evaluateGraph();
+}
+
+function renderNodes(){
+  nodesLayer.innerHTML = '';
+  state.nodes.forEach(node=>{
+    nodesLayer.appendChild(buildNodeEl(node));
+  });
+}
+
+function buildNodeEl(node){
+  const el = document.createElement('div');
+  el.className = 'node type-'+node.type;
+  el.dataset.id = node.id;
+  el.style.left = node.x+'px';
+  el.style.top = node.y+'px';
+
+  const header = document.createElement('div');
+  header.className = 'node-header';
+  const canDelete = node.type !== 'output';
+  header.innerHTML = `<span>${nodeTitle(node.type)}</span>` + (canDelete ? `<button class="node-close" data-action="delete" title="Delete node">×</button>` : `<span class="pill text-lime" title="Exactly one Output node is required">FIXED</span>`);
+  el.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'node-body';
+  body.innerHTML = bodyTemplate(node);
+  el.appendChild(body);
+
+  return el;
+}
+
+function optionList(opts, selected){
+  return opts.map(([v,l])=>`<option value="${v}" ${v===selected?'selected':''}>${l}</option>`).join('');
+}
+
+function bodyTemplate(node){
+  switch(node.type){
+    case 'metric':
+      return `
+        <select class="node-select" data-field="metric">${optionList(METRIC_OPTS, node.config.metric)}</select>
+        <div class="rollup-badge font-tech" data-rollup>&#931; rolling sum</div>
+        <div class="io-row out-row" data-port-row="out">
+          <span class="io-label">OUT</span><span class="io-val font-tech" data-val="out">–</span>
+          <span class="port port-out number" data-port="out" data-type="number"></span>
+        </div>`;
+    case 'analysis':
+      return `
+        <select class="node-select" data-field="prompt">${optionList(ANALYSIS_OPTS, node.config.prompt)}</select>
+        <div class="io-row out-row" data-port-row="out">
+          <span class="io-label">OUT</span><span class="io-val font-tech" data-val="out">–</span>
+          <span class="port port-out number" data-port="out" data-type="number"></span>
+        </div>`;
+    case 'constant':
+      return `
+        <input type="number" class="node-input" data-field="value" value="${node.config.value}">
+        <div class="io-row out-row" data-port-row="out">
+          <span class="io-label">OUT</span><span class="io-val font-tech" data-val="out">–</span>
+          <span class="port port-out number" data-port="out" data-type="number"></span>
+        </div>`;
+    case 'arithmetic':
+      return `
+        <div class="io-row" data-port-row="a"><span class="port port-in number" data-port="a" data-type="number"></span><span class="io-label">A</span><span class="io-val font-tech" data-val="a">–</span></div>
+        <div class="io-row" data-port-row="b"><span class="port port-in number" data-port="b" data-type="number"></span><span class="io-label">B</span><span class="io-val font-tech" data-val="b">–</span></div>
+        <select class="node-select" data-field="op">${optionList(ARITH_OPTS, node.config.op)}</select>
+        <div class="io-row out-row" data-port-row="out">
+          <span class="io-label">OUT</span><span class="io-val font-tech" data-val="out">–</span>
+          <span class="port port-out number" data-port="out" data-type="number"></span>
+        </div>`;
+    case 'comparison':
+      return `
+        <div class="io-row" data-port-row="a"><span class="port port-in number" data-port="a" data-type="number"></span><span class="io-label">A</span><span class="io-val font-tech" data-val="a">–</span></div>
+        <div class="io-row" data-port-row="b"><span class="port port-in number" data-port="b" data-type="number"></span><span class="io-label">B</span><span class="io-val font-tech" data-val="b">–</span></div>
+        <select class="node-select" data-field="op">${optionList(COMPARE_OPTS, node.config.op)}</select>
+        <div class="io-row out-row" data-port-row="out">
+          <span class="io-label">OUT</span><span class="io-val font-tech" data-val="out">–</span>
+          <span class="port port-out boolean" data-port="out" data-type="boolean"></span>
+        </div>`;
+    case 'logic': {
+      const isNot = node.config.op==='NOT';
+      return `
+        <div class="io-row" data-port-row="a"><span class="port port-in boolean" data-port="a" data-type="boolean"></span><span class="io-label">A</span><span class="io-val font-tech" data-val="a">–</span></div>
+        ${isNot? '' : `<div class="io-row" data-port-row="b"><span class="port port-in boolean" data-port="b" data-type="boolean"></span><span class="io-label">B</span><span class="io-val font-tech" data-val="b">–</span></div>`}
+        <select class="node-select" data-field="op">${optionList(LOGIC_OPTS, node.config.op)}</select>
+        <div class="io-row out-row" data-port-row="out">
+          <span class="io-label">OUT</span><span class="io-val font-tech" data-val="out">–</span>
+          <span class="port port-out boolean" data-port="out" data-type="boolean"></span>
+        </div>`;
+    }
+    case 'output':
+      return `
+        <div class="io-row" data-port-row="a"><span class="port port-in boolean" data-port="a" data-type="boolean"></span><span class="io-label">CONDITION</span><span class="io-val font-tech" data-val="a">–</span></div>
+        <div class="node-fires" data-fires>HOLD</div>`;
+  }
+}
+
+/* re-render just one node's body (op change etc.) and prune invalid edges */
+function refreshNodeBody(node){
+  const el = nodesLayer.querySelector(`.node[data-id="${node.id}"]`);
+  if(!el) return;
+  el.querySelector('.node-body').innerHTML = bodyTemplate(node);
+  updatePortFillClasses();
+}
+
+/* ============================= Edges (SVG) ============================= */
+function portEl(nodeId, port){
+  return nodesLayer.querySelector(`.node[data-id="${nodeId}"] [data-port="${port}"]`);
+}
+function worldPointOf(el){
+  const r = el.getBoundingClientRect();
+  const wr = worldEl.getBoundingClientRect();
+  const z = state.zoom;
+  return { x: (r.left + r.width/2 - wr.left)/z, y: (r.top + r.height/2 - wr.top)/z };
+}
+function bezierPath(p1,p2){
+  const dx = Math.max(60, Math.abs(p2.x-p1.x)*0.5);
+  return `M ${p1.x} ${p1.y} C ${p1.x+dx} ${p1.y}, ${p2.x-dx} ${p2.y}, ${p2.x} ${p2.y}`;
+}
+
+function renderEdges(){
+  svg.innerHTML = '';
+  state.edges.forEach(edge=>{
+    const fromEl = portEl(edge.from.node, edge.from.port);
+    const toEl = portEl(edge.to.node, edge.to.port);
+    if(!fromEl || !toEl) return;
+    const p1 = worldPointOf(fromEl), p2 = worldPointOf(toEl);
+    const fromNode = getNode(edge.from.node);
+    const boolType = nodeOutputType(fromNode)==='boolean';
+    const color = boolType ? 'var(--magenta)' : 'var(--blue)';
+    const unreached = !state.reached.has(edge.from.node) || !state.reached.has(edge.to.node);
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.dataset.edgeId = edge.id;
+
+    const hit = document.createElementNS('http://www.w3.org/2000/svg','path');
+    hit.setAttribute('d', bezierPath(p1,p2));
+    hit.setAttribute('class','edge-hit');
+    hit.setAttribute('stroke','transparent');
+    hit.setAttribute('stroke-width','16');
+    hit.setAttribute('fill','none');
+
+    const visible = document.createElementNS('http://www.w3.org/2000/svg','path');
+    visible.setAttribute('d', bezierPath(p1,p2));
+    visible.setAttribute('stroke', edge.id===state.selectedEdge ? '#fff' : color);
+    visible.setAttribute('stroke-width', edge.id===state.selectedEdge ? '3' : '2');
+    visible.setAttribute('fill','none');
+    visible.setAttribute('opacity', unreached ? '0.25' : '0.9');
+
+    g.appendChild(hit);
+    g.appendChild(visible);
+
+    if(edge.id === state.selectedEdge){
+      const mid = {x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2};
+      const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circ.setAttribute('cx',mid.x); circ.setAttribute('cy',mid.y); circ.setAttribute('r','9');
+      circ.setAttribute('fill','#1a0008'); circ.setAttribute('stroke','#ff4757'); circ.setAttribute('stroke-width','1.5');
+      circ.setAttribute('class','edge-x');
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x',mid.x); txt.setAttribute('y',mid.y+3.5); txt.setAttribute('text-anchor','middle');
+      txt.setAttribute('font-size','11'); txt.setAttribute('fill','#ff4757'); txt.setAttribute('class','edge-x');
+      txt.textContent = '×';
+      g.appendChild(circ); g.appendChild(txt);
+    }
+
+    svg.appendChild(g);
+  });
+  updatePortFillClasses();
+}
+
+function updateEdgePositionsOnly(){
+  // cheaper path used during drag/pan/zoom: just recompute d attributes
+  const groups = svg.querySelectorAll('g[data-edge-id]');
+  groups.forEach(g=>{
+    const edge = state.edges.find(e=>e.id===g.dataset.edgeId);
+    if(!edge) return;
+    const fromEl = portEl(edge.from.node, edge.from.port);
+    const toEl = portEl(edge.to.node, edge.to.port);
+    if(!fromEl||!toEl) return;
+    const p1 = worldPointOf(fromEl), p2 = worldPointOf(toEl);
+    const d = bezierPath(p1,p2);
+    g.querySelectorAll('path').forEach(p=>p.setAttribute('d',d));
+    const circ = g.querySelector('circle');
+    const txt = g.querySelector('text');
+    if(circ){ const mid={x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2}; circ.setAttribute('cx',mid.x); circ.setAttribute('cy',mid.y); txt.setAttribute('x',mid.x); txt.setAttribute('y',mid.y+3.5); }
+  });
+}
+
+function updatePortFillClasses(){
+  nodesLayer.querySelectorAll('.port.port-in').forEach(p=>p.classList.remove('filled'));
+  nodesLayer.querySelectorAll('.port.port-out').forEach(p=>p.classList.remove('filled'));
+  state.edges.forEach(edge=>{
+    const inEl = portEl(edge.to.node, edge.to.port);
+    const outEl = portEl(edge.from.node, edge.from.port);
+    if(inEl) inEl.classList.add('filled');
+    if(outEl) outEl.classList.add('filled');
+  });
+}
+
+/* ============================= Evaluation ============================= */
+function horizonHours(){
+  return state.scope.horizonUnit==='D' ? state.scope.horizonValue*24 : state.scope.horizonValue;
+}
+function metricValue(key){
+  const tp = state.testPost;
+  const horizon = state.scope.mode==='horizon';
+  const hrs = horizon ? horizonHours() : 0;
+  let upvotes = tp.upvotes, comments = tp.comments, age = tp.age;
+  if(horizon){
+    upvotes = Math.round(tp.upvotes + tp.upvel*hrs);
+    comments = Math.round(tp.comments + tp.comvel*hrs);
+    age = Math.round((tp.age + hrs)*10)/10;
+  }
+  switch(key){
+    case 'upvotes': return upvotes;
+    case 'comments': return comments;
+    case 'upvel': return horizon ? Math.round(tp.upvel*hrs) : tp.upvel;
+    case 'comvel': return horizon ? Math.round(tp.comvel*hrs) : tp.comvel;
+    case 'age': return age;
+    case 'score': return Math.round(upvotes + comments*1.5);
+  }
+  return null;
+}
+function analysisValue(key){
+  const tp = state.testPost;
+  switch(key){
+    case 'market': return tp.market;
+    case 'sentiment': return tp.sentiment;
+    case 'urgency': return tp.urgency;
+    case 'relevance': return tp.relevance;
+  }
+  return null;
+}
+
+function evaluateGraph(){
+  state.evalCache = {};
+  state.reached = new Set();
+  state.trace = [];
+  const visiting = new Set();
+
+  function resolveInput(node, port){
+    const e = edgeInto(node.id, port);
+    if(!e) return null;
+    return resolve(e.from.node);
+  }
+  function resolve(nodeId){
+    if(state.evalCache.hasOwnProperty(nodeId)) return state.evalCache[nodeId];
+    if(visiting.has(nodeId)) return null; // defensive cycle guard
+    visiting.add(nodeId);
+    const node = getNode(nodeId);
+    let value = null;
+    if(node){
+      switch(node.type){
+        case 'metric': value = metricValue(node.config.metric); break;
+        case 'analysis': value = analysisValue(node.config.prompt); break;
+        case 'constant': value = node.config.value; break;
+        case 'arithmetic': {
+          const a = resolveInput(node,'a'), b = resolveInput(node,'b');
+          if(a!=null && b!=null){
+            switch(node.config.op){
+              case '+': value=a+b; break;
+              case '-': value=a-b; break;
+              case '*': value=a*b; break;
+              case '/': value = b===0 ? null : a/b; break;
+              case 'min': value=Math.min(a,b); break;
+              case 'max': value=Math.max(a,b); break;
+            }
+          }
+          break;
+        }
+        case 'comparison': {
+          const a = resolveInput(node,'a'), b = resolveInput(node,'b');
+          if(a!=null && b!=null){
+            switch(node.config.op){
+              case '>': value=a>b; break;
+              case '>=': value=a>=b; break;
+              case '<': value=a<b; break;
+              case '<=': value=a<=b; break;
+              case '==': value=a===b; break;
+              case '!=': value=a!==b; break;
+            }
+          }
+          break;
+        }
+        case 'logic': {
+          if(node.config.op==='NOT'){
+            const a = resolveInput(node,'a');
+            value = a==null ? null : !a;
+          } else {
+            const a = resolveInput(node,'a'), b = resolveInput(node,'b');
+            if(a!=null && b!=null) value = node.config.op==='AND' ? (a&&b) : (a||b);
+          }
+          break;
+        }
+        case 'output': {
+          const a = resolveInput(node,'a');
+          value = a===true;
+          break;
+        }
+      }
+    }
+    visiting.delete(nodeId);
+    state.evalCache[nodeId] = value;
+    state.reached.add(nodeId);
+    state.trace.push({id:nodeId, value});
+    return value;
+  }
+
+  const out = outputNode();
+  if(out) resolve(out.id);
+
+  paintValues();
+  paintTrace();
+}
+
+function paintValues(){
+  state.nodes.forEach(node=>{
+    const el = nodesLayer.querySelector(`.node[data-id="${node.id}"]`);
+    if(!el) return;
+    const reached = state.reached.has(node.id);
+    el.classList.toggle('unreached', !reached);
+    const val = state.evalCache[node.id];
+    const outType = nodeOutputType(node);
+
+    if(node.type==='output'){
+      const fires = el.querySelector('[data-fires]');
+      const on = val===true;
+      fires.textContent = on ? 'FIRES' : 'HOLD';
+      fires.style.color = on ? 'var(--lime)' : '#6b7280';
+      fires.style.textShadow = on ? '0 0 12px rgba(50,205,50,.6)' : 'none';
+    } else {
+      const outEl = el.querySelector('[data-val="out"]');
+      if(outEl) outEl.textContent = reached ? fmtVal(val, outType) : 'n/a';
+      if(outEl) outEl.classList.toggle('dim', !reached);
+    }
+    // input rows
+    ['a','b'].forEach(port=>{
+      const inEl = el.querySelector(`[data-val="${port}"]`);
+      if(!inEl) return;
+      const e = edgeInto(node.id, port);
+      if(!e){ inEl.textContent='–'; inEl.classList.add('dim'); return; }
+      const srcNode = getNode(e.from.node);
+      const srcReached = state.reached.has(e.from.node);
+      inEl.textContent = srcReached ? fmtVal(state.evalCache[e.from.node], nodeOutputType(srcNode)) : 'n/a';
+      inEl.classList.toggle('dim', !srcReached);
+    });
+
+    if(node.type==='metric'){
+      const badge = el.querySelector('[data-rollup]');
+      if(badge){
+        const hrs = horizonHours();
+        badge.textContent = `Σ ${Math.round(hrs*2)} buckets · ${hrs}h`;
+      }
+    }
+  });
+
+  document.body.classList.toggle('scope-horizon', state.scope.mode==='horizon');
+  updateOutputBanner();
+}
+
+function updateOutputBanner(){
+  const banner = document.getElementById('output-banner');
+  const stateEl = document.getElementById('output-state');
+  const out = outputNode();
+  const val = out ? state.evalCache[out.id] : null;
+  const on = val===true;
+  banner.style.borderColor = on ? 'rgba(50,205,50,.4)' : 'rgba(255,255,255,.1)';
+  banner.style.background = on ? 'rgba(50,205,50,.08)' : 'rgba(255,255,255,.02)';
+  stateEl.textContent = on ? 'FIRES' : 'HOLD';
+  stateEl.style.color = on ? 'var(--lime)' : '#9ca3af';
+}
+
+function paintTrace(){
+  const list = document.getElementById('trace-list');
+  list.innerHTML = '';
+  if(state.trace.length===0){
+    list.innerHTML = `<div class="text-[11px] text-gray-500 font-tech">No Output node, nothing evaluated.</div>`;
+    return;
+  }
+  state.trace.forEach((t,i)=>{
+    const node = getNode(t.id);
+    if(!node) return;
+    const outType = nodeOutputType(node);
+    const color = outType==='boolean' ? 'var(--magenta)' : (outType===null ? 'var(--lime)' : 'var(--blue)');
+    const row = document.createElement('div');
+    row.className = 'trace-item';
+    row.style.borderLeftColor = color;
+    row.innerHTML = `<span class="trace-idx">${i+1}</span><span class="trace-name">${nodeTitle(node.type)}${nodeConfigLabel(node)}</span><span class="trace-val" style="color:${color}">${node.type==='output' ? (t.value?'FIRES':'HOLD') : fmtVal(t.value,outType)}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function nodeConfigLabel(node){
+  switch(node.type){
+    case 'metric': return ' · ' + (METRIC_OPTS.find(o=>o[0]===node.config.metric)||[])[1];
+    case 'analysis': return ' · ' + (ANALYSIS_OPTS.find(o=>o[0]===node.config.prompt)||[])[1];
+    case 'constant': return ' · ' + node.config.value;
+    case 'arithmetic': return ' · ' + node.config.op;
+    case 'comparison': return ' · ' + node.config.op;
+    case 'logic': return ' · ' + node.config.op;
+    default: return '';
+  }
+}
+
+/* ============================= Transform / pan / zoom ============================= */
+function applyTransform(){
+  worldEl.style.transform = `translate(${state.pan.x}px, ${state.pan.y}px) scale(${state.zoom})`;
+  zoomLabel.textContent = Math.round(state.zoom*100)+'%';
+}
+function clampZoom(z){ return Math.min(1.6, Math.max(0.5, z)); }
+
+function screenToWorld(clientX, clientY){
+  const wr = worldEl.getBoundingClientRect();
+  return { x:(clientX-wr.left)/state.zoom, y:(clientY-wr.top)/state.zoom };
+}
+
+/* ============================= Interaction: pan, node drag, connect ============================= */
+let rejectToastEl = null;
+function showReject(msg, clientX, clientY){
+  if(rejectToastEl) rejectToastEl.remove();
+  const vr = viewportEl.getBoundingClientRect();
+  rejectToastEl = document.createElement('div');
+  rejectToastEl.className = 'reject-toast';
+  rejectToastEl.textContent = msg;
+  rejectToastEl.style.left = Math.min(clientX - vr.left + 10, vr.width-180) + 'px';
+  rejectToastEl.style.top = Math.max(clientY - vr.top - 30, 4) + 'px';
+  viewportEl.appendChild(rejectToastEl);
+  setTimeout(()=>{ if(rejectToastEl){ rejectToastEl.remove(); rejectToastEl=null; } }, 1600);
+}
+
+let tempPathEl = null;
+
+viewportEl.addEventListener('pointerdown', (e)=>{
+  const portTarget = e.target.closest('.port');
+  const nodeTarget = e.target.closest('.node');
+  const headerTarget = e.target.closest('.node-header');
+  const closeBtn = e.target.closest('[data-action="delete"]');
+
+  if(closeBtn){
+    const node = getNode(nodeTarget.dataset.id);
+    if(node && node.type!=='output'){
+      state.edges = state.edges.filter(ed=>ed.from.node!==node.id && ed.to.node!==node.id);
+      state.nodes = state.nodes.filter(n=>n.id!==node.id);
+      renderAll();
+    }
+    return;
+  }
+
+  if(portTarget && portTarget.classList.contains('port-out')){
+    e.preventDefault();
+    const node = nodeTarget;
+    const fromNode = node.dataset.id;
+    const fromType = portTarget.dataset.type;
+    state.connecting = {fromNode, fromPort:'out', type:fromType};
+    const p1 = worldPointOf(portTarget);
+    tempPathEl = document.createElementNS('http://www.w3.org/2000/svg','path');
+    tempPathEl.setAttribute('stroke', fromType==='boolean' ? 'var(--magenta)' : 'var(--blue)');
+    tempPathEl.setAttribute('stroke-width','2');
+    tempPathEl.setAttribute('fill','none');
+    tempPathEl.setAttribute('stroke-dasharray','5,4');
+    tempPathEl.setAttribute('d', bezierPath(p1,p1));
+    svg.appendChild(tempPathEl);
+    try{ viewportEl.setPointerCapture(e.pointerId); }catch(_){}
+    return;
+  }
+
+  if(headerTarget){
+    e.preventDefault();
+    const node = getNode(nodeTarget.dataset.id);
+    const wp = screenToWorld(e.clientX, e.clientY);
+    state.dragNode = {node, offX: wp.x-node.x, offY: wp.y-node.y, pointerId:e.pointerId};
+    nodeTarget.classList.add('dragging');
+    try{ viewportEl.setPointerCapture(e.pointerId); }catch(_){}
+    return;
+  }
+
+  if(!nodeTarget){
+    // click empty space: deselect edge, start pan
+    if(state.selectedEdge){ state.selectedEdge=null; renderEdges(); }
+    state.panDrag = {startX:e.clientX, startY:e.clientY, origPan:{...state.pan}, pointerId:e.pointerId};
+    try{ viewportEl.setPointerCapture(e.pointerId); }catch(_){}
+  }
+});
+
+viewportEl.addEventListener('pointermove', (e)=>{
+  if(state.connecting){
+    const wp = screenToWorld(e.clientX, e.clientY);
+    const fromEl = portEl(state.connecting.fromNode, 'out');
+    const p1 = worldPointOf(fromEl);
+    tempPathEl.setAttribute('d', bezierPath(p1, wp));
+    return;
+  }
+  if(state.dragNode){
+    const wp = screenToWorld(e.clientX, e.clientY);
+    let nx = wp.x - state.dragNode.offX;
+    let ny = wp.y - state.dragNode.offY;
+    const node = state.dragNode.node;
+    nx = Math.max(4, Math.min(WORLD_W-216, nx));
+    ny = Math.max(4, Math.min(WORLD_H-60, ny));
+    node.x = nx; node.y = ny;
+    const el = nodesLayer.querySelector(`.node[data-id="${node.id}"]`);
+    el.style.left = nx+'px'; el.style.top = ny+'px';
+    updateEdgePositionsOnly();
+    return;
+  }
+  if(state.panDrag){
+    const dx = e.clientX - state.panDrag.startX;
+    const dy = e.clientY - state.panDrag.startY;
+    state.pan.x = state.panDrag.origPan.x + dx;
+    state.pan.y = state.panDrag.origPan.y + dy;
+    applyTransform();
+    return;
+  }
+});
+
+function endConnecting(e){
+  if(!state.connecting) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const targetPort = el ? el.closest('.port.port-in') : null;
+  if(tempPathEl){ tempPathEl.remove(); tempPathEl=null; }
+  const from = state.connecting;
+  state.connecting = null;
+  if(!targetPort){ return; }
+  const toNodeEl = targetPort.closest('.node');
+  const toNode = toNodeEl.dataset.id;
+  const toPort = targetPort.dataset.port;
+  const toType = targetPort.dataset.type;
+
+  if(toType !== from.type){
+    showReject(`Type mismatch: ${from.type} ≠ ${toType}`, e.clientX, e.clientY); return;
+  }
+  if(edgeInto(toNode, toPort)){
+    showReject('Input already connected', e.clientX, e.clientY); return;
+  }
+  if(from.fromNode === toNode){
+    showReject('Cannot connect a node to itself', e.clientX, e.clientY); return;
+  }
+  if(wouldCycle(from.fromNode, toNode)){
+    showReject('Rejected: would create a cycle', e.clientX, e.clientY); return;
+  }
+  state.edges.push({id:uid('e'), from:{node:from.fromNode, port:'out'}, to:{node:toNode, port:toPort}});
+  renderAll();
+}
+
+window.addEventListener('pointerup', (e)=>{
+  if(state.connecting){ endConnecting(e); }
+  if(state.dragNode){
+    const el = nodesLayer.querySelector(`.node[data-id="${state.dragNode.node.id}"]`);
+    if(el) el.classList.remove('dragging');
+    state.dragNode = null;
+  }
+  state.panDrag = null;
+});
+
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    if(state.connecting){
+      state.connecting = null;
+      if(tempPathEl){ tempPathEl.remove(); tempPathEl=null; }
+    }
+    if(state.selectedEdge){ state.selectedEdge=null; renderEdges(); }
+  }
+  if((e.key==='Delete' || e.key==='Backspace') && state.selectedEdge){
+    const tag = document.activeElement.tagName;
+    if(tag==='INPUT' || tag==='SELECT' || tag==='TEXTAREA') return;
+    e.preventDefault();
+    state.edges = state.edges.filter(ed=>ed.id!==state.selectedEdge);
+    state.selectedEdge = null;
+    renderAll();
+  }
+});
+
+svg.addEventListener('pointerdown', (e)=>{
+  const g = e.target.closest('g[data-edge-id]');
+  if(!g) return;
+  e.stopPropagation();
+  const isX = e.target.classList.contains('edge-x');
+  const id = g.dataset.edgeId;
+  if(isX){
+    state.edges = state.edges.filter(ed=>ed.id!==id);
+    state.selectedEdge = null;
+    renderAll();
+  } else {
+    state.selectedEdge = id;
+    renderEdges();
+  }
+});
+
+/* wheel zoom, centered on cursor */
+viewportEl.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const vr = viewportEl.getBoundingClientRect();
+  const cx = e.clientX - vr.left, cy = e.clientY - vr.top;
+  const worldX = (cx - state.pan.x)/state.zoom;
+  const worldY = (cy - state.pan.y)/state.zoom;
+  const factor = e.deltaY < 0 ? 1.12 : 1/1.12;
+  const newZoom = clampZoom(state.zoom*factor);
+  state.pan.x = cx - worldX*newZoom;
+  state.pan.y = cy - worldY*newZoom;
+  state.zoom = newZoom;
+  applyTransform();
+  updateEdgePositionsOnly();
+}, {passive:false});
+
+document.getElementById('zoom-in').addEventListener('click', ()=>zoomBy(1.15));
+document.getElementById('zoom-out').addEventListener('click', ()=>zoomBy(1/1.15));
+function zoomBy(factor){
+  const vr = viewportEl.getBoundingClientRect();
+  const cx = vr.width/2, cy = vr.height/2;
+  const worldX = (cx - state.pan.x)/state.zoom;
+  const worldY = (cy - state.pan.y)/state.zoom;
+  const newZoom = clampZoom(state.zoom*factor);
+  state.pan.x = cx - worldX*newZoom;
+  state.pan.y = cy - worldY*newZoom;
+  state.zoom = newZoom;
+  applyTransform();
+  updateEdgePositionsOnly();
+}
+
+/* node field edits (select/input) via delegation */
+nodesLayer.addEventListener('input', handleNodeFieldChange);
+nodesLayer.addEventListener('change', handleNodeFieldChange);
+function handleNodeFieldChange(e){
+  const field = e.target.dataset.field;
+  if(!field) return;
+  const nodeEl = e.target.closest('.node');
+  const node = getNode(nodeEl.dataset.id);
+  if(!node) return;
+  if(field==='value'){
+    node.config.value = parseFloat(e.target.value)||0;
+  } else {
+    node.config[field] = e.target.value;
+    if(field==='op' && node.type==='logic'){
+      // pruning: NOT only uses port a
+      if(node.config.op==='NOT'){
+        state.edges = state.edges.filter(ed=>!(ed.to.node===node.id && ed.to.port==='b'));
+      }
+      refreshNodeBody(node);
+    }
+  }
+  evaluateGraph();
+  renderEdges();
+}
+
+/* ============================= Palette ============================= */
+const PALETTE = [
+  ['metric','Metric Input','var(--blue)'],
+  ['analysis','Analysis','var(--magenta)'],
+  ['constant','Constant','var(--blue)'],
+  ['arithmetic','Arithmetic','var(--blue)'],
+  ['comparison','Comparison','var(--magenta)'],
+  ['logic','Logic','var(--magenta)'],
+];
+const paletteEl = document.getElementById('palette');
+PALETTE.forEach(([type,label,color])=>{
+  const btn = document.createElement('button');
+  btn.className = 'palette-btn';
+  btn.innerHTML = `<span class="palette-swatch" style="background:${color}"></span>${label}`;
+  btn.addEventListener('click', ()=>addNodeNearCenter(type));
+  paletteEl.appendChild(btn);
+});
+
+function addNodeNearCenter(type){
+  const vr = viewportEl.getBoundingClientRect();
+  const wp = screenToWorld(vr.left+vr.width/2, vr.top+vr.height/2);
+  const jitter = (Math.random()-0.5)*60;
+  const node = makeNode(type, Math.max(10,Math.min(WORLD_W-220, wp.x-100+jitter)), Math.max(10,Math.min(WORLD_H-100, wp.y-50+jitter)));
+  state.nodes.push(node);
+  renderAll();
+}
+
+/* ============================= Auto layout ============================= */
+function autoLayout(){
+  const layer = {};
+  const indeg = {};
+  state.nodes.forEach(n=> indeg[n.id]=0);
+  state.edges.forEach(e=> indeg[e.to.node] = (indeg[e.to.node]||0)+1);
+  const queue = state.nodes.filter(n=>indeg[n.id]===0).map(n=>n.id);
+  queue.forEach(id=> layer[id]=0);
+  const indegCopy = {...indeg};
+  let qi = 0;
+  const order = [...queue];
+  while(qi < order.length){
+    const cur = order[qi++];
+    state.edges.filter(e=>e.from.node===cur).forEach(e=>{
+      layer[e.to.node] = Math.max(layer[e.to.node]||0, (layer[cur]||0)+1);
+      indegCopy[e.to.node]--;
+      if(indegCopy[e.to.node]===0) order.push(e.to.node);
+    });
+  }
+  state.nodes.forEach(n=>{ if(layer[n.id]===undefined) layer[n.id]=0; });
+
+  const byLayer = {};
+  state.nodes.forEach(n=>{
+    const l = layer[n.id];
+    (byLayer[l] = byLayer[l]||[]).push(n);
+  });
+  Object.keys(byLayer).forEach(l=>{
+    const arr = byLayer[l];
+    const totalH = arr.length*150;
+    let startY = Math.max(30, (760-totalH)/2);
+    arr.forEach((n,i)=>{
+      n.x = 60 + Number(l)*270;
+      n.y = startY + i*150;
+    });
+  });
+  renderAll();
+}
+
+/* ============================= Controls binding ============================= */
+function syncControlInputs(){
+  document.getElementById('tp-upvotes').value = state.testPost.upvotes;
+  document.getElementById('tp-comments').value = state.testPost.comments;
+  document.getElementById('tp-upvel').value = state.testPost.upvel;
+  document.getElementById('tp-comvel').value = state.testPost.comvel;
+  document.getElementById('tp-age').value = state.testPost.age;
+  document.getElementById('tp-market').value = state.testPost.market;
+  document.getElementById('tp-market-val').textContent = state.testPost.market;
+  document.getElementById('tp-sentiment').value = state.testPost.sentiment;
+  document.getElementById('tp-sentiment-val').textContent = state.testPost.sentiment.toFixed(2);
+  document.getElementById('tp-urgency').value = state.testPost.urgency;
+  document.getElementById('tp-urgency-val').textContent = state.testPost.urgency;
+  document.getElementById('tp-relevance').value = state.testPost.relevance;
+  document.getElementById('tp-relevance-val').textContent = state.testPost.relevance;
+  document.querySelector(`input[name="scope"][value="${state.scope.mode}"]`).checked = true;
+  document.getElementById('horizon-value').value = state.scope.horizonValue;
+  document.getElementById('horizon-unit').value = state.scope.horizonUnit;
+  document.getElementById('horizon-controls').classList.toggle('hidden', state.scope.mode!=='horizon');
+  document.getElementById('debounce-max').value = state.debounceMax;
+}
+
+function bindNum(id, key){
+  document.getElementById(id).addEventListener('input', (e)=>{
+    state.testPost[key] = parseFloat(e.target.value)||0;
+    evaluateGraph();
+  });
+}
+bindNum('tp-upvotes','upvotes');
+bindNum('tp-comments','comments');
+bindNum('tp-upvel','upvel');
+bindNum('tp-comvel','comvel');
+bindNum('tp-age','age');
+
+function bindSlider(id, labelId, key, fmt){
+  document.getElementById(id).addEventListener('input', (e)=>{
+    const v = parseFloat(e.target.value);
+    state.testPost[key] = v;
+    document.getElementById(labelId).textContent = fmt? fmt(v) : v;
+    evaluateGraph();
+  });
+}
+bindSlider('tp-market','tp-market-val','market');
+bindSlider('tp-sentiment','tp-sentiment-val','sentiment', v=>v.toFixed(2));
+bindSlider('tp-urgency','tp-urgency-val','urgency');
+bindSlider('tp-relevance','tp-relevance-val','relevance');
+
+document.querySelectorAll('input[name="scope"]').forEach(r=>{
+  r.addEventListener('change', (e)=>{
+    state.scope.mode = e.target.value;
+    document.getElementById('horizon-controls').classList.toggle('hidden', state.scope.mode!=='horizon');
+    evaluateGraph();
+  });
+});
+document.getElementById('horizon-value').addEventListener('input', (e)=>{
+  state.scope.horizonValue = Math.max(1, parseFloat(e.target.value)||1);
+  evaluateGraph();
+});
+document.getElementById('horizon-unit').addEventListener('change', (e)=>{
+  state.scope.horizonUnit = e.target.value;
+  evaluateGraph();
+});
+document.getElementById('debounce-max').addEventListener('input', (e)=>{
+  state.debounceMax = Math.max(1, parseFloat(e.target.value)||1);
+});
+
+document.getElementById('btn-reset').addEventListener('click', fullReset);
+document.getElementById('btn-example').addEventListener('click', ()=>loadExample(false));
+document.getElementById('btn-autolayout').addEventListener('click', autoLayout);
+
+/* ============================= Boot ============================= */
+applyTransform();
+resetTestPost();
+loadExample(true);
+
+})();
+</script>
+</body>
+</html>

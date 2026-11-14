@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-page="projects">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daemon Data | Jack Buhr</title>
+    <meta name="description" content="A Reddit monitoring platform I built alone on Firebase and Google Cloud: shared scraping, a leased pool of Reddit accounts, user-built LLM prompts and a visual alert rule graph.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
+    <style>
+        /* ---- Page-specific rules (built from site tokens) ---- */
+        .title-row { display: flex; align-items: center; gap: 1rem; }
+        .title-row img { width: 64px; height: 64px; flex: none; }
+        @media (max-width: 520px) { .title-row img { width: 48px; height: 48px; } }
+
+        /* "Try it" panel for the two sandboxes */
+        .try {
+            margin-top: 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.9rem 1.5rem;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-left: 2px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 1rem 1.15rem;
+        }
+        .try p { margin: 0; color: var(--text-2); font-size: 0.94rem; max-width: 46ch; }
+        .try p strong { display: block; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 0.2rem; }
+        .try-note { display: block; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); margin-top: 0.55rem; }
+        @media (max-width: 520px) { .try .btn-row, .try .btn { width: 100%; } .try .btn { justify-content: center; } }
+
+        /* Main pipeline: wide on desktop, stacked on narrow screens */
+        .fig > svg.pipe-v { display: none; }
+        @media (max-width: 860px) {
+            .fig > svg.pipe-h { display: none; }
+            .fig > svg.pipe-v { display: block; max-width: 420px; margin-inline: auto; }
+        }
+
+        .eng p { color: var(--text-2); }
+        .eng .btn { margin-top: 0.4rem; }
+        .more-body ul.list { margin-bottom: 0.9rem; }
+        .more-body p { margin-bottom: 0.75rem; }
+
+        /* Replay control under the stepped diagrams */
+        .replay { margin-top: 0.6rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+        .replay figcaption { margin-top: 0 !important; }
+        .replay .btn { flex: none; }
+        .dg .lease-dot, .dg .q-item { transition: transform 0.7s var(--ease), fill 0.3s; }
+        .dg .row-hl { opacity: 0; transition: opacity 0.3s; }
+        .dg .row-hl.on { opacity: 1; }
+        .dg .row-hl.bad { stroke: var(--bad); stroke-dasharray: none; }
+        .dg .msg { font-size: 12px; fill: var(--text); }
+
+        .mini h3 { font-size: 0.98rem; }
+        .mini p { font-size: 0.9rem; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .dg .pkt { display: none; }
+            .replay .btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html">← Projects</a>
+        <p class="kicker">Software · Solo build</p>
+        <div class="title-row">
+            <img src="../assets/img/daemon-logo.png" alt="Daemon Data logo, a small cartoon devil peeking over a curve" width="64" height="64">
+            <h1>Daemon Data</h1>
+        </div>
+        <p class="lede">A Reddit monitoring platform I built on my own on Firebase and Google Cloud. Users pick subreddits to watch and write LLM prompts that score each post. A rule graph they draw decides when to send them an alert.</p>
+        <dl class="facts">
+            <div><dt>Role</dt><dd>Solo build</dd></div>
+            <div><dt>Platform</dt><dd>Firebase, Google Cloud</dd></div>
+            <div><dt>Languages</dt><dd>Python, Node.js</dd></div>
+            <div><dt>LLMs</dt><dd>OpenAI, Anthropic, Gemini</dd></div>
+        </dl>
+        <div class="try">
+            <p><strong>Try it</strong>Two parts of the real interface run here as sandboxes, so you can use them yourself.</p>
+            <div>
+                <div class="btn-row">
+                    <a class="btn" href="daemon-notification-sandbox.html">Try the notification builder →</a>
+                    <a class="btn btn--ghost" href="daemon-prompt-sandbox.html">Try the prompt builder →</a>
+                </div>
+                <span class="try-note">Runs in your browser. Nothing is saved.</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <ul class="keypoints" data-reveal>
+            <li><strong>Each subreddit is scraped once.</strong> Every user's request for the same subreddit merges into one schedule, so overlapping users share one scrape.</li>
+            <li><strong>Reddit accounts are a leased pool.</strong> One account tops out near 100 posts a minute. I lease accounts through Firestore transactions and cool them down when they get rate limited.</li>
+            <li><strong>Users build their own logic.</strong> Typed LLM prompts and a drawn boolean graph run on a metered queue, with billing per prompt that survives retries.</li>
+        </ul>
+    </div>
+
+    <!-- 01 Pipeline -->
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>How it works</h2></div>
+        <p class="section-intro">Each stage runs asynchronously. The scrape side stays under Reddit's rate limit and the LLM side stays under each user's concurrency cap. Work over either limit waits in a queue.</p>
+
+        <figure class="fig">
+            <svg class="dg pipe-h" viewBox="0 30 984 184" role="img" aria-label="Pipeline: workflows feed schedulers, which use leased Reddit accounts to scrape into Firestore. LLM workers analyse posts and write results back. The notification graph evaluates the results and sends an alert.">
+                <defs>
+                    <marker id="ddPipeArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-accent"/></marker>
+                    <marker id="ddPipeArrowDim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-dim"/></marker>
+                </defs>
+
+                <!-- step numbers -->
+                <text x="12" y="44" class="t-dim">01</text>
+                <text x="148" y="44" class="t-dim">02</text>
+                <text x="288" y="44" class="t-dim">03</text>
+                <text x="420" y="44" class="t-dim">04</text>
+                <text x="556" y="44" class="t-dim">05</text>
+                <text x="700" y="44" class="t-dim">06</text>
+                <text x="888" y="44" class="t-dim">07</text>
+
+                <!-- boxes -->
+                <rect x="12" y="56" width="108" height="88" rx="6" class="box"/>
+                <rect x="148" y="56" width="112" height="88" rx="6" class="box"/>
+                <rect x="288" y="56" width="104" height="88" rx="6" class="box"/>
+                <rect x="420" y="56" width="108" height="88" rx="6" class="box"/>
+                <rect x="556" y="56" width="116" height="88" rx="6" class="box"/>
+                <rect x="700" y="56" width="160" height="88" rx="6" class="box box--accent"/>
+                <rect x="888" y="56" width="84" height="88" rx="6" class="box box--ok"/>
+
+                <text x="66" y="90" class="t-strong t-mid">Workflows</text>
+                <text x="66" y="110" class="t-dim t-mid">what each user</text>
+                <text x="66" y="125" class="t-dim t-mid">wants watched</text>
+
+                <text x="204" y="90" class="t-strong t-mid">Schedulers</text>
+                <text x="204" y="110" class="t-dim t-mid">one plan per</text>
+                <text x="204" y="125" class="t-dim t-mid">subreddit</text>
+
+                <text x="340" y="90" class="t-strong t-mid">Bot pool</text>
+                <text x="340" y="110" class="t-dim t-mid">leased Reddit</text>
+                <text x="340" y="125" class="t-dim t-mid">accounts</text>
+
+                <text x="474" y="90" class="t-strong t-mid">Firestore</text>
+                <text x="474" y="110" class="t-dim t-mid">posts stored</text>
+                <text x="474" y="125" class="t-dim t-mid">once, shared</text>
+
+                <text x="614" y="90" class="t-strong t-mid">LLM workers</text>
+                <text x="614" y="110" class="t-dim t-mid">metered by</text>
+                <text x="614" y="125" class="t-dim t-mid">Cloud Tasks</text>
+
+                <text x="780" y="90" class="t-strong t-mid">Notification graph</text>
+                <text x="780" y="110" class="t-dim t-mid">user's boolean</text>
+                <text x="780" y="125" class="t-dim t-mid">rule, one output</text>
+
+                <text x="930" y="90" class="t-strong t-mid">Alert</text>
+                <text x="930" y="110" class="t-dim t-mid">idempotent</text>
+                <text x="930" y="125" class="t-dim t-mid">delivery</text>
+
+                <!-- connectors -->
+                <line x1="122" y1="100" x2="145" y2="100" class="wire wire--accent" marker-end="url(#ddPipeArrow)"/>
+                <line x1="262" y1="100" x2="285" y2="100" class="wire wire--accent" marker-end="url(#ddPipeArrow)"/>
+                <line x1="394" y1="100" x2="417" y2="100" class="wire wire--accent" marker-end="url(#ddPipeArrow)"/>
+                <line x1="530" y1="100" x2="553" y2="100" class="wire wire--accent" marker-end="url(#ddPipeArrow)"/>
+                <line x1="674" y1="100" x2="697" y2="100" class="wire wire--accent" marker-end="url(#ddPipeArrow)"/>
+                <line x1="862" y1="100" x2="885" y2="100" class="wire wire--accent" marker-end="url(#ddPipeArrow)"/>
+
+                <!-- data packets moving through each hand-off -->
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="0s" repeatCount="indefinite" path="M120 100 H148"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="0.4s" repeatCount="indefinite" path="M260 100 H288"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite" path="M392 100 H420"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M528 100 H556"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite" path="M672 100 H700"/></circle>
+                <circle r="3.5" class="fill-ok pkt"><animateMotion dur="2.4s" begin="2.0s" repeatCount="indefinite" path="M860 100 H888"/></circle>
+
+                <!-- notes under stages -->
+                <text x="204" y="166" class="t-dim t-mid">Cloud Scheduler</text>
+                <text x="340" y="166" class="t-dim t-mid">~100 posts/min each</text>
+                <text x="780" y="166" class="t-dim t-mid">Pub/Sub trigger</text>
+
+                <!-- results written back -->
+                <path d="M614 146 V184 H474 V150" class="wire wire--dim flow flow--slow" marker-end="url(#ddPipeArrowDim)"/>
+                <text x="544" y="202" class="t-dim t-mid">results written back per user</text>
+            </svg>
+
+            <svg class="dg pipe-v" viewBox="0 0 360 530" role="img" aria-label="Pipeline, stacked: workflows, schedulers, bot pool, Firestore, LLM workers, notification graph, alert.">
+                <defs>
+                    <marker id="ddPipeVArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-accent"/></marker>
+                    <marker id="ddPipeVArrowDim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-dim"/></marker>
+                </defs>
+                <g>
+                    <text x="20" y="41" class="t-dim t-mid">01</text>
+                    <rect x="40" y="10" width="296" height="52" rx="6" class="box"/>
+                    <text x="56" y="32" class="t-strong">Workflows</text>
+                    <text x="56" y="50" class="t-dim">what each user wants watched</text>
+
+                    <text x="20" y="117" class="t-dim t-mid">02</text>
+                    <rect x="40" y="86" width="296" height="52" rx="6" class="box"/>
+                    <text x="56" y="108" class="t-strong">Schedulers</text>
+                    <text x="56" y="126" class="t-dim">one plan per subreddit</text>
+
+                    <text x="20" y="193" class="t-dim t-mid">03</text>
+                    <rect x="40" y="162" width="296" height="52" rx="6" class="box"/>
+                    <text x="56" y="184" class="t-strong">Bot pool</text>
+                    <text x="56" y="202" class="t-dim">leased accounts, ~100 posts/min each</text>
+
+                    <text x="20" y="269" class="t-dim t-mid">04</text>
+                    <rect x="40" y="238" width="296" height="52" rx="6" class="box"/>
+                    <text x="56" y="260" class="t-strong">Firestore</text>
+                    <text x="56" y="278" class="t-dim">posts stored once, shared</text>
+
+                    <text x="20" y="345" class="t-dim t-mid">05</text>
+                    <rect x="40" y="314" width="296" height="52" rx="6" class="box"/>
+                    <text x="56" y="336" class="t-strong">LLM workers</text>
+                    <text x="56" y="354" class="t-dim">metered by Cloud Tasks</text>
+
+                    <text x="20" y="421" class="t-dim t-mid">06</text>
+                    <rect x="40" y="390" width="296" height="52" rx="6" class="box box--accent"/>
+                    <text x="56" y="412" class="t-strong">Notification graph</text>
+                    <text x="56" y="430" class="t-dim">boolean rule with one output</text>
+
+                    <text x="20" y="497" class="t-dim t-mid">07</text>
+                    <rect x="40" y="466" width="296" height="52" rx="6" class="box box--ok"/>
+                    <text x="56" y="488" class="t-strong">Alert</text>
+                    <text x="56" y="506" class="t-dim">idempotent delivery</text>
+                </g>
+                <line x1="188" y1="64" x2="188" y2="83" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
+                <line x1="188" y1="140" x2="188" y2="159" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
+                <line x1="188" y1="216" x2="188" y2="235" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
+                <line x1="188" y1="292" x2="188" y2="311" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
+                <line x1="188" y1="368" x2="188" y2="387" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
+                <line x1="188" y1="444" x2="188" y2="463" class="wire wire--accent" marker-end="url(#ddPipeVArrow)"/>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="0s" repeatCount="indefinite" path="M188 62 V86"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="0.4s" repeatCount="indefinite" path="M188 138 V162"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite" path="M188 214 V238"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M188 290 V314"/></circle>
+                <circle r="3.5" class="fill-accent pkt"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite" path="M188 366 V390"/></circle>
+                <circle r="3.5" class="fill-ok pkt"><animateMotion dur="2.4s" begin="2.0s" repeatCount="indefinite" path="M188 442 V466"/></circle>
+                <!-- results written back -->
+                <path d="M336 340 H350 V264 H340" class="wire wire--dim flow flow--slow" marker-end="url(#ddPipeVArrowDim)"/>
+            </svg>
+            <figcaption>The pipeline. Results from the LLM workers are written back to Firestore per user (dashed line) before the notification graph reads them.</figcaption>
+        </figure>
+
+        <div class="split split--fig-wide split--center mt-3">
+            <div>
+                <h3 class="mb-1">What a user sets up</h3>
+                <p class="dim">A workflow is one user's request: which subreddits, how often and how far back to scrape, whether to run AI analysis, which prompts to use and which model runs them.</p>
+            </div>
+            <figure class="fig">
+                <img src="../assets/img/data-collection.jpg" alt="Daemon Data workflow settings: runtime type, duration, scrape frequency, max posts and max post age; a list of subreddits; an AI analysis toggle with prompt list; and model cards for Gemini, Claude and ChatGPT." width="1400" height="1155" loading="lazy">
+                <figcaption>Workflow settings in the product: runtime and scrape frequency, subreddits, analysis prompts, and the model choice across Gemini, Claude and ChatGPT.</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <!-- 02 Shared scrape -->
+    <section class="section wrap eng">
+        <div class="section-head"><span class="num">02</span><h2>Shared scrape layer</h2></div>
+        <div class="split">
+            <div>
+                <p>Many users can watch the same subreddit with different settings. When a workflow is saved, its settings merge into one scheduler document per subreddit that keeps the fastest interval, the largest post count and the widest age window anyone asked for. One scrape then covers everyone.</p>
+                <p>Posts are stored once and shared. Each user only owns a small record of which posts matched their workflows and what their prompts returned.</p>
+                <details class="more">
+                    <summary>More detail</summary>
+                    <div class="more-body">
+                        <ul class="list">
+                            <li>Leaving is the harder case. Stopping or expiring a workflow runs a cleanup task that removes that user and recomputes the plan from whoever is left, so one heavy user leaving does not keep everyone on their schedule.</li>
+                            <li>When the merged plan changes, the Cloud Scheduler job is recreated with the new payload.</li>
+                            <li>Scrapes write three ways: full post updates, light batched time-series points for upvotes and comments (with first and second derivatives), and AI queue entries only when the workflow, flair, prompts and credit balance allow it.</li>
+                            <li>Reddit listings come in pages of 100, so the post-count control moves in steps of 100, from 100 to 1000.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+            <figure class="fig">
+                <svg class="dg" viewBox="0 0 400 386" role="img" aria-label="Three users' workflows on r/investing merge into one scheduler document that keeps the fastest interval, largest post count and widest age window. One scrape stores the posts once, and each user gets their own results.">
+                    <defs>
+                        <marker id="ddScrapeArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-accent"/></marker>
+                    </defs>
+                    <text x="0" y="12" class="t-dim">3 workflows on r/investing</text>
+
+                    <rect x="0" y="24" width="124" height="88" rx="6" class="box"/>
+                    <text x="12" y="45" class="t-strong">User A</text>
+                    <text x="12" y="65" class="t-accent">every 60 s</text>
+                    <text x="12" y="81">100 posts</text>
+                    <text x="12" y="97">24 h</text>
+
+                    <rect x="138" y="24" width="124" height="88" rx="6" class="box"/>
+                    <text x="150" y="45" class="t-strong">User B</text>
+                    <text x="150" y="65">every 300 s</text>
+                    <text x="150" y="81" class="t-accent">500 posts</text>
+                    <text x="150" y="97">72 h</text>
+
+                    <rect x="276" y="24" width="124" height="88" rx="6" class="box"/>
+                    <text x="288" y="45" class="t-strong">User C</text>
+                    <text x="288" y="65">every 120 s</text>
+                    <text x="288" y="81">200 posts</text>
+                    <text x="288" y="97" class="t-accent">168 h</text>
+
+                    <path d="M62 112 C62 134 200 128 200 147" class="wire wire--accent flow"/>
+                    <path d="M200 112 V147" class="wire wire--accent flow"/>
+                    <path d="M338 112 C338 134 200 128 200 147" class="wire wire--accent flow"/>
+
+                    <rect x="30" y="150" width="340" height="96" rx="6" class="box box--accent"/>
+                    <text x="46" y="172" class="t-accent">schedulers/investing</text>
+                    <text x="46" y="196">interval</text><text x="150" y="196" class="t-strong">60 s</text><text x="250" y="196" class="t-dim">fastest</text>
+                    <text x="46" y="214">posts</text><text x="150" y="214" class="t-strong">500</text><text x="250" y="214" class="t-dim">largest</text>
+                    <text x="46" y="232">max age</text><text x="150" y="232" class="t-strong">168 h</text><text x="250" y="232" class="t-dim">widest</text>
+
+                    <line x1="200" y1="246" x2="200" y2="274" class="wire wire--accent" marker-end="url(#ddScrapeArrow)"/>
+                    <text x="210" y="264" class="t-dim">one Cloud Scheduler job</text>
+
+                    <rect x="70" y="278" width="260" height="34" rx="6" class="box"/>
+                    <text x="200" y="299" class="t-mid" style="fill:var(--text)">one scrape · posts stored once</text>
+
+                    <path d="M200 312 C200 330 62 326 62 345" class="wire" marker-end="url(#ddScrapeArrow)"/>
+                    <path d="M200 312 V345" class="wire" marker-end="url(#ddScrapeArrow)"/>
+                    <path d="M200 312 C200 330 338 326 338 345" class="wire" marker-end="url(#ddScrapeArrow)"/>
+
+                    <rect x="0" y="350" width="124" height="32" rx="6" class="box box--cool"/>
+                    <text x="62" y="370" class="t-mid">A's results</text>
+                    <rect x="138" y="350" width="124" height="32" rx="6" class="box box--cool"/>
+                    <text x="200" y="370" class="t-mid">B's results</text>
+                    <rect x="276" y="350" width="124" height="32" rx="6" class="box box--cool"/>
+                    <text x="338" y="370" class="t-mid">C's results</text>
+                </svg>
+                <figcaption>Illustrative values. The merged plan keeps the most demanding setting in each field (amber), and each user's results stay private.</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <!-- 03 Bot leasing -->
+    <section class="section wrap eng">
+        <div class="section-head"><span class="num">03</span><h2>Bot leasing</h2></div>
+        <div class="split">
+            <div>
+                <p>One Reddit account can pull about 100 posts a minute, and that limit caps the whole system more than compute does. So each account is a Firestore document with an <code>available_at</code> time.</p>
+                <p>A worker picks a candidate, then a transaction re-reads <code>available_at</code> and writes the lease only if the account is still free. Two scrapes starting in the same second never share an account. How the lease ends depends on how the scrape went.</p>
+                <details class="more">
+                    <summary>More detail</summary>
+                    <div class="more-body">
+                        <ul class="list">
+                            <li><strong>Success:</strong> <code>available_at</code> goes back to now and the account rejoins the pool.</li>
+                            <li><strong>Rate limited:</strong> <code>available_at</code> is pushed into the future and the lease is kept, so the account cools down instead of going straight to the next worker.</li>
+                            <li><strong>Auth failure or repeated 403:</strong> a long lockout, so the system stops retrying a dead login or a private subreddit every cycle.</li>
+                        </ul>
+                        <p>Advanced scraping spreads a user's subreddit list over time and a chosen number of accounts using Cloud Tasks. When no account is free, the task reschedules for the earliest recovery time plus jitter, so waiting tasks do not all wake at once. The system stays under Reddit's rate limit and queues the overflow.</p>
+                    </div>
+                </details>
+            </div>
+            <figure class="fig" id="leaseFig">
+                <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Four Reddit accounts on a timeline of available_at. Leasing pushes an account's time forward. On success it returns to now, on a rate limit it is pushed into a cooldown, and on an auth failure it is locked out for a long time.">
+                    <text x="0" y="16" class="msg" id="leaseMsg">How each lease ended</text>
+
+                    <!-- time regions -->
+                    <line x1="150" y1="34" x2="150" y2="196" class="wire wire--accent" stroke-dasharray="3 4"/>
+                    <line x1="120" y1="200" x2="392" y2="200" class="axis"/>
+                    <text x="150" y="216" class="t-dim t-mid">now</text>
+                    <text x="205" y="216" class="t-dim t-mid">lease</text>
+                    <text x="285" y="216" class="t-dim t-mid">cooldown</text>
+                    <text x="368" y="216" class="t-dim t-mid">lockout</text>
+                    <text x="392" y="232" class="t-dim t-end">available_at →</text>
+
+                    <!-- rows -->
+                    <rect x="-6" y="39" width="404" height="30" rx="6" class="box--ghost row-hl" data-row="0"/>
+                    <rect x="-6" y="79" width="404" height="30" rx="6" class="box--ghost row-hl" data-row="1"/>
+                    <rect x="-6" y="119" width="404" height="30" rx="6" class="box--ghost row-hl" data-row="2"/>
+                    <rect x="-6" y="159" width="404" height="30" rx="6" class="box--ghost row-hl" data-row="3"/>
+
+                    <text x="0" y="58">bot-1</text>
+                    <text x="0" y="98">bot-2</text>
+                    <text x="0" y="138">bot-3</text>
+                    <text x="0" y="178">bot-4</text>
+                    <text x="52" y="58" class="t-bad" data-st="0">locked</text>
+                    <text x="52" y="98" class="t-ok" data-st="1">free</text>
+                    <text x="52" y="138" class="t-cool" data-st="2">cooling</text>
+                    <text x="52" y="178" class="t-ok" data-st="3">free</text>
+
+                    <line x1="120" y1="54" x2="392" y2="54" class="gridline"/>
+                    <line x1="120" y1="94" x2="392" y2="94" class="gridline"/>
+                    <line x1="120" y1="134" x2="392" y2="134" class="gridline"/>
+                    <line x1="120" y1="174" x2="392" y2="174" class="gridline"/>
+
+                    <circle r="6.5" cx="0" cy="54" class="lease-dot fill-bad" data-dot="0" style="transform:translateX(368px)"/>
+                    <circle r="6.5" cx="0" cy="94" class="lease-dot fill-ok" data-dot="1" style="transform:translateX(150px)"/>
+                    <circle r="6.5" cx="0" cy="134" class="lease-dot fill-cool" data-dot="2" style="transform:translateX(285px)"/>
+                    <circle r="6.5" cx="0" cy="174" class="lease-dot fill-ok" data-dot="3" style="transform:translateX(134px)"/>
+
+                    <!-- legend -->
+                    <circle cx="6" cy="252" r="4.5" class="fill-ok"/><text x="16" y="256">free</text>
+                    <circle cx="86" cy="252" r="4.5" class="fill-accent"/><text x="96" y="256">leased</text>
+                    <circle cx="178" cy="252" r="4.5" class="fill-cool"/><text x="188" y="256">cooling</text>
+                    <circle cx="276" cy="252" r="4.5" class="fill-bad"/><text x="286" y="256">locked</text>
+                </svg>
+                <div class="replay">
+                    <figcaption>Illustrative timeline. bot-2 ended in success, bot-3 hit a rate limit, bot-1 failed auth.</figcaption>
+                    <button type="button" class="btn btn--ghost btn--sm" id="leaseReplay">Replay</button>
+                </div>
+            </figure>
+        </div>
+    </section>
+
+    <!-- 04 Notification graph -->
+    <section class="section wrap eng">
+        <div class="section-head"><span class="num">04</span><h2>Notification graph</h2></div>
+        <div class="split">
+            <div>
+                <p>Users connect metrics, analysis results, constants, arithmetic and comparisons into a graph with one output node. The backend walks backward from the output, evaluates only the nodes that reach it, and returns one boolean. Half-built branches left on the canvas are never evaluated.</p>
+                <a class="btn" href="daemon-notification-sandbox.html">Try the notification builder →</a>
+                <span class="try-note">Sandbox of the real builder. Nothing is saved.</span>
+                <details class="more">
+                    <summary>More detail</summary>
+                    <div class="more-body">
+                        <p><strong>Two modes.</strong> Single-post mode fires as soon as one post meets the condition. Time-horizon mode groups values into half-hour buckets, keeps rolling sums over the chosen window, and only evaluates once there is enough history. A debounce stops the same signal from alerting over and over.</p>
+                        <p><strong>Firing once.</strong> A batch can only be evaluated after every post in it has finished analysis, and several workers can finish at almost the same moment. The first worker to see the batch fully drained claims a transaction-backed lock and publishes the evaluation message. The others see the claim and stop. Delivery is idempotent, so a redelivered Pub/Sub message does not send a second alert.</p>
+                    </div>
+                </details>
+            </div>
+            <figure class="fig">
+                <svg class="dg" viewBox="0 0 400 284" role="img" aria-label="A node graph: upvote velocity greater than 50 AND market signal greater than 70 feeds the output. Evaluation walks backward from the output. A separate comments to multiply branch is not connected and is skipped.">
+                    <!-- forward wires (data direction) -->
+                    <path d="M120 28 C138 28 134 47 152 47" class="wire"/>
+                    <path d="M120 78 C138 78 134 59 152 59" class="wire"/>
+                    <path d="M120 138 C138 138 134 157 152 157" class="wire"/>
+                    <path d="M120 188 C138 188 134 169 152 169" class="wire"/>
+                    <path d="M224 53 C242 53 238 102 256 102" class="wire"/>
+                    <path d="M224 163 C242 163 238 114 256 114" class="wire"/>
+                    <path d="M316 108 H340" class="wire"/>
+                    <path d="M120 252 H152" class="wire wire--dim" stroke-dasharray="4 4"/>
+
+                    <!-- backward walk, drawn from the output toward the inputs -->
+                    <path d="M340 108 H316" class="wire wire--accent draw" pathLength="1" style="--d:1"/>
+                    <path d="M256 102 C238 102 242 53 224 53" class="wire wire--accent draw" pathLength="1" style="--d:3"/>
+                    <path d="M256 114 C238 114 242 163 224 163" class="wire wire--accent draw" pathLength="1" style="--d:3"/>
+                    <path d="M152 47 C134 47 138 28 120 28" class="wire wire--accent draw" pathLength="1" style="--d:5"/>
+                    <path d="M152 59 C134 59 138 78 120 78" class="wire wire--accent draw" pathLength="1" style="--d:5"/>
+                    <path d="M152 157 C134 157 138 138 120 138" class="wire wire--accent draw" pathLength="1" style="--d:5"/>
+                    <path d="M152 169 C134 169 138 188 120 188" class="wire wire--accent draw" pathLength="1" style="--d:5"/>
+
+                    <!-- input nodes -->
+                    <rect x="0" y="8" width="120" height="40" rx="6" class="box"/><rect x="0" y="8" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
+                    <text x="10" y="24" class="t-dim">METRIC</text><text x="10" y="40">upvote velocity</text>
+                    <rect x="0" y="58" width="120" height="40" rx="6" class="box"/><rect x="0" y="58" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
+                    <text x="10" y="74" class="t-dim">CONSTANT</text><text x="10" y="90">50</text>
+                    <rect x="0" y="118" width="120" height="40" rx="6" class="box"/><rect x="0" y="118" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
+                    <text x="10" y="134" class="t-dim">ANALYSIS</text><text x="10" y="150">market signal</text>
+                    <rect x="0" y="168" width="120" height="40" rx="6" class="box"/><rect x="0" y="168" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
+                    <text x="10" y="184" class="t-dim">CONSTANT</text><text x="10" y="200">70</text>
+
+                    <!-- comparisons, logic, output -->
+                    <rect x="152" y="33" width="72" height="40" rx="6" class="box"/><rect x="152" y="33" width="72" height="40" rx="6" class="box box--accent pop" style="--d:4"/>
+                    <text x="188" y="58" class="t-strong t-mid">&gt;</text>
+                    <rect x="152" y="143" width="72" height="40" rx="6" class="box"/><rect x="152" y="143" width="72" height="40" rx="6" class="box box--accent pop" style="--d:4"/>
+                    <text x="188" y="168" class="t-strong t-mid">&gt;</text>
+                    <rect x="256" y="88" width="60" height="40" rx="6" class="box"/><rect x="256" y="88" width="60" height="40" rx="6" class="box box--accent pop" style="--d:2"/>
+                    <text x="286" y="113" class="t-strong t-mid">AND</text>
+                    <rect x="340" y="88" width="60" height="40" rx="6" class="box box--accent"/>
+                    <text x="370" y="113" class="t-strong t-mid">Output</text>
+                    <text x="370" y="148" class="t-ok t-mid pop" style="--d:8">true</text>
+                    <text x="370" y="163" class="t-ok t-mid pop" style="--d:8">→ alert</text>
+
+                    <!-- unconnected branch -->
+                    <rect x="0" y="232" width="120" height="40" rx="6" class="box--ghost"/>
+                    <text x="10" y="248" class="t-dim">METRIC</text><text x="10" y="264" class="t-dim" style="font-size:11.5px">comments</text>
+                    <rect x="152" y="232" width="72" height="40" rx="6" class="box--ghost"/>
+                    <text x="188" y="257" class="t-dim t-mid" style="font-size:13px">×</text>
+                    <text x="236" y="249" class="t-dim">not connected</text>
+                    <text x="236" y="264" class="t-dim">to output: skipped</text>
+                </svg>
+                <figcaption>Evaluation starts at the output and walks back along its inputs (amber). The dashed branch never reaches the output, so it costs nothing.</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <!-- 05 Prompt builder -->
+    <section class="section wrap eng">
+        <div class="section-head"><span class="num">05</span><h2>Prompt builder</h2></div>
+        <div class="split">
+            <div>
+                <p>A prompt is an ordered stack of blocks plus a response type: bounded number, unbounded number, single choice, multiple choice or free text. The builder compiles the stack into the text the model receives, and the same response type tells the worker how to parse the reply. Changing the bounds changes both in one edit, so they cannot drift apart.</p>
+                <a class="btn" href="daemon-prompt-sandbox.html">Try the prompt builder →</a>
+                <span class="try-note">Sandbox of the real builder. Nothing is saved.</span>
+                <details class="more">
+                    <summary>More detail</summary>
+                    <div class="more-body">
+                        <ul class="list">
+                            <li>The response type supplies the header and footer around everything else. Between them go instructions, post title and body placeholders such as <code>{POST_TITLE}</code>, a metadata block and up to five few-shot examples.</li>
+                            <li>The builder checks each example's expected answer against the bounds or option list and will not compile until it fits, because the model copies bad examples.</li>
+                            <li>Each result is stored per prompt with the provider, model, timing, token counts, credits charged, parsed value and the bounds used. Reanalysis can overwrite a bad result without refetching the post.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+            <figure class="fig">
+                <svg class="dg" viewBox="0 0 400 290" role="img" aria-label="One response type, a bounded number from 1 to 10, compiles into the prompt text sent to the model and also defines the parser that reads the model's reply.">
+                    <defs>
+                        <marker id="ddPromptArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-accent"/></marker>
+                        <marker id="ddPromptArrowDim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-dim"/></marker>
+                    </defs>
+                    <rect x="40" y="4" width="320" height="48" rx="6" class="box box--accent"/>
+                    <text x="200" y="23" class="t-dim t-mid">RESPONSE TYPE</text>
+                    <text x="200" y="41" class="t-strong t-mid">Bounded number, 1 to 10</text>
+
+                    <line x1="95" y1="52" x2="95" y2="84" class="wire wire--accent" marker-end="url(#ddPromptArrow)"/>
+                    <line x1="305" y1="52" x2="305" y2="84" class="wire wire--accent" marker-end="url(#ddPromptArrow)"/>
+                    <text x="104" y="73" class="t-dim">compiles into</text>
+                    <text x="296" y="73" class="t-dim t-end">parses with</text>
+
+                    <rect x="0" y="88" width="190" height="118" rx="6" class="box"/>
+                    <text x="10" y="106" class="t-dim">PROMPT TEXT</text>
+                    <text x="10" y="124" class="t-accent" style="font-size:10.5px">You must respond with a</text>
+                    <text x="10" y="138" class="t-accent" style="font-size:10.5px">number between 1 and 10.</text>
+                    <text x="10" y="152" style="font-size:10.5px">Rate how bullish this is.</text>
+                    <text x="10" y="166" style="font-size:10.5px">{POST_TITLE} {POST_BODY}</text>
+                    <text x="10" y="180" class="t-accent" style="font-size:10.5px">Respond with a single</text>
+                    <text x="10" y="194" class="t-accent" style="font-size:10.5px">number between 1 and 10.</text>
+
+                    <rect x="210" y="88" width="190" height="118" rx="6" class="box"/>
+                    <text x="220" y="106" class="t-dim">PARSER</text>
+                    <text x="220" y="128">read one number</text>
+                    <text x="220" y="146" class="t-accent">check 1 ≤ x ≤ 10</text>
+                    <text x="220" y="164">store value, bounds,</text>
+                    <text x="220" y="182">tokens, credits</text>
+
+                    <line x1="95" y1="206" x2="95" y2="240" class="wire flow" marker-end="url(#ddPromptArrowDim)"/>
+                    <rect x="0" y="244" width="190" height="36" rx="6" class="box"/>
+                    <text x="95" y="266" class="t-mid" style="fill:var(--text)">LLM call</text>
+                    <path d="M190 262 H305 V210" class="wire flow" marker-end="url(#ddPromptArrowDim)"/>
+                    <text x="248" y="254" class="t-mid">reply: 7</text>
+                </svg>
+                <figcaption>Amber parts come from the response type. One definition writes the instructions and checks the answer. Example prompt is illustrative.</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <!-- 06 Metered LLM queue -->
+    <section class="section wrap eng">
+        <div class="section-head"><span class="num">06</span><h2>Metered LLM queue</h2></div>
+        <div class="split">
+            <div>
+                <p>Scraping never calls a model. It writes queue documents and sends one kickoff message per batch. A dispatcher creates Cloud Tasks only up to the user's concurrency cap, and each worker queues the next item when it finishes. The queue stays busy without going over the limit, whether the burst is ten posts or a thousand.</p>
+                <details class="more">
+                    <summary>More detail</summary>
+                    <div class="more-body">
+                        <ul class="list">
+                            <li>The worker picks OpenAI, Anthropic or Gemini from the model ID. API keys stay in Secret Manager and never reach the browser.</li>
+                            <li>Tokens convert to credits through a pricing table and are deducted in a transaction. Billing is tracked per prompt, not per post, so a task that retries after finishing three of five prompts is not charged twice for those three.</li>
+                            <li>Credits are checked twice: before tasks are created and again inside the worker before more model calls. Checking only at dispatch would let a long batch overspend.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+            <figure class="fig" id="queueFig">
+                <svg class="dg" viewBox="0 0 400 222" role="img" aria-label="A burst of twelve posts waits in a queue. Cloud Tasks runs at most three at a time for the user. Each worker that finishes queues the next item, so posts leave at a steady rate.">
+                    <defs>
+                        <marker id="ddQueueArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-accent"/></marker>
+                        <marker id="ddQueueArrowOk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-ok"/></marker>
+                        <marker id="ddQueueArrowDim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-dim"/></marker>
+                    </defs>
+                    <text x="48" y="22" class="t-mid" style="fill:var(--text)">queue</text>
+                    <text x="210" y="22" class="t-mid" style="fill:var(--text)">Cloud Tasks</text>
+                    <text x="352" y="22" class="t-mid" style="fill:var(--text)">done</text>
+
+                    <rect x="6" y="34" width="84" height="96" rx="6" class="box--ghost"/>
+                    <rect x="140" y="34" width="140" height="106" rx="6" class="box"/>
+                    <rect x="310" y="34" width="84" height="96" rx="6" class="box--ghost"/>
+
+                    <rect x="150" y="44" width="120" height="26" rx="4" class="box"/>
+                    <rect x="150" y="76" width="120" height="26" rx="4" class="box"/>
+                    <rect x="150" y="108" width="120" height="26" rx="4" class="box"/>
+                    <text x="160" y="61" class="t-dim">worker 1</text>
+                    <text x="160" y="93" class="t-dim">worker 2</text>
+                    <text x="160" y="125" class="t-dim">worker 3</text>
+
+                    <line x1="92" y1="82" x2="136" y2="82" class="wire wire--accent" marker-end="url(#ddQueueArrow)"/>
+                    <line x1="282" y1="82" x2="306" y2="82" class="wire wire--ok" marker-end="url(#ddQueueArrowOk)"/>
+
+                    <text x="48" y="150" class="t-dim t-mid">burst in</text>
+                    <text x="210" y="156" class="t-accent t-mid">cap: 3 at a time</text>
+                    <text x="352" y="150" class="t-dim t-mid">steady out</text>
+
+                    <path d="M250 142 V190 H76 V134" class="wire wire--dim flow flow--slow" marker-end="url(#ddQueueArrowDim)"/>
+                    <text x="200" y="210" class="t-dim t-mid">each finishing worker queues the next item</text>
+
+                    <g id="qItems"></g>
+                </svg>
+                <div class="replay">
+                    <figcaption>Illustrative: a cap of 3 and a burst of 12. Credits are checked at dispatch and again in the worker.</figcaption>
+                    <button type="button" class="btn btn--ghost btn--sm" id="queueReplay">Replay</button>
+                </div>
+            </figure>
+        </div>
+    </section>
+
+    <!-- 07 Also in the build -->
+    <section class="section wrap">
+        <div class="section-head"><span class="num">07</span><h2>Also in the build</h2></div>
+        <div class="grid grid-2">
+            <div class="card mini" data-reveal>
+                <h3>Two sign-in providers, one account</h3>
+                <p>Google through Firebase Auth, and Discord through a custom OAuth exchange that mints a Firebase token. A Discord login with an existing email links to that account instead of making a duplicate.</p>
+            </div>
+            <div class="card mini" data-reveal style="--d:1">
+                <h3>Firestore rules as the client boundary</h3>
+                <p>The browser can read credits, subscription state and protected profile fields but cannot write them. Only the server can, so limits cannot be edited from a console.</p>
+            </div>
+            <div class="card mini" data-reveal style="--d:2">
+                <h3>Stripe reconciliation</h3>
+                <p>Subscription state is mirrored onto the user document. Plan limits are enforced in a transaction at creation time, so per-user counters stay correct under concurrent writes.</p>
+            </div>
+            <div class="card mini" data-reveal style="--d:3">
+                <h3>Heartbeats instead of hot writes</h3>
+                <p>Scrape runs report progress through a periodic heartbeat document instead of a write per post. The dashboard stays live without one heavily contended document.</p>
+            </div>
+        </div>
+
+        <h3 class="mt-3 mb-1">Stack</h3>
+        <ul class="tags">
+            <li>Firestore</li>
+            <li>Firestore Security Rules</li>
+            <li>Firebase Auth</li>
+            <li>Firebase Hosting</li>
+            <li>Cloud Functions v2</li>
+            <li>Cloud Tasks</li>
+            <li>Cloud Scheduler</li>
+            <li>Pub/Sub</li>
+            <li>Secret Manager</li>
+            <li>Python</li>
+            <li>PRAW</li>
+            <li>Node.js</li>
+            <li>Stripe</li>
+            <li>OpenAI</li>
+            <li>Anthropic</li>
+            <li>Gemini</li>
+        </ul>
+
+        <div class="btn-row mt-3">
+            <a class="btn" href="daemon-notification-sandbox.html">Try the notification builder →</a>
+            <a class="btn btn--ghost" href="daemon-prompt-sandbox.html">Try the prompt builder →</a>
+        </div>
+    </section>
+</main>
+
+<script>
+(function () {
+    'use strict';
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function whenVisible(el, fn) {
+        if (!('IntersectionObserver' in window)) { fn(); return; }
+        var io = new IntersectionObserver(function (es) {
+            if (es[0].isIntersecting) { io.disconnect(); fn(); }
+        }, { threshold: 0.35 });
+        io.observe(el);
+    }
+
+    /* ---------- Bot leasing: step through one lease cycle per outcome ---------- */
+    (function () {
+        var fig = document.getElementById('leaseFig');
+        if (!fig) return;
+        var msg = document.getElementById('leaseMsg');
+        var dots = fig.querySelectorAll('[data-dot]');
+        var sts = fig.querySelectorAll('[data-st]');
+        var hls = fig.querySelectorAll('.row-hl');
+        var COL = { free: 'ok', leased: 'accent', cooling: 'cool', locked: 'bad' };
+        var X = { free: 134, now: 150, lease: 205, cool: 285, lock: 368 };
+
+        function set(row, x, state) {
+            dots[row].style.transform = 'translateX(' + x + 'px)';
+            dots[row].setAttribute('class', 'lease-dot fill-' + COL[state]);
+            sts[row].textContent = state;
+            sts[row].setAttribute('class', 't-' + COL[state]);
+        }
+        function hl(row, bad) {
+            hls.forEach(function (h, i) {
+                h.classList.toggle('on', i === row);
+                h.classList.toggle('bad', i === row && !!bad);
+            });
+        }
+        var initial = [[X.free + 2, 'free'], [X.free - 6, 'free'], [X.free + 6, 'free'], [X.free, 'free']];
+        var steps = [
+            ['Each account has an available_at time', function () { initial.forEach(function (s, i) { set(i, s[0], s[1]); }); hl(-1); }],
+            ['Job A picks bot-2 from the pool', function () { hl(1); }],
+            ['Transaction re-reads it: still free, lease', function () { set(1, X.lease, 'leased'); }],
+            ['Job B also picked bot-2: re-read fails', function () { hl(1, true); }],
+            ['Scrape succeeds: back to now', function () { hl(1); set(1, X.now, 'free'); }],
+            ['Job C leases bot-3', function () { hl(2); set(2, X.lease, 'leased'); }],
+            ['Rate limited: pushed into the future', function () { set(2, X.cool, 'cooling'); }],
+            ['Job D leases bot-1', function () { hl(0); set(0, X.lease, 'leased'); }],
+            ['Auth failure: long lockout', function () { set(0, X.lock, 'locked'); }],
+            ['How each lease ended', function () { hl(-1); }]
+        ];
+        var timer = null;
+        function play() {
+            clearTimeout(timer);
+            var i = 0;
+            (function next() {
+                msg.textContent = steps[i][0];
+                steps[i][1]();
+                i++;
+                if (i < steps.length) timer = setTimeout(next, 1700);
+            })();
+        }
+        if (reduced) return; // static final state is already in the markup
+        whenVisible(fig, play);
+        document.getElementById('leaseReplay').addEventListener('click', play);
+    })();
+
+    /* ---------- Metered queue: burst in, at most 3 running, steady out ---------- */
+    (function () {
+        var fig = document.getElementById('queueFig');
+        if (!fig) return;
+        var g = document.getElementById('qItems');
+        var NS = 'http://www.w3.org/2000/svg';
+        var N = 12, CAP = 3;
+        var items = [];
+        for (var k = 0; k < N; k++) {
+            var r = document.createElementNS(NS, 'rect');
+            r.setAttribute('width', 20); r.setAttribute('height', 14); r.setAttribute('rx', 3);
+            g.appendChild(r);
+            items.push(r);
+        }
+        function qPos(i) { return [14 + (i % 3) * 26, 44 + Math.floor(i / 3) * 22]; }
+        function lanePos(l) { return [240, 50 + l * 32]; }
+        function donePos(j) { return [318 + (j % 3) * 26, 44 + Math.floor(j / 3) * 22]; }
+        function place(el, p, cls) {
+            el.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)';
+            el.setAttribute('class', 'q-item ' + cls);
+        }
+        var queue, lanes, done;
+        function render() {
+            queue.forEach(function (it, i) { place(items[it], qPos(i), 'fill-dim'); });
+            lanes.forEach(function (it, l) { if (it != null) place(items[it], lanePos(l), 'fill-accent'); });
+            done.forEach(function (it, j) { place(items[it], donePos(j), 'fill-ok'); });
+        }
+        function reset() {
+            queue = []; for (var i = 0; i < N; i++) queue.push(i);
+            lanes = [null, null, null]; done = [];
+        }
+        function fill(l) { if (queue.length) lanes[l] = queue.shift(); }
+
+        // Static frame (reduced motion): mid-way through the batch.
+        reset();
+        for (var s = 0; s < CAP; s++) fill(s);
+        for (var f = 0; f < 5; f++) { var l0 = f % CAP; done.push(lanes[l0]); lanes[l0] = null; fill(l0); }
+        render();
+        if (reduced) return;
+
+        var timer = null;
+        function play() {
+            clearTimeout(timer);
+            reset(); render();
+            var tick = 0;
+            timer = setTimeout(function start() {
+                for (var l = 0; l < CAP; l++) fill(l);
+                render();
+                (function step() {
+                    timer = setTimeout(function () {
+                        var lane = tick % CAP; tick++;
+                        if (lanes[lane] != null) { done.push(lanes[lane]); lanes[lane] = null; fill(lane); render(); }
+                        if (done.length < N) step();
+                    }, 750);
+                })();
+            }, 700);
+        }
+        whenVisible(fig, play);
+        document.getElementById('queueReplay').addEventListener('click', play);
+    })();
+})();
+</script>
+</body>
+</html>

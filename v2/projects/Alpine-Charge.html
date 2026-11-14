@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-page="projects">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alpine Charge | Jack Buhr</title>
+    <meta name="description" content="Alpine Charge, a startup I co-founded that rents portable phone chargers to hikers from self-serve kiosks at trailheads in Lions Bay, BC.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
+    <style>
+        /* Hero photo: a one-item gallery so it opens in the shared lightbox. */
+        .ac-hero { grid-template-columns: minmax(0, 1fr); }
+        .ac-hero button { aspect-ratio: 4 / 5; }
+        .ac-hero img { object-position: 50% 20%; }
+        .ac-hero-cap { margin-top: 0.7rem; font-family: var(--mono); font-size: 0.74rem; line-height: 1.5; color: var(--text-3); }
+        .ac-gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        @media (max-width: 620px) { .ac-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        /* Lifecycle diagram: wide version on desktop, stacked version on phones. */
+        .fig > svg.ac-life-tall { display: none; }
+        @media (max-width: 620px) {
+            .fig > svg.ac-life-wide { display: none; }
+            .fig > svg.ac-life-tall { display: block; max-width: 380px; margin-inline: auto; }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html">← Projects</a>
+        <p class="kicker">Startup · Trailhead hardware</p>
+        <h1>Alpine Charge</h1>
+        <p class="lede">I co-founded Alpine Charging Solutions Inc. in March 2026. We run self-serve kiosks at trailheads that rent portable phone chargers to hikers, under a municipal contract with the Village of Lions Bay, BC.</p>
+        <dl class="facts">
+            <div><dt>Role</dt><dd>Co-founder</dd></div>
+            <div><dt>Founded</dt><dd>March 2026</dd></div>
+            <div><dt>Where</dt><dd>Lions Bay, BC</dd></div>
+            <div><dt>Status</dt><dd><span class="lamp pulse"></span>Operating</dd></div>
+        </dl>
+    </header>
+
+    <div class="wrap">
+        <ul class="keypoints" data-reveal>
+            <li><strong>A municipal contract.</strong> We drafted and secured a contract with the Village of Lions Bay to put kiosks at the trailhead.</li>
+            <li><strong>Hardware in the field.</strong> We sourced the kiosks from international suppliers and installed them with the village's public works and electrical departments.</li>
+            <li><strong>Running today.</strong> The kiosks are managed remotely over an industrial IoT network, and the business is in active operations.</li>
+        </ul>
+    </div>
+
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>At the trailhead</h2></div>
+        <div class="split split--center">
+            <div data-reveal>
+                <div class="gallery ac-hero">
+                    <button type="button" data-full="../assets/img/alpine/photo-3.jpg" data-caption="A kiosk installed at the trailhead">
+                        <img src="../assets/img/alpine/photo-3.jpg" alt="Black Alpine Charge kiosk on a concrete pad at a forested trailhead, with a screen on top, three bays of power banks and a card terminal on the side">
+                    </button>
+                </div>
+                <p class="ac-hero-cap">A kiosk installed at the trailhead: screen on top, three bays of power banks, card terminal on the side.</p>
+            </div>
+            <div data-reveal style="--d:2">
+                <p class="dim">Hikers rent a power bank at the start of the trail and return it to the kiosk. The kiosk runs on its own. The steps below are the ones printed on its screen.</p>
+                <ol class="steps mt-2">
+                    <li><strong>Pay at the terminal.</strong> Card reader on the side of the kiosk.</li>
+                    <li><strong>A power bank releases.</strong> The kiosk unlocks one from a bay.</li>
+                    <li><strong>Take it on the trail.</strong> Lightning, USB-C and Micro USB cables are built in.</li>
+                    <li><strong>Return it to any empty slot.</strong> Push it in until it locks.</li>
+                </ol>
+                <p class="dim mt-2">We designed the branding in-house: the logo, the screen artwork, the signage and the label on each power bank.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">02</span><h2>What I handled</h2></div>
+        <p class="section-intro">As co-founder I oversaw the whole product lifecycle, from buying hardware to keeping it running.</p>
+
+        <figure class="fig">
+            <svg class="dg ac-life-wide" viewBox="0 0 720 196" role="img" aria-label="Lifecycle: procurement from international suppliers, municipal contract with the Village of Lions Bay, installation with public works and electrical departments, remote management over an industrial IoT network, then active operations. Branding and signage were designed in-house alongside.">
+                <defs>
+                    <marker id="acw-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-accent"/></marker>
+                </defs>
+                <!-- connectors -->
+                <path class="wire wire--accent draw" pathLength="1" d="M122 70 H146" marker-end="url(#acw-arr)" style="--d:1"/>
+                <path class="wire wire--accent draw" pathLength="1" d="M272 70 H296" marker-end="url(#acw-arr)" style="--d:2"/>
+                <path class="wire wire--accent draw" pathLength="1" d="M422 70 H446" marker-end="url(#acw-arr)" style="--d:3"/>
+                <path class="wire wire--accent draw" pathLength="1" d="M572 70 H596" marker-end="url(#acw-arr)" style="--d:4"/>
+
+                <g class="pop" style="--d:0">
+                    <rect class="box box--accent" x="2" y="20" width="120" height="100" rx="6"/>
+                    <text x="14" y="42" class="t-accent">01</text>
+                    <text x="14" y="64" class="t-strong">Procurement</text>
+                    <text x="14" y="88" class="t-dim">kiosks from</text>
+                    <text x="14" y="103" class="t-dim">intl. suppliers</text>
+                </g>
+                <g class="pop" style="--d:1">
+                    <rect class="box box--accent" x="152" y="20" width="120" height="100" rx="6"/>
+                    <text x="164" y="42" class="t-accent">02</text>
+                    <text x="164" y="64" class="t-strong">Contract</text>
+                    <text x="164" y="88" class="t-dim">Village of</text>
+                    <text x="164" y="103" class="t-dim">Lions Bay</text>
+                </g>
+                <g class="pop" style="--d:2">
+                    <rect class="box box--accent" x="302" y="20" width="120" height="100" rx="6"/>
+                    <text x="314" y="42" class="t-accent">03</text>
+                    <text x="314" y="64" class="t-strong">Installation</text>
+                    <text x="314" y="88" class="t-dim">public works,</text>
+                    <text x="314" y="103" class="t-dim">electrical dept.</text>
+                </g>
+                <g class="pop" style="--d:3">
+                    <rect class="box box--accent" x="452" y="20" width="120" height="100" rx="6"/>
+                    <text x="464" y="42" class="t-accent">04</text>
+                    <text x="464" y="64" class="t-strong">Remote mgmt</text>
+                    <text x="464" y="88" class="t-dim">industrial IoT</text>
+                    <text x="464" y="103" class="t-dim">network</text>
+                </g>
+                <g class="pop" style="--d:4">
+                    <rect class="box box--ok" x="602" y="20" width="116" height="100" rx="6"/>
+                    <text x="614" y="42" class="t-ok">05</text>
+                    <text x="614" y="64" class="t-strong">Operations</text>
+                    <circle cx="619" cy="84" r="4" class="fill-ok pulse"/>
+                    <text x="629" y="88" class="t-ok">active</text>
+                </g>
+
+                <!-- branding runs alongside every stage -->
+                <g class="pop" style="--d:5">
+                    <rect class="box box--ghost" x="2" y="144" width="716" height="40" rx="6"/>
+                    <text x="16" y="168">Alongside</text>
+                    <text x="104" y="168" class="t-dim">branding, logo, kiosk screen artwork, signage and power bank labels, all designed in-house</text>
+                </g>
+            </svg>
+
+            <svg class="dg ac-life-tall" viewBox="0 0 340 520" role="img" aria-label="Lifecycle: procurement, municipal contract with the Village of Lions Bay, installation with public works and electrical departments, remote management over an industrial IoT network, then active operations. Branding designed in-house alongside.">
+                <defs>
+                    <marker id="act-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-accent"/></marker>
+                </defs>
+                <path class="wire wire--accent" d="M40 64 V80" marker-end="url(#act-arr)"/>
+                <path class="wire wire--accent" d="M40 148 V164" marker-end="url(#act-arr)"/>
+                <path class="wire wire--accent" d="M40 232 V248" marker-end="url(#act-arr)"/>
+                <path class="wire wire--accent" d="M40 316 V332" marker-end="url(#act-arr)"/>
+
+                <rect class="box box--accent" x="2" y="2" width="336" height="62" rx="6"/>
+                <text x="16" y="28" class="t-accent">01</text>
+                <text x="48" y="28" class="t-strong">Procurement</text>
+                <text x="48" y="48" class="t-dim">kiosks from international suppliers</text>
+
+                <rect class="box box--accent" x="2" y="86" width="336" height="62" rx="6"/>
+                <text x="16" y="112" class="t-accent">02</text>
+                <text x="48" y="112" class="t-strong">Municipal contract</text>
+                <text x="48" y="132" class="t-dim">Village of Lions Bay</text>
+
+                <rect class="box box--accent" x="2" y="170" width="336" height="62" rx="6"/>
+                <text x="16" y="196" class="t-accent">03</text>
+                <text x="48" y="196" class="t-strong">Installation</text>
+                <text x="48" y="216" class="t-dim">with public works and electrical</text>
+
+                <rect class="box box--accent" x="2" y="254" width="336" height="62" rx="6"/>
+                <text x="16" y="280" class="t-accent">04</text>
+                <text x="48" y="280" class="t-strong">Remote management</text>
+                <text x="48" y="300" class="t-dim">industrial IoT network</text>
+
+                <rect class="box box--ok" x="2" y="338" width="336" height="62" rx="6"/>
+                <text x="16" y="364" class="t-ok">05</text>
+                <text x="48" y="364" class="t-strong">Operations</text>
+                <circle cx="52" cy="380" r="4" class="fill-ok pulse"/>
+                <text x="62" y="384" class="t-ok">active</text>
+
+                <rect class="box box--ghost" x="2" y="428" width="336" height="80" rx="6"/>
+                <text x="16" y="454">Alongside</text>
+                <text x="16" y="475" class="t-dim">branding, logo, screen artwork,</text>
+                <text x="16" y="492" class="t-dim">signage and labels, designed in-house</text>
+            </svg>
+            <figcaption>The stages I worked through, in order. Branding ran alongside all of them.</figcaption>
+        </figure>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">03</span><h2>Photos</h2><span class="aside">Tap to enlarge</span></div>
+        <div class="gallery ac-gallery">
+            <button type="button" data-full="../assets/img/alpine/photo-4.jpg" data-caption="The kiosk on its pad beside the gravel access road">
+                <img src="../assets/img/alpine/photo-4.jpg" alt="Wider view of the kiosk on a concrete pad beside a gravel road in the forest" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/photo-1.jpg" data-caption="Opened up before installation: controller at the top, a circuit board for each of the three bays">
+                <img src="../assets/img/alpine/photo-1.jpg" alt="Kiosk standing indoors with its side door open, showing a metal controller box at the top and three blue circuit boards below" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/photo-5.jpg" data-caption="The screen at night during setup, showing offline while it connects to the server">
+                <img src="../assets/img/alpine/photo-5.jpg" alt="Kiosk screen glowing in the dark with an Offline badge over the rental artwork" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/kiosk-screen.jpg" data-caption="Screen artwork designed in-house">
+                <img src="../assets/img/alpine/kiosk-screen.jpg" alt="Green kiosk screen artwork reading Don't Run Out, Rent a Power Bank, with a hiker photo, how-it-works steps and included cables" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/label.png" data-caption="Power bank label designed in-house, with rental and return terms and a support QR code">
+                <img src="../assets/img/alpine/label.png" alt="Dark green power bank label with the Alpine Charge logo, rental and returns sections and a support QR code" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/photo-2.jpg" data-caption="Label sheets printed and ready to cut">
+                <img src="../assets/img/alpine/photo-2.jpg" alt="Printed sheets of Alpine Charge labels spread on a wooden table next to a paper cutter" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/station.jpg" data-caption="Studio image of the kiosk model">
+                <img src="../assets/img/alpine/station.jpg" alt="Black charging kiosk photographed against a black background" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine-logo.png" data-caption="The Alpine Charge logo">
+                <img src="../assets/img/alpine-logo.png" alt="Alpine Charge logo: a green battery wearing ski goggles, smiling, with a lightning bolt" loading="lazy">
+            </button>
+        </div>
+
+        <ul class="tags mt-3">
+            <li>Hardware procurement</li>
+            <li>Municipal contracting</li>
+            <li>Site installation</li>
+            <li>Industrial IoT</li>
+            <li>Remote management</li>
+            <li>Branding and signage</li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

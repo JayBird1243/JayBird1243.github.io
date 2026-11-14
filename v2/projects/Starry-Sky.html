@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-page="projects">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Starry Sky | Jack Buhr</title>
+    <meta name="description" content="A night sky drawn in the browser from a 32-digit hex seed, with a live demo and how it works.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
+    <style>
+        .sky-stage { position: relative; aspect-ratio: 3 / 1; background: var(--bg); border-radius: var(--radius-sm); overflow: hidden; }
+        .sky-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 0.7s ease; }
+        .sky-stage canvas.is-on { opacity: 1; }
+        @media (max-width: 620px) { .sky-stage { aspect-ratio: 4 / 3; } }
+
+        .sky-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem 2rem; margin-top: 1.25rem; align-items: start; }
+        @media (max-width: 760px) { .sky-panel { grid-template-columns: minmax(0, 1fr); } }
+
+        .seed-form label { display: block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.4rem; }
+        .seed-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .seed-input {
+            flex: 1 1 18rem; min-width: 0;
+            font-family: var(--mono); font-size: 0.86rem; letter-spacing: 0.02em;
+            color: var(--text); background: var(--bg-2);
+            border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+            padding: 0.5rem 0.65rem;
+        }
+        .seed-input:focus { outline: none; border-color: var(--accent); }
+        .seed-input[aria-invalid='true'] { border-color: var(--bad); }
+        .seed-msg { min-height: 1.3em; margin: 0.35rem 0 0; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); }
+        .seed-msg.is-bad { color: var(--bad); }
+        .sky-stats { margin-top: 0.9rem; }
+        .sky-stats .stat-num { font-family: var(--mono); font-weight: 500; font-size: 1.35rem; }
+
+        .hist-title { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin: 0 0 0.4rem; }
+        .hist-cap { font-family: var(--mono); font-size: 0.72rem; line-height: 1.5; color: var(--text-3); margin: 0.4rem 0 0; }
+
+        .hw { display: grid; gap: 1.5rem; margin-top: 1.75rem; }
+        .hw-step { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 0.75rem 2rem; align-items: start; }
+        .hw-step h3 { margin-bottom: 0.4rem; }
+        .hw-step h3 .num { font-family: var(--mono); font-size: 0.76rem; color: var(--accent); margin-right: 0.5rem; font-weight: 400; }
+        .hw-step p { color: var(--text-2); font-size: 0.95rem; }
+        .hw-step pre { margin: 0; font-size: 0.78rem; }
+        @media (max-width: 760px) { .hw-step { grid-template-columns: minmax(0, 1fr); } .hw-step pre { font-size: 0.72rem; } }
+
+        .slices .digit { font-size: 15px; fill: var(--text); }
+        .slices .digit--off { fill: var(--text-3); }
+    </style>
+</head>
+<body>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html">← Projects</a>
+        <p class="kicker">Side project · Generative art</p>
+        <h1>Starry Sky</h1>
+        <p class="lede">A night sky drawn in the browser from one 32-digit hex seed, so the same seed always gives the same sky.</p>
+        <dl class="facts">
+            <div><dt>Input</dt><dd>32-digit hex seed</dd></div>
+            <div><dt>Stack</dt><dd>JavaScript, Canvas 2D</dd></div>
+            <div><dt>Used in</dt><dd>Home page hero</dd></div>
+        </dl>
+    </header>
+
+    <section class="wrap" aria-labelledby="demo-heading">
+        <h2 id="demo-heading" class="sr-only">Live demo</h2>
+        <figure class="fig">
+            <div class="sky-stage" id="sky-stage">
+                <canvas class="is-on" role="img" aria-label="Generated night sky"></canvas>
+                <canvas role="img" aria-hidden="true"></canvas>
+            </div>
+
+            <div class="sky-panel">
+                <div>
+                    <form class="seed-form" id="seed-form" novalidate>
+                        <label for="seed-input">Seed</label>
+                        <div class="seed-row">
+                            <input class="seed-input" id="seed-input" name="seed" type="text" maxlength="40" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="seed-msg">
+                            <button class="btn btn--ghost btn--sm" type="submit">Draw</button>
+                            <button class="btn btn--sm" type="button" id="new-sky">New sky</button>
+                        </div>
+                        <p class="seed-msg" id="seed-msg" aria-live="polite">Type or paste a seed, or press New sky.</p>
+                    </form>
+                    <div class="stats sky-stats">
+                        <div class="stat stat--accent"><span class="stat-num" id="out-stars">–</span><span class="stat-label">Stars</span></div>
+                        <div class="stat"><span class="stat-num" id="out-nodes">–</span><span class="stat-label">Nebula nodes</span></div>
+                        <div class="stat"><span class="stat-num" id="out-mean">–</span><span class="stat-label">Expected count for this canvas size</span></div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="hist-title">Stars by size</p>
+                    <svg class="dg hist" id="hist" viewBox="0 0 400 170" role="img" aria-label="Histogram of star sizes 1 to 10">
+                        <line class="axis" x1="30" y1="140" x2="392" y2="140"/>
+                        <g id="hist-bars"></g>
+                    </svg>
+                    <p class="hist-cap">Sizes are normal with mean 2, rounded down and clamped to 1–10, so everything under 2 lands in size 1 (about half the stars). Sizes 6 to 10 are drawn in colour.</p>
+                </div>
+            </div>
+        </figure>
+    </section>
+
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>How it works</h2></div>
+        <p class="section-intro">Every random choice comes from the seed. The renderer splits it into 8-digit slices and starts a separate random stream from each, so the star count, star placement and nebula don't disturb each other.</p>
+
+        <figure class="fig">
+            <div class="fig-scroll">
+                <svg class="dg slices" viewBox="0 0 720 196" role="img" aria-label="The seed split into four 8-digit slices. Slice 0 seeds the nebula stream, slice 1 the star count stream, slice 2 the star stream. Nebula colours read digit pairs from across the whole seed.">
+                    <defs>
+                        <marker id="sky-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                            <path d="M0 0 L10 5 L0 10 z" fill="#566173"/>
+                        </marker>
+                    </defs>
+                    <g id="slice-digits"></g>
+                    <!-- brackets under each slice -->
+                    <path class="wire" d="M34 50 v6 h148 v-6"/>
+                    <path class="wire" d="M200 50 v6 h148 v-6"/>
+                    <path class="wire" d="M366 50 v6 h148 v-6"/>
+                    <path class="wire wire--dim" d="M532 50 v6 h148 v-6"/>
+                    <text class="t-dim t-mid" x="108" y="18">digits 0–7</text>
+                    <text class="t-dim t-mid" x="274" y="18">8–15</text>
+                    <text class="t-dim t-mid" x="440" y="18">16–23</text>
+                    <text class="t-dim t-mid" x="606" y="18">24–31</text>
+
+                    <path class="wire" d="M108 56 V84" marker-end="url(#sky-arrow)"/>
+                    <path class="wire" d="M274 56 V84" marker-end="url(#sky-arrow)"/>
+                    <path class="wire" d="M440 56 V84" marker-end="url(#sky-arrow)"/>
+
+                    <rect class="box" x="34" y="88" width="148" height="62" rx="6"/>
+                    <text class="t-strong" x="46" y="110">Nebula</text>
+                    <text class="t-dim" x="46" y="127">stream 0</text>
+                    <text x="46" y="142">nodes, x, y, r</text>
+
+                    <rect class="box box--cool" x="200" y="88" width="148" height="62" rx="6"/>
+                    <text class="t-strong" x="212" y="110">Star count</text>
+                    <text class="t-dim" x="212" y="127">stream 1</text>
+                    <text x="212" y="142">normal(mean, sd)</text>
+
+                    <rect class="box box--accent" x="366" y="88" width="148" height="62" rx="6"/>
+                    <text class="t-strong" x="378" y="110">Stars</text>
+                    <text class="t-dim" x="378" y="127">stream 2</text>
+                    <text x="378" y="142">x, y, size</text>
+
+                    <rect class="box box--ghost" x="532" y="88" width="148" height="62" rx="6"/>
+                    <text class="t-strong" x="544" y="110">No stream</text>
+                    <text x="544" y="127">read only for</text>
+                    <text x="544" y="142">nebula colours</text>
+
+                    <path class="wire wire--dim" d="M34 172 H680" stroke-dasharray="3 4"/>
+                    <text class="t-dim t-mid" x="357" y="190">Nebula colours read digit pairs from anywhere in the seed</text>
+                </svg>
+            </div>
+            <figcaption>The current seed, split the way <code>Sky.render</code> splits it. Change the seed above and this updates.</figcaption>
+        </figure>
+
+        <div class="hw">
+            <div class="hw-step">
+                <div>
+                    <h3><span class="num">Step 1</span>Seed to random numbers</h3>
+                    <p>I use Mulberry32, a small, fast pseudo-random generator. Each stream starts from its own 8-digit slice of the seed, read as a 32-bit number.</p>
+                </div>
+<pre><code>function prng(seed, stream) {
+  var start = (stream * 8) % 32;
+  var state = parseInt(seed.substring(start, start + 8), 16) &gt;&gt;&gt; 0;
+  return function () { /* Mulberry32 step: 0 ≤ n &lt; 1 */ };
+}
+var nodeRng  = prng(seed, 0);
+var countRng = prng(seed, 1);
+var starRng  = prng(seed, 2);</code></pre>
+            </div>
+
+            <div class="hw-step">
+                <div>
+                    <h3><span class="num">Step 2</span>Uniform to normal</h3>
+                    <p>The generator gives uniform numbers. The Box–Muller transform turns two of them into one normally distributed number. Star sizes use mean 2 and standard deviation 1.426. The star count is normal too, around a mean that grows with the canvas area.</p>
+                </div>
+<pre><code>function normal(rng, mean, sd) {
+  var u = 0, v = 0;               // two uniform samples
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
+  return Math.sqrt(-2 * Math.log(u))
+       * Math.cos(2 * Math.PI * v) * sd + mean;
+}
+size  = clamp(floor(normal(starRng, 2, 1.426)), 1, 10);
+count = normal(countRng, density * area,
+                         density * 0.27 * sqrt(area));</code></pre>
+            </div>
+
+            <div class="hw-step">
+                <div>
+                    <h3><span class="num">Step 3</span>Nebula colours from the seed</h3>
+                    <p>Three to six large, soft radial gradients make the nebula. Each colour comes straight from pairs of seed digits: they pick one of four base hues, nudge it by up to 12°, and set saturation, lightness and opacity.</p>
+                </div>
+<pre><code>var a = parseInt(seed.substr((i * 3) % 30, 2), 16);  // 0–255
+var b = parseInt(seed.substr((i * 5 + 7) % 30, 2), 16);
+var c = parseInt(seed.substr((i * 7 + 13) % 30, 2), 16);
+var hue   = [38, 215, 265, 12][(a + b * (i + 1)) % 4] + (c % 24) - 12;
+var sat   = 35 + (b % 30);          // %
+var light = 16 + (c % 12);          // %
+var alpha = 0.18 + (a % 40) / 200;</code></pre>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    if (!window.Sky) return;
+    var Sky = window.Sky;
+    // Small (phone) canvases get a higher density so there are enough
+    // stars for the histogram to show its shape.
+    function opts(canvas) {
+        var r = canvas.getBoundingClientRect();
+        var area = Math.max(1, r.width * r.height) / 1e6;
+        return { density: Math.max(800, Math.round(300 / area)), scale: 0.85 };
+    }
+    // Same colours site.js gives stars of size 6 to 10.
+    var STAR_COLORS = { 6: '#fcd34d', 7: '#f0705f', 8: '#a78bfa', 9: '#6ea8fe', 10: '#c4b5fd' };
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    var canvases = document.querySelectorAll('#sky-stage canvas');
+    var front = 0;
+    var input = document.getElementById('seed-input');
+    var msg = document.getElementById('seed-msg');
+    var outStars = document.getElementById('out-stars');
+    var outNodes = document.getElementById('out-nodes');
+    var outMean = document.getElementById('out-mean');
+    var bars = document.getElementById('hist-bars');
+    var digits = document.getElementById('slice-digits');
+    var seed = null;
+
+    // ── Histogram: build bars once, then update heights ──
+    var BASE = 140, TOP = 22, X0 = 34, BAND = 35.8, BW = 22;
+    var barEls = [];
+    for (var s = 1; s <= 10; s++) {
+        var x = X0 + (s - 1) * BAND + (BAND - BW) / 2;
+        var g = document.createElementNS(SVGNS, 'g');
+        var r = document.createElementNS(SVGNS, 'rect');
+        r.setAttribute('x', x); r.setAttribute('width', BW);
+        r.setAttribute('y', BASE); r.setAttribute('height', 0); r.setAttribute('rx', 3);
+        r.setAttribute('fill', STAR_COLORS[s] || '#7c8697');
+        var v = document.createElementNS(SVGNS, 'text');
+        v.setAttribute('class', 't-mid'); v.setAttribute('x', x + BW / 2); v.setAttribute('y', BASE - 5);
+        var l = document.createElementNS(SVGNS, 'text');
+        l.setAttribute('class', 't-dim t-mid'); l.setAttribute('x', x + BW / 2); l.setAttribute('y', 158);
+        l.textContent = s;
+        g.appendChild(r); g.appendChild(v); g.appendChild(l);
+        bars.appendChild(g);
+        barEls.push({ r: r, v: v });
+    }
+
+    function drawHist(sizes) {
+        var max = 1;
+        for (var i = 1; i <= 10; i++) max = Math.max(max, sizes[i]);
+        for (var k = 1; k <= 10; k++) {
+            var n = sizes[k];
+            // Square-root scale would hide the shape; keep it linear but give
+            // non-zero counts a visible sliver.
+            var h = n ? Math.max(2, (n / max) * (BASE - TOP)) : 0;
+            var b = barEls[k - 1];
+            b.r.setAttribute('y', BASE - h);
+            b.r.setAttribute('height', h);
+            b.v.setAttribute('y', BASE - h - 5);
+            b.v.textContent = n;
+        }
+    }
+
+    // ── Seed slice diagram ──
+    function drawDigits(sd) {
+        digits.textContent = '';
+        for (var i = 0; i < 32; i++) {
+            var slice = Math.floor(i / 8);
+            var t = document.createElementNS(SVGNS, 'text');
+            t.setAttribute('class', 'digit t-mid' + (slice === 3 ? ' digit--off' : ''));
+            t.setAttribute('x', 34 + slice * 166 + (i % 8) * 18.5 + 9.25);
+            t.setAttribute('y', 42);
+            t.textContent = sd[i];
+            digits.appendChild(t);
+        }
+    }
+
+    function show(stats) {
+        outStars.textContent = stats.stars.toLocaleString();
+        outNodes.textContent = stats.nodes;
+        outMean.textContent = Math.round(stats.mean) + ' ± ' + Math.round(stats.sd);
+        drawHist(stats.sizes);
+    }
+
+    // Draw into the hidden canvas, then cross-fade to it.
+    function draw(newSeed, fade) {
+        seed = newSeed.toLowerCase();
+        input.value = seed;
+        input.setAttribute('aria-invalid', 'false');
+        drawDigits(seed);
+        var stats;
+        if (fade) {
+            var back = 1 - front;
+            stats = Sky.render(canvases[back], seed, opts(canvases[back]));
+            canvases[back].classList.add('is-on');
+            canvases[back].removeAttribute('aria-hidden');
+            canvases[front].classList.remove('is-on');
+            canvases[front].setAttribute('aria-hidden', 'true');
+            front = back;
+        } else {
+            stats = Sky.render(canvases[front], seed, opts(canvases[front]));
+        }
+        show(stats);
+        try { history.replaceState(null, '', '#' + seed); } catch (e) { /* file:// */ }
+    }
+
+    document.getElementById('seed-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var val = input.value.trim().replace(/^#/, '');
+        if (!Sky.isSeed(val)) {
+            input.setAttribute('aria-invalid', 'true');
+            msg.textContent = 'A seed is exactly 32 hex digits (0–9, a–f). That has ' + val.length + ' characters.';
+            msg.classList.add('is-bad');
+            return;
+        }
+        msg.textContent = 'Same seed, same sky. Try drawing it again.';
+        msg.classList.remove('is-bad');
+        draw(val, val.toLowerCase() !== seed);
+    });
+
+    document.getElementById('new-sky').addEventListener('click', function () {
+        msg.textContent = 'New random seed.';
+        msg.classList.remove('is-bad');
+        draw(Sky.randomSeed(), true);
+    });
+
+    var t = null;
+    window.addEventListener('resize', function () {
+        clearTimeout(t);
+        t = setTimeout(function () { show(Sky.render(canvases[front], seed, opts(canvases[front]))); }, 150);
+    });
+
+    var fromHash = location.hash.replace(/^#/, '');
+    draw(Sky.isSeed(fromHash) ? fromHash : Sky.randomSeed(), false);
+});
+</script>
+</body>
+</html>
