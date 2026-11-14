@@ -59,7 +59,7 @@
         <dl class="facts">
             <div><dt>Input</dt><dd>32-digit hex seed</dd></div>
             <div><dt>Stack</dt><dd>JavaScript, Canvas 2D</dd></div>
-            <div><dt>Used in</dt><dd>Home page hero</dd></div>
+            <div><dt>Used in</dt><dd>The background of this site</dd></div>
         </dl>
     </header>
 
@@ -308,6 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
             stats = Sky.render(canvases[front], seed, opts(canvases[front]));
         }
         show(stats);
+        if (Sky.site) Sky.site.set(seed);   // the page background follows the demo
         try { history.replaceState(null, '', '#' + seed); } catch (e) { /* file:// */ }
     }
 
@@ -338,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     var fromHash = location.hash.replace(/^#/, '');
-    draw(Sky.isSeed(fromHash) ? fromHash : Sky.randomSeed(), false);
+    draw(Sky.isSeed(fromHash) ? fromHash : (Sky.site ? Sky.site.seed : Sky.randomSeed()), false);
 });
 </script>
 </body>

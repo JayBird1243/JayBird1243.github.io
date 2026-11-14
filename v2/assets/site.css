@@ -114,6 +114,24 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
 
 ::selection { background: var(--accent); color: var(--accent-ink); }
 
+/* ---------- Site-wide sky ---------- */
+/* Fixed behind everything, drawn by site.js. Taller than the viewport so it
+   can drift slowly as the page scrolls. */
+.site-sky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 130vh;
+    height: 130lvh;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    will-change: transform;
+}
+.site-sky.is-on { opacity: 0.9; }
+
 /* ---------- Layout ---------- */
 .wrap {
     width: 100%;
@@ -702,11 +720,12 @@ details.more > .more-body h4:first-child { margin-top: 0; }
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .js [data-reveal] { opacity: 1; transform: none; }
+    .site-sky.is-on { opacity: 0.9; }
     .js .dg .draw { stroke-dashoffset: 0; }
     .js .dg .pop { opacity: 1; }
 }
 
 @media print {
-    .site-nav, .site-footer { display: none; }
+    .site-nav, .site-footer, .site-sky { display: none; }
     body { padding-top: 0; background: #fff; color: #000; }
 }

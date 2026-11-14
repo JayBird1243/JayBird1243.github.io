@@ -1,6 +1,6 @@
 /* Jack Buhr — shared site script.
-   Nav + footer, scroll reveal, count-up numbers, image lightbox,
-   and the seeded sky renderer (window.Sky).
+   Nav + footer, the site-wide seeded sky (window.Sky), scroll reveal,
+   count-up numbers and the image lightbox.
 
    Each page sets on <html>:
      data-root="" (top-level page) or "../" (page inside /projects)
@@ -297,8 +297,83 @@
     })();
     window.Sky = Sky;
 
+    // ── Site-wide sky ──────────────────────────────────────────────
+    // One fixed canvas behind every page. The seed is kept for the visit
+    // (sessionStorage), so the same sky follows you from page to page.
+    //   Sky.site.seed            current seed
+    //   Sky.site.set(seed)       draw a given seed everywhere
+    //   Sky.site.reroll()        new random seed
+    // A 'sky:change' event fires on document with the render stats.
+    function initSiteSky() {
+        var KEY = 'sky-seed';
+        var canvas = document.createElement('canvas');
+        canvas.className = 'site-sky';
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.insertBefore(canvas, document.body.firstChild);
+
+        var seed = null;
+        try { seed = window.sessionStorage.getItem(KEY); } catch (e) { /* storage blocked */ }
+        if (!Sky.isSeed(seed)) seed = Sky.randomSeed();
+
+        var site = { seed: seed, stats: null };
+
+        function draw() {
+            site.stats = Sky.render(canvas, site.seed, { density: 340, scale: 0.55 });
+            canvas.classList.add('is-on');
+            try { window.sessionStorage.setItem(KEY, site.seed); } catch (e) { /* storage blocked */ }
+            var ev;
+            try { ev = new CustomEvent('sky:change', { detail: site.stats }); } catch (e) { ev = null; }
+            if (ev) document.dispatchEvent(ev);
+        }
+
+        site.set = function (next) {
+            if (!Sky.isSeed(next)) return false;
+            next = next.toLowerCase();
+            if (next === site.seed && site.stats) return true;
+            site.seed = next;
+            if (reduced) { draw(); return true; }
+            canvas.classList.remove('is-on');
+            setTimeout(draw, 350);
+            return true;
+        };
+        site.reroll = function () { site.set(Sky.randomSeed()); return site.seed; };
+        Sky.site = site;
+
+        draw();
+
+        // Redraw when the width changes. Height changes are ignored so the
+        // mobile URL bar sliding away does not reshuffle the stars.
+        var lastW = window.innerWidth;
+        var timer = null;
+        window.addEventListener('resize', function () {
+            if (window.innerWidth === lastW) return;
+            lastW = window.innerWidth;
+            clearTimeout(timer);
+            timer = setTimeout(draw, 200);
+        });
+
+        // Slow drift as the page scrolls: the canvas is taller than the
+        // viewport and slides up by the extra height over the full scroll.
+        if (reduced) return;
+        var ticking = false;
+        function drift() {
+            ticking = false;
+            var max = document.documentElement.scrollHeight - window.innerHeight;
+            var p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+            var extra = canvas.offsetHeight - window.innerHeight;
+            canvas.style.transform = 'translate3d(0,' + (-p * Math.max(0, extra)).toFixed(1) + 'px,0)';
+        }
+        window.addEventListener('scroll', function () {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(drift);
+        }, { passive: true });
+        drift();
+    }
+
     // ── Boot ───────────────────────────────────────────────────────
     function boot() {
+        initSiteSky();
         buildChrome();
         initReveal();
         initCount();
