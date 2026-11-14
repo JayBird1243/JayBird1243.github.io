@@ -30,33 +30,9 @@
             border: 1px solid var(--line-2);
             box-shadow: 0 0 0 6px rgba(12, 15, 20, 0.6);
         }
-        .sky-ctl {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 0.9rem;
-            flex-wrap: wrap;
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            color: var(--text-3);
-            padding-bottom: 1rem;
-        }
-        .sky-ctl button {
-            font: inherit;
-            color: var(--text-2);
-            background: none;
-            border: 1px solid var(--line-2);
-            border-radius: 4px;
-            padding: 0.2rem 0.55rem;
-            cursor: pointer;
-        }
-        .sky-ctl button:hover { color: var(--accent); border-color: var(--accent); }
-        .sky-ctl a { color: var(--text-2); }
-        .sky-ctl a:hover { color: var(--accent); }
         @media (max-width: 620px) {
             .hero-inner { grid-template-columns: minmax(0, 1fr); }
             .hero-photo { order: -1; width: 96px; }
-            .sky-ctl { justify-content: flex-start; }
         }
 
         /* The automation stack: one row per layer, wires between rows. */
@@ -107,11 +83,6 @@
                     </div>
                 </div>
                 <img class="hero-photo" src="assets/img/profile.jpg" alt="Portrait of Jack Buhr" width="176" height="176">
-            </div>
-            <div class="sky-ctl">
-                <span>sky seed <span id="sky-seed">…</span></span>
-                <button type="button" id="sky-new">New sky</button>
-                <a href="projects/Starry-Sky.html">How it's generated</a>
             </div>
         </div>
     </section>
@@ -283,17 +254,5 @@
     </section>
 </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var label = document.getElementById('sky-seed');
-        function show() {
-            label.textContent = Sky.site.seed.slice(0, 8) + '…';
-            label.title = Sky.site.seed;
-        }
-        show();
-        document.addEventListener('sky:change', show);
-        document.getElementById('sky-new').addEventListener('click', function () { Sky.site.reroll(); });
-    });
-</script>
 </body>
 </html>

@@ -32,12 +32,24 @@
         nav.innerHTML =
             '<div class="wrap">' +
             '<a class="brand" href="' + root + 'index.html">Jack Buhr</a>' +
+            '<div class="nav-seed">' +
+            '<span class="seed-text" title="Sky seed"><span class="seed-lbl">seed</span> ' +
+            '<span class="seed-head"></span><span class="seed-tail"></span><span class="seed-dots">…</span></span>' +
+            '<button type="button" class="seed-help" aria-label="What is the seed?" aria-expanded="false" aria-controls="seed-pop">?</button>' +
+            '<div class="seed-pop" id="seed-pop" role="group" aria-label="About the sky seed">' +
+            '<p>The star field behind this site is generated from a 32-digit seed. The same seed always draws the same sky.</p>' +
+            '<p class="seed-full"></p>' +
+            '<div class="seed-actions">' +
+            '<button type="button" class="btn btn--ghost btn--sm seed-new">New sky</button>' +
+            '<a href="' + root + 'projects/Starry-Sky.html">How it works →</a>' +
+            '</div></div></div>' +
             '<nav aria-label="Main"><ul>' +
             link(root + 'projects.html', 'Projects', 'projects') +
             link(root + 'skills.html', 'Skills', 'skills') +
             link(root + 'index.html#contact', 'Contact', 'contact') +
             '</ul></nav></div>';
         document.body.insertBefore(nav, document.body.firstChild);
+        initSeedMenu(nav);
 
         var foot = document.createElement('footer');
         foot.className = 'site-footer';
@@ -50,6 +62,40 @@
             '<li><a href="' + CONTACT.github + '" target="_blank" rel="noopener">GitHub</a></li>' +
             '</ul></div>';
         document.body.appendChild(foot);
+    }
+
+    // Seed readout in the menu bar, with a "?" that opens a short explanation.
+    // Opens on hover and keyboard focus (CSS) and on click or tap (JS).
+    function initSeedMenu(nav) {
+        var box = nav.querySelector('.nav-seed');
+        var help = box.querySelector('.seed-help');
+        var head = box.querySelector('.seed-head');
+        var tail = box.querySelector('.seed-tail');
+        var full = box.querySelector('.seed-full');
+
+        function show() {
+            if (!Sky.site) return;
+            var seed = Sky.site.seed;
+            head.textContent = seed.slice(0, 8);
+            tail.textContent = seed.slice(8);
+            full.textContent = seed;
+        }
+        function setOpen(open) {
+            box.classList.toggle('is-open', open);
+            help.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        show();
+        document.addEventListener('sky:change', show);
+
+        help.addEventListener('click', function () { setOpen(!box.classList.contains('is-open')); });
+        box.querySelector('.seed-new').addEventListener('click', function () { if (Sky.site) Sky.site.reroll(); });
+        document.addEventListener('click', function (e) { if (!box.contains(e.target)) setOpen(false); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape' || !box.classList.contains('is-open')) return;
+            setOpen(false);
+            help.focus();
+        });
     }
 
     // ── Scroll reveal ──────────────────────────────────────────────
