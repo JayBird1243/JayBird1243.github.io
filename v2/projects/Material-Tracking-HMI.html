@@ -30,6 +30,8 @@
         .dg .is-good .pipe { stroke: var(--ok); }
         .dg .is-cold .pipe { stroke: var(--cool); }
         .dg .duct { fill: var(--bg-2); stroke: var(--line-2); }
+        .scroll-hint { display: none; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); margin: -0.4rem 0 0.6rem; }
+        @media (max-width: 680px) { .scroll-hint { display: block; } }
     </style>
 </head>
 <body>
@@ -58,6 +60,7 @@
     <div class="wrap" style="margin-top:2.75rem">
         <figure class="fig">
             <div class="fig-title">From a tap at the station to an engineering query</div>
+            <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
             <div class="fig-scroll">
                 <svg class="dg" id="mlt-flow" viewBox="0 0 720 300" role="img" aria-label="Report path. The line PLC sends station and context data to the station HMI. An operator picks a loss reason from a fixed list in two taps. The report goes into a send queue, which sends it to a SQL stored procedure over the network and retries until the database acknowledges it. When the network is slow, reports wait in the queue. Engineering queries the losses by station, reason and shift.">
                     <defs>

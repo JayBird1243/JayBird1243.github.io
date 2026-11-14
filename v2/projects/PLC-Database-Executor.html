@@ -30,6 +30,8 @@
         .dg .is-good .pipe { stroke: var(--ok); }
         .dg .is-cold .pipe { stroke: var(--cool); }
         .dg .duct { fill: var(--bg-2); stroke: var(--line-2); }
+        .scroll-hint { display: none; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); margin: -0.4rem 0 0.6rem; }
+        @media (max-width: 680px) { .scroll-hint { display: block; } }
     </style>
 </head>
 <body>
@@ -58,6 +60,7 @@
     <div class="wrap" style="margin-top:2.75rem">
         <figure class="fig">
             <div class="fig-title">One database transaction, as a state machine</div>
+            <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
             <div class="fig-scroll">
                 <svg class="dg" id="pde-sm" viewBox="0 0 720 360" role="img" aria-label="State machine for one database transaction. Idle waits for a trigger, Build XML maps PLC variables, Send calls the stored procedure, Wait holds for the reply with a timeout, Validate parses and confirms it, and Done records the result before returning to Idle. A timeout or a bad response goes to Fault, which raises a typed error code and the raw response to the HMI. From Fault, only an engineer login can retry, which re-enters at Send. An HMI bar at the bottom shows the current step, database status, error code and access level.">
                     <defs>
@@ -150,6 +153,7 @@
 
         <figure class="fig fig-gap">
             <div class="fig-title">Data path</div>
+            <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
             <div class="fig-scroll">
                 <svg class="dg" viewBox="0 0 720 130" role="img" aria-label="Data path: PLC variables are built into an XML payload in Structured Text, sent to an existing SQL stored procedure, and the response is parsed in the PLC and shown as status on the HMI.">
                     <defs>
