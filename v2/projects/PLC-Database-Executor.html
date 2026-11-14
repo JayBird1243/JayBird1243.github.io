@@ -23,6 +23,13 @@
         .dg .ed.is-on { stroke: var(--accent); }
         .dg .dash { stroke-dasharray: 4 4; }
         .dg .t-up { letter-spacing: 0.08em; }
+        .dg .slot { fill: var(--bg-2); stroke: var(--line-2); }
+        .dg .slot.is-full { fill: var(--accent); stroke: var(--accent); }
+        .dg .pipe { fill: none; stroke: var(--line-2); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+        .dg .is-act .pipe { stroke: var(--accent); }
+        .dg .is-good .pipe { stroke: var(--ok); }
+        .dg .is-cold .pipe { stroke: var(--cool); }
+        .dg .duct { fill: var(--bg-2); stroke: var(--line-2); }
     </style>
 </head>
 <body>
@@ -72,7 +79,7 @@
                     <path class="wire wire--bad" d="M670,238 V300" marker-end="url(#pde-sm-arr)"/>
 
                     <!-- edge labels -->
-                    <text class="t-dim t-mid" x="165" y="56">trigger</text>
+                    <text class="t-dim t-mid" x="165" y="56">start</text>
                     <text class="t-dim t-mid" x="335" y="56">XML</text>
                     <text class="t-dim" x="428" y="143">insert</text>
                     <text class="t-dim t-mid" x="335" y="206">reply</text>

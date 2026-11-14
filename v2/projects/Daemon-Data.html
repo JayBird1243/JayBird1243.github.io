@@ -306,9 +306,9 @@
 
                     <rect x="30" y="150" width="340" height="96" rx="6" class="box box--accent"/>
                     <text x="46" y="172" class="t-accent">schedulers/investing</text>
-                    <text x="46" y="196">interval</text><text x="150" y="196" class="t-strong">60 s</text><text x="250" y="196" class="t-dim">fastest</text>
-                    <text x="46" y="214">posts</text><text x="150" y="214" class="t-strong">500</text><text x="250" y="214" class="t-dim">largest</text>
-                    <text x="46" y="232">max age</text><text x="150" y="232" class="t-strong">168 h</text><text x="250" y="232" class="t-dim">widest</text>
+                    <text x="46" y="196">interval</text><text x="150" y="196" class="t-strong">60 s</text><text x="250" y="196" class="t-dim" style="font-size:11.5px">fastest</text>
+                    <text x="46" y="214">posts</text><text x="150" y="214" class="t-strong">500</text><text x="250" y="214" class="t-dim" style="font-size:11.5px">largest</text>
+                    <text x="46" y="232">max age</text><text x="150" y="232" class="t-strong">168 h</text><text x="250" y="232" class="t-dim" style="font-size:11.5px">widest</text>
 
                     <line x1="200" y1="246" x2="200" y2="274" class="wire wire--accent" marker-end="url(#ddScrapeArrow)"/>
                     <text x="210" y="264" class="t-dim">one Cloud Scheduler job</text>
@@ -442,11 +442,11 @@
 
                     <!-- input nodes -->
                     <rect x="0" y="8" width="120" height="40" rx="6" class="box"/><rect x="0" y="8" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
-                    <text x="10" y="24" class="t-dim">METRIC</text><text x="10" y="40">upvote velocity</text>
+                    <text x="10" y="24" class="t-dim">METRIC</text><text x="10" y="40" style="font-size:11px">upvote velocity</text>
                     <rect x="0" y="58" width="120" height="40" rx="6" class="box"/><rect x="0" y="58" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
                     <text x="10" y="74" class="t-dim">CONSTANT</text><text x="10" y="90">50</text>
                     <rect x="0" y="118" width="120" height="40" rx="6" class="box"/><rect x="0" y="118" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
-                    <text x="10" y="134" class="t-dim">ANALYSIS</text><text x="10" y="150">market signal</text>
+                    <text x="10" y="134" class="t-dim">ANALYSIS</text><text x="10" y="150" style="font-size:11px">market signal</text>
                     <rect x="0" y="168" width="120" height="40" rx="6" class="box"/><rect x="0" y="168" width="120" height="40" rx="6" class="box box--accent pop" style="--d:6"/>
                     <text x="10" y="184" class="t-dim">CONSTANT</text><text x="10" y="200">70</text>
 
@@ -579,10 +579,10 @@
                     <line x1="282" y1="82" x2="306" y2="82" class="wire wire--ok" marker-end="url(#ddQueueArrowOk)"/>
 
                     <text x="48" y="150" class="t-dim t-mid">burst in</text>
-                    <text x="210" y="156" class="t-accent t-mid">cap: 3 at a time</text>
+                    <text x="200" y="156" class="t-accent t-mid">cap: 3 at a time</text>
                     <text x="352" y="150" class="t-dim t-mid">steady out</text>
 
-                    <path d="M250 142 V190 H76 V134" class="wire wire--dim flow flow--slow" marker-end="url(#ddQueueArrowDim)"/>
+                    <path d="M264 142 V190 H82 V134" class="wire wire--dim flow flow--slow" marker-end="url(#ddQueueArrowDim)"/>
                     <text x="200" y="210" class="t-dim t-mid">each finishing worker queues the next item</text>
 
                     <g id="qItems"></g>
