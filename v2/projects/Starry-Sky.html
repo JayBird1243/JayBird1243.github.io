@@ -21,7 +21,7 @@
         .seed-form label { display: block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.4rem; }
         .seed-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .seed-input {
-            flex: 1 1 18rem; min-width: 0;
+            flex: 1 1 100%; min-width: 0;
             font-family: var(--mono); font-size: 0.86rem; letter-spacing: 0.02em;
             color: var(--text); background: var(--bg-2);
             border: 1px solid var(--line-2); border-radius: var(--radius-sm);
@@ -50,6 +50,34 @@
         .odds-table td.num { font-family: var(--mono); font-size: 0.8rem; }
         .odds-table td, .odds-table th { white-space: nowrap; padding-left: 0.5rem; padding-right: 0.5rem; }
         #odds { scroll-margin-top: calc(var(--nav-h) + 16px); }
+
+        #neighbours { scroll-margin-top: calc(var(--nav-h) + 16px); }
+
+        /* Animation view: the page steps aside and the sky runs on its own. */
+        main, .site-footer { transition: opacity 0.5s ease, visibility 0s linear 0s; }
+        .sky-show { overflow: hidden; }
+        .sky-show main, .sky-show .site-footer { opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0s linear 0.5s; }
+        .sky-show .site-sky.is-on { opacity: 1; }
+        .sky-bar {
+            position: fixed; left: 50%; bottom: 1.25rem; z-index: 60;
+            transform: translate(-50%, 12px);
+            width: min(34rem, calc(100vw - 1.5rem));
+            padding: 0.85rem 1rem;
+            background: rgba(18, 22, 30, 0.86);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            border: 1px solid var(--line-2); border-radius: var(--radius);
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
+        }
+        .sky-show .sky-bar { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+        .sky-bar-seed { margin: 0; font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.02em; color: var(--text-3); overflow-wrap: anywhere; }
+        .sky-bar-seed .neb { color: var(--cool); }
+        .sky-bar-seed .star { color: var(--accent); }
+        .sky-bar-note { margin: 0.4rem 0 0.75rem; font-size: 0.84rem; line-height: 1.45; color: var(--text-2); }
+        .sky-bar-note .neb { color: var(--cool); }
+        .sky-bar-note .star { color: var(--accent); }
+        .sky-bar-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        @media (max-width: 420px) { .sky-bar-seed { font-size: 0.7rem; } }
 
         .slices .digit { font-size: 15px; fill: var(--text); }
         .slices .digit--off { fill: var(--text-3); }
@@ -85,6 +113,7 @@
                             <input class="seed-input" id="seed-input" name="seed" type="text" maxlength="40" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="seed-msg">
                             <button class="btn btn--ghost btn--sm" type="submit">Draw</button>
                             <button class="btn btn--sm" type="button" id="new-sky">New sky</button>
+                            <button class="btn btn--ghost btn--sm" type="button" id="view-anim">View animation</button>
                         </div>
                         <p class="seed-msg" id="seed-msg" aria-live="polite">Type or paste a seed, or press New sky.</p>
                     </form>
@@ -114,7 +143,7 @@
 
         <figure class="fig">
             <div class="fig-scroll">
-                <svg class="dg slices" viewBox="0 0 720 196" role="img" aria-label="The seed split into four 8-digit slices. Slice 0 seeds the nebula stream, slice 1 the star count stream, slice 2 the star stream. Nebula colours read digit pairs from across the whole seed.">
+                <svg class="dg slices" viewBox="0 0 720 196" role="img" aria-label="The seed split into four 8-digit slices. Slice 0 seeds the nebula stream, slice 1 the star count stream, slice 2 the star stream. Nebula colours read digit pairs from every slice except the star slice.">
                     <defs>
                         <marker id="sky-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                             <path d="M0 0 L10 5 L0 10 z" fill="#566173"/>
@@ -156,7 +185,7 @@
                     <text x="544" y="142">nebula colours</text>
 
                     <path class="wire wire--dim" d="M34 172 H680" stroke-dasharray="3 4"/>
-                    <text class="t-dim t-mid" x="357" y="190">Nebula colours read digit pairs from anywhere in the seed</text>
+                    <text class="t-dim t-mid" x="357" y="190">Nebula colours read digit pairs from every slice except the star slice</text>
                 </svg>
             </div>
             <figcaption>The current seed, split the way <code>Sky.render</code> splits it. Change the seed above and this updates.</figcaption>
@@ -231,15 +260,35 @@ for (var big = 10; big &gt;= 6; big--) {
             <div class="hw-step">
                 <div>
                     <h3><span class="num">Step 4</span>Nebula colours from the seed</h3>
-                    <p>Three to six large, soft radial gradients make the nebula. Each colour comes straight from pairs of seed digits: they pick one of four base hues, nudge it by up to 12°, and set saturation, lightness and opacity.</p>
+                    <p>Three to six large, soft radial gradients make the nebula. Each colour comes straight from pairs of seed digits: they pick one of four base hues, nudge it by up to 12°, and set saturation, lightness and opacity. The star slice is skipped, so changing it changes the stars and nothing else.</p>
                 </div>
-<pre><code>var a = parseInt(seed.substr((i * 3) % 30, 2), 16);  // 0–255
-var b = parseInt(seed.substr((i * 5 + 7) % 30, 2), 16);
-var c = parseInt(seed.substr((i * 7 + 13) % 30, 2), 16);
+<pre><code>var d = seed.substring(0, 16) + seed.substring(24);  // skip the star slice
+var a = parseInt(d.substr((i * 3) % 22, 2), 16);     // 0–255
+var b = parseInt(d.substr((i * 5 + 7) % 22, 2), 16);
+var c = parseInt(d.substr((i * 7 + 13) % 22, 2), 16);
 var hue   = [38, 215, 265, 12][(a + b * (i + 1)) % 4] + (c % 24) - 12;
 var sat   = 45 + (b % 36);          // %
 var light = 17 + (c % 13);          // %
 var alpha = 0.22 + (a % 40) / 170;</code></pre>
+            </div>
+
+            <div class="hw-step" id="neighbours">
+                <div>
+                    <h3><span class="num">Step 5</span>Seeds one star apart</h3>
+                    <p>Two random seeds give unrelated skies, so swapping between them looks like a cut. But Mulberry32 is a counter pushed through a mixer, and the counter goes up by the same amount on every draw. Each star uses five draws. Add five of those steps to the star slice and you get the seed whose star list starts one star later: the same sky, minus its first star, plus one new star at the end.</p>
+                    <p>The animation walks that chain, fading one star out and one in at each step. The nebula has no neighbours like this, so every few seconds it gets new digits and the blobs glide to the new layout.</p>
+                    <p><button class="btn btn--ghost btn--sm" type="button" data-view-anim>View animation</button></p>
+                </div>
+<pre><code>var STEP = 0x6D2B79F5;   // Mulberry32 counter step
+
+// x, y, big roll, and two draws for the size
+var DRAWS_PER_STAR = 5;
+
+function nextSeed(seed) {
+  var state = parseInt(seed.substr(16, 8), 16);
+  state = (state + Math.imul(STEP, DRAWS_PER_STAR)) &gt;&gt;&gt; 0;
+  return seed.substr(0, 16) + hex8(state) + seed.substr(24);
+}</code></pre>
             </div>
         </div>
     </section>
@@ -396,6 +445,68 @@ document.addEventListener('DOMContentLoaded', function () {
                 '<td class="num">1 in ' + Math.round(1 / c.p).toLocaleString() + '</td>';
             rows.appendChild(tr);
         });
+    })();
+
+    // ── Animation view ──
+    // Hides the page, runs the sky through neighbouring seeds, and shows the
+    // seed as it steps. Leaving keeps the sky it stopped on.
+    (function () {
+        if (!Sky.site || !Sky.site.play) return;
+        var opener = document.getElementById('view-anim');
+        var bar = document.createElement('div');
+        bar.className = 'sky-bar';
+        bar.setAttribute('role', 'region');
+        bar.setAttribute('aria-label', 'Sky animation');
+        bar.innerHTML =
+            '<p class="sky-bar-seed" aria-hidden="true"></p>' +
+            '<p class="sky-bar-note">Every step is a real seed. The <span class="star">star digits</span> move on by one star at a time. ' +
+            'The <span class="neb">nebula digits</span> change every few seconds and the colours glide over.</p>' +
+            '<div class="sky-bar-btns">' +
+            '<button class="btn btn--sm" type="button" data-act="toggle">Pause</button>' +
+            '<button class="btn btn--ghost btn--sm" type="button" data-act="exit">Back to page</button>' +
+            '</div>';
+        document.body.appendChild(bar);
+        var seedEl = bar.querySelector('.sky-bar-seed');
+        var toggle = bar.querySelector('[data-act="toggle"]');
+        var root = document.documentElement;
+        var open = false;
+        var from = null;
+
+        function showSeed() {
+            var sd = Sky.site.seed;
+            seedEl.innerHTML = '<span class="neb">' + sd.slice(0, 8) + '</span>' + sd.slice(8, 16) +
+                '<span class="star">' + sd.slice(16, 24) + '</span><span class="neb">' + sd.slice(24) + '</span>';
+        }
+        function setPlaying(on) {
+            if (on) Sky.site.play(); else Sky.site.stop();
+            toggle.textContent = on ? 'Pause' : 'Play';
+        }
+        function enter(e) {
+            if (open) return;
+            open = true;
+            from = e && e.currentTarget ? e.currentTarget : opener;
+            showSeed();
+            root.classList.add('sky-show');
+            setPlaying(true);
+            toggle.focus({ preventScroll: true });
+        }
+        function exit() {
+            if (!open) return;
+            open = false;
+            setPlaying(false);
+            root.classList.remove('sky-show');
+            draw(Sky.site.seed, true);     // the demo and diagram catch up with the sky
+            msg.textContent = 'This is the seed the animation stopped on.';
+            msg.classList.remove('is-bad');
+            if (from) from.focus({ preventScroll: true });
+        }
+
+        opener.addEventListener('click', enter);
+        document.querySelectorAll('[data-view-anim]').forEach(function (b) { b.addEventListener('click', enter); });
+        toggle.addEventListener('click', function () { setPlaying(!Sky.site.playing); });
+        bar.querySelector('[data-act="exit"]').addEventListener('click', exit);
+        document.addEventListener('sky:tick', function () { if (open) showSeed(); });
+        document.addEventListener('keydown', function (e) { if (open && e.key === 'Escape' && !e.defaultPrevented) exit(); });
     })();
 
     var fromHash = location.hash.replace(/^#/, '');
