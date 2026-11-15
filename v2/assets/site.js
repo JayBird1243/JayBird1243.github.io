@@ -16,7 +16,7 @@
 
     var CONTACT = {
         email: 'jack.buhr@gmail.com',
-        linkedin: 'https://linkedin.com/in/jack-buhr',
+        linkedin: 'https://www.linkedin.com/in/jack-buhr-346a20215/',
         github: 'https://github.com/JayBird1243'
     };
 
