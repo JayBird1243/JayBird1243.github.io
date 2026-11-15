@@ -31,7 +31,11 @@
         .seed-input[aria-invalid='true'] { border-color: var(--bad); }
         .seed-msg { min-height: 1.3em; margin: 0.35rem 0 0; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); }
         .seed-msg.is-bad { color: var(--bad); }
-        .sky-stats { margin-top: 0.9rem; }
+        .anim-ctl { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); display: grid; gap: 0.6rem; }
+        .anim-ctl .hist-title, .anim-ctl .seed-msg { margin: 0; }
+        .anim-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.1rem; }
+        .hw-step .anim-ctl { border-top: 0; padding-top: 0; margin-top: 1rem; }
+        .sky-stats { margin-top: 1.1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .sky-stats .stat-num { font-family: var(--mono); font-weight: 500; font-size: 1.35rem; }
 
         .hist-title { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin: 0 0 0.4rem; }
@@ -73,7 +77,11 @@
         .sky-bar-seed { margin: 0; font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.02em; color: var(--text-3); overflow-wrap: anywhere; }
         .sky-bar-seed .neb { color: var(--cool); }
         .sky-bar-seed .star { color: var(--accent); }
-        .sky-bar-note { margin: 0.4rem 0 0.75rem; font-size: 0.84rem; line-height: 1.45; color: var(--text-2); }
+        .sky-bar-seed span.flash { animation: seed-flash 0.9s ease-out; }
+        @keyframes seed-flash { from { color: #fff; text-shadow: 0 0 10px currentColor; } }
+        .sky-bar-note { margin: 0.4rem 0 0.7rem; font-size: 0.84rem; line-height: 1.45; color: var(--text-2); }
+        .sky-bar-note b { font-weight: 500; color: var(--text); }
+        .sky-bar .sky-speed { margin-bottom: 0.8rem; }
         .sky-bar-note .neb { color: var(--cool); }
         .sky-bar-note .star { color: var(--accent); }
         .sky-bar-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -113,10 +121,18 @@
                             <input class="seed-input" id="seed-input" name="seed" type="text" maxlength="40" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="seed-msg">
                             <button class="btn btn--ghost btn--sm" type="submit">Draw</button>
                             <button class="btn btn--sm" type="button" id="new-sky">New sky</button>
-                            <button class="btn btn--ghost btn--sm" type="button" id="view-anim">View animation</button>
                         </div>
                         <p class="seed-msg" id="seed-msg" aria-live="polite">Type or paste a seed, or press New sky.</p>
                     </form>
+                    <div class="anim-ctl">
+                        <p class="hist-title">Animation</p>
+                        <div class="anim-row">
+                            <button class="btn btn--ghost btn--sm" type="button" id="view-anim">View animation</button>
+                            <button class="sky-switch" type="button" data-anim-switch>Animate background</button>
+                        </div>
+                        <div data-speed></div>
+                        <p class="seed-msg">Steps to the next seed over and over. Each step swaps one star. The switch keeps it running behind every page. <a href="#neighbours">How it works</a></p>
+                    </div>
                     <div class="stats sky-stats">
                         <div class="stat stat--accent"><span class="stat-num" id="out-stars">–</span><span class="stat-label">Stars</span></div>
                         <div class="stat"><span class="stat-num" id="out-nodes">–</span><span class="stat-label">Nebula nodes</span></div>
@@ -276,8 +292,14 @@ var alpha = 0.22 + (a % 40) / 170;</code></pre>
                 <div>
                     <h3><span class="num">Step 5</span>Seeds one star apart</h3>
                     <p>Two random seeds give unrelated skies, so swapping between them looks like a cut. But Mulberry32 is a counter pushed through a mixer, and the counter goes up by the same amount on every draw. Each star uses five draws. Add five of those steps to the star slice and you get the seed whose star list starts one star later: the same sky, minus its first star, plus one new star at the end.</p>
-                    <p>The animation walks that chain, fading one star out and one in at each step. The nebula has no neighbours like this, so every few seconds it gets new digits and the blobs glide to the new layout.</p>
-                    <p><button class="btn btn--ghost btn--sm" type="button" data-view-anim>View animation</button></p>
+                    <p>The animation walks that chain. At each step one star fades out and the new one flares in. The nebula has no neighbours like this, so every few seconds it gets new digits and the blobs drift to the new layout. The slider sets how many seeds it steps through each second, from 0.25 to 20.</p>
+                    <div class="anim-ctl">
+                        <div class="anim-row">
+                            <button class="btn btn--ghost btn--sm" type="button" data-view-anim>View animation</button>
+                            <button class="sky-switch" type="button" data-anim-switch>Animate background</button>
+                        </div>
+                        <div data-speed></div>
+                    </div>
                 </div>
 <pre><code>var STEP = 0x6D2B79F5;   // Mulberry32 counter step
 
@@ -447,65 +469,92 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     })();
 
+    // ── Animation controls ──
+    document.querySelectorAll('[data-speed]').forEach(function (el) { el.appendChild(Sky.speedSlider()); });
+    document.querySelectorAll('[data-anim-switch]').forEach(function (b) { Sky.bindPlay(b); });
+
+    // The background can change without the demo: the menu bar's New sky,
+    // or the animation stopping on a seed. The demo follows.
+    document.addEventListener('sky:change', function (e) {
+        if (!e.detail || e.detail.seed === seed) return;
+        draw(e.detail.seed, true);
+        msg.textContent = Sky.site.playing ? 'New seed.' : 'This is the seed the background is showing.';
+        msg.classList.remove('is-bad');
+    });
+
     // ── Animation view ──
-    // Hides the page, runs the sky through neighbouring seeds, and shows the
-    // seed as it steps. Leaving keeps the sky it stopped on.
+    // Hides the page so the sky can be watched on its own, with the seed
+    // shown as it steps. Leaving puts the animation back as it was.
     (function () {
-        if (!Sky.site || !Sky.site.play) return;
         var opener = document.getElementById('view-anim');
         var bar = document.createElement('div');
         bar.className = 'sky-bar';
         bar.setAttribute('role', 'region');
         bar.setAttribute('aria-label', 'Sky animation');
         bar.innerHTML =
-            '<p class="sky-bar-seed" aria-hidden="true"></p>' +
-            '<p class="sky-bar-note">Every step is a real seed. The <span class="star">star digits</span> move on by one star at a time. ' +
-            'The <span class="neb">nebula digits</span> change every few seconds and the colours glide over.</p>' +
+            '<p class="sky-bar-seed" aria-hidden="true"><span class="neb"></span><span></span><span class="star"></span><span class="neb"></span></p>' +
+            '<p class="sky-bar-note">The <span class="star">star digits</span> step <b data-out="rate"></b>: one star fades out and a new one flares in. ' +
+            'The <span class="neb">nebula digits</span> change every <b data-out="neb"></b> and the colours drift to the new layout.</p>' +
             '<div class="sky-bar-btns">' +
             '<button class="btn btn--sm" type="button" data-act="toggle">Pause</button>' +
             '<button class="btn btn--ghost btn--sm" type="button" data-act="exit">Back to page</button>' +
             '</div>';
+        bar.insertBefore(Sky.speedSlider(), bar.querySelector('.sky-bar-btns'));
         document.body.appendChild(bar);
-        var seedEl = bar.querySelector('.sky-bar-seed');
+        var parts = bar.querySelectorAll('.sky-bar-seed span');
         var toggle = bar.querySelector('[data-act="toggle"]');
+        var outRate = bar.querySelector('[data-out="rate"]');
+        var outNeb = bar.querySelector('[data-out="neb"]');
         var root = document.documentElement;
         var open = false;
         var from = null;
+        var wasPlaying = false;
 
         function showSeed() {
             var sd = Sky.site.seed;
-            seedEl.innerHTML = '<span class="neb">' + sd.slice(0, 8) + '</span>' + sd.slice(8, 16) +
-                '<span class="star">' + sd.slice(16, 24) + '</span><span class="neb">' + sd.slice(24) + '</span>';
+            parts[0].textContent = sd.slice(0, 8);
+            parts[1].textContent = sd.slice(8, 16);
+            parts[2].textContent = sd.slice(16, 24);
+            parts[3].textContent = sd.slice(24);
         }
-        function setPlaying(on) {
-            if (on) Sky.site.play(); else Sky.site.stop();
-            toggle.textContent = on ? 'Pause' : 'Play';
+        function showRates() {
+            var v = Sky.site.speed;
+            outRate.textContent = v === 1 ? 'once a second' : v > 1 ? v + ' times a second' : 'once every ' + (Math.round(10 / v) / 10) + ' s';
+            outNeb.textContent = (Math.round(Sky.site.nebulaEvery() / 100) / 10) + ' s';
+        }
+        function flash() {
+            [parts[0], parts[3]].forEach(function (el) {
+                el.classList.remove('flash');
+                void el.offsetWidth;          // restart the CSS animation
+                el.classList.add('flash');
+            });
         }
         function enter(e) {
             if (open) return;
             open = true;
             from = e && e.currentTarget ? e.currentTarget : opener;
+            wasPlaying = Sky.site.playing;
             showSeed();
+            showRates();
             root.classList.add('sky-show');
-            setPlaying(true);
+            Sky.site.play();
             toggle.focus({ preventScroll: true });
         }
         function exit() {
             if (!open) return;
             open = false;
-            setPlaying(false);
+            if (!wasPlaying) Sky.site.stop();
             root.classList.remove('sky-show');
-            draw(Sky.site.seed, true);     // the demo and diagram catch up with the sky
-            msg.textContent = 'This is the seed the animation stopped on.';
-            msg.classList.remove('is-bad');
             if (from) from.focus({ preventScroll: true });
         }
 
         opener.addEventListener('click', enter);
         document.querySelectorAll('[data-view-anim]').forEach(function (b) { b.addEventListener('click', enter); });
-        toggle.addEventListener('click', function () { setPlaying(!Sky.site.playing); });
+        Sky.bindPlay(toggle, ['Play', 'Pause']);
         bar.querySelector('[data-act="exit"]').addEventListener('click', exit);
         document.addEventListener('sky:tick', function () { if (open) showSeed(); });
+        document.addEventListener('sky:nebula', function () { if (open) flash(); });
+        document.addEventListener('sky:speed', showRates);
         document.addEventListener('keydown', function (e) { if (open && e.key === 'Escape' && !e.defaultPrevented) exit(); });
     })();
 
