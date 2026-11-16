@@ -1,143 +1,211 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="../" data-page="projects">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Material Loss Tracking | Jack Buhr</title>
-    <meta name="description" content="End-to-end material-loss tracking tool for a production line: Beckhoff HMI, custom SQL stored procedures, PLC networking and operator training.">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="automation.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="description" content="An end-to-end material loss tracking tool for a production line: TwinCAT HMI, SQL stored procedures, PLC networking and operator training.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
+    <style>
+        /* Automation set: identical block on all four co-op pages */
+        .sub-h { font-family: var(--mono); font-size: 0.72rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin: 0 0 0.9rem; }
+        .fig-gap { margin-top: 1.5rem; }
+        .dg .st .box, .dg .st text, .dg .ed, .dg .pipe, .dg .slot, .dg .row { transition: fill 0.35s ease, stroke 0.35s ease, opacity 0.35s ease; }
+        .dg .st.is-on .box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+        .dg .st.is-on .t-strong { fill: var(--accent); }
+        .dg .st--ok.is-on .box { fill: var(--ok-soft); stroke: var(--ok); }
+        .dg .st--ok.is-on .t-strong { fill: var(--ok); }
+        .dg .st--bad.is-on .box { fill: var(--bad-soft); stroke: var(--bad); }
+        .dg .st--bad.is-on .t-strong { fill: var(--bad); }
+        .dg .ed.is-on { stroke: var(--accent); }
+        .dg .dash { stroke-dasharray: 4 4; }
+        .dg .t-up { letter-spacing: 0.08em; }
+        .dg .slot { fill: var(--bg-2); stroke: var(--line-2); }
+        .dg .slot.is-full { fill: var(--accent); stroke: var(--accent); }
+        .dg .pipe { fill: none; stroke: var(--line-2); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+        .dg .is-act .pipe { stroke: var(--accent); }
+        .dg .is-good .pipe { stroke: var(--ok); }
+        .dg .is-cold .pipe { stroke: var(--cool); }
+        .dg .duct { fill: var(--bg-2); stroke: var(--line-2); }
+        .scroll-hint { display: none; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); margin: -0.4rem 0 0.6rem; }
+        @media (max-width: 680px) { .scroll-hint { display: block; } }
+    </style>
 </head>
 <body>
-    <div id="background-container">
-        <div id="stars-container"></div>
-        <div id="nodes-container"></div>
-    </div>
-
-    <header>
-        <nav>
-            <div class="logo">JB</div>
-            <div id="seed-display" class="seed-display">Seed: </div>
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../projects.html" class="active">Projects</a></li>
-                <li><a href="../skills.html">Skills</a></li>
-            </ul>
-        </nav>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html#automation">← Projects</a>
+        <p class="kicker">Industrial automation · Co-op · 02 / 04</p>
+        <h1>Material Loss Tracking</h1>
+        <p class="lede">Material was going missing on a production line and nobody could say where. I built the tool that found out: the HMI, database procedures, PLC networking and operator training.</p>
+        <dl class="facts">
+            <div><dt>Role</dt><dd>Owned end to end</dd></div>
+            <div><dt>HMI</dt><dd>TwinCAT HMI on a Linux-based kiosk</dd></div>
+            <div><dt>Backend</dt><dd>SQL stored procedures</dd></div>
+            <div><dt>Rollout</dt><dd>Operator training, run by me</dd></div>
+        </dl>
     </header>
 
-    <main id="content-wrapper" class="auto-page">
-        <section class="hero">
-            <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · Co-op <span class="idx">02 / 04</span></div>
-            <h1 class="auto-title">Material Loss Tracking</h1>
-            <p class="auto-deck">Material was going missing on a production line and nobody could say where. I built the tool that found out — HMI, database procedures, PLC networking and operator training, end to end.</p>
-            <ul class="auto-facts" aria-label="At a glance">
-                <li><span class="k">Role</span><span class="v">Owned end to end</span></li>
-                <li><span class="k">HMI</span><span class="v">TwinCAT HMI · Linux based kiosk</span></li>
-                <li><span class="k">Backend</span><span class="v">SQL stored procedures</span></li>
-                <li><span class="k">Rollout</span><span class="v">Operator training sessions, run by me</span></li>
-            </ul>
-            <a href="../projects.html#automation" class="deep-dive-btn">&larr; All automation work</a>
-        </section>
-
-        <ul class="auto-highlights" aria-label="Highlights">
-            <li><span class="n">01</span><strong>Full-stack ownership.</strong> Designed the HMI, wrote the stored procedures, networked the panel to the main line PLC, and trained the operators who use it.</li>
-            <li><span class="n">02</span><strong>Turned "material is going missing" into data.</strong> Every loss is now logged with a reason, at the station where it happened, and is queryable by engineering.</li>
-            <li><span class="n">03</span><strong>Low-friction reporting.</strong> Logging a loss takes two taps from a fixed list of reasons.</li>
+    <div class="wrap">
+        <ul class="keypoints" data-reveal>
+            <li>I designed the HMI, created the stored procedures with IT, networked the panel to the main line PLC and trained the operators.</li>
+            <li>Every loss is logged with a reason at the station where it happened, and engineering can query it.</li>
+            <li>Reporting a loss takes two taps, from a fixed list of reasons.</li>
         </ul>
+    </div>
 
-        <article class="auto-body">
-            <section class="auto-panel">
-                <h2>Problem <span class="tag">context</span></h2>
-                <p>Valualbe material was being lost along the line for unknown reasons. Existing systems simply recorded 'scrapped' statuseswith no reason code. The engineers needed traceable data to improve the process.</p>
-            </section>
+    <div class="wrap" style="margin-top:2.75rem">
+        <figure class="fig">
+            <div class="fig-title">From a tap at the station to an engineering query</div>
+            <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
+            <div class="fig-scroll">
+                <svg class="dg" id="mlt-flow" viewBox="0 0 720 300" role="img" aria-label="Report path. The line PLC sends station and context data to the station HMI. An operator picks a loss reason from a fixed list in two taps. The HMI sends the report to a SQL stored procedure and gets the database's reply back. Engineering queries the losses by station, reason and shift.">
+                    <defs>
+                        <marker id="mlt-arr" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="fill-dim"/></marker>
+                        <marker id="mlt-arr-a" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="fill-accent"/></marker>
+                    </defs>
 
-            <div class="auto-grid-2">
-                <section class="auto-panel">
-                    <h2>What I built <span class="tag">scope</span></h2>
-                    <ol class="auto-steps">
-                        <li><strong>Reporting HMI.</strong> A low-friction flow: pick the loss reason in two taps. If reporting is cumbersome, operators stop reporting, and the data is worthless.</li>
-                        <li><strong>Database layer.</strong> Corresponded with IT to create new SQL stored procedures for inserts and reporting, structured so engineering can query losses by station, reason and shift.</li>
-                        <li><strong>PLC networking.</strong> Connected the HMI to the main line controller for station and context data; configured the network path between panel and PLC.</li>
-                        <li><strong>Database messaging.</strong> A send that times out or is not acknowledged raises an error.</li>
-                        <li><strong>Training.</strong> I ran planned and ran the operator training sessions to get them acquainted with the tool.</li>
-                    </ol>
-                </section>
+                    <!-- PLC context -->
+                    <rect class="box" x="150" y="30" width="120" height="48" rx="6"/>
+                    <text class="t-strong t-mid" x="210" y="51">Line PLC</text>
+                    <text class="t-dim t-mid" x="210" y="67">main controller</text>
+                    <path class="wire" d="M210,78 V130" marker-end="url(#mlt-arr)"/>
+                    <text class="t-dim" x="218" y="108">station + context</text>
 
-                <section class="auto-panel">
-                    <h2>Design decisions <span class="tag">why</span></h2>
-                    <ul>
-                        <li><strong>Report where the loss happens.</strong> Terminals sit at the station, for easy operator access.</li>
-                        <li><strong>Reasons are a fixed list, not free text.</strong> Free text cannot be aggregated; a curated list can be easily queried and analyzed.</li>
-                        <li><strong>Same colour discipline as the rest of the line:</strong> no red or yellow on a non-safety screen, high-contrast primaries for mismatched monitors.</li>
-                    </ul>
-                </section>
+                    <!-- edges -->
+                    <path class="wire ed" data-e="e-op" d="M120,154 H150" marker-end="url(#mlt-arr)"/>
+                    <path class="wire ed" data-e="e-send" d="M270,146 H420" marker-end="url(#mlt-arr)"/>
+                    <path class="wire ed dash" data-e="e-reply" d="M420,164 H270" marker-end="url(#mlt-arr)"/>
+                    <path class="wire ed" data-e="e-eng" d="M540,154 H600" marker-end="url(#mlt-arr)"/>
+                    <text class="t-dim t-mid" x="345" y="137">loss report</text>
+                    <text class="t-dim t-mid" x="345" y="181">reply</text>
+
+                    <!-- main row -->
+                    <g class="st" data-s="op"><rect class="box" x="0" y="130" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="60" y="151">Operator</text><text class="t-dim t-mid" x="60" y="167">at the station</text></g>
+                    <g class="st" data-s="hmi"><rect class="box" x="150" y="130" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="210" y="151">Station HMI</text><text class="t-dim t-mid" x="210" y="167">two taps</text></g>
+                    <g class="st" data-s="sp"><rect class="box" x="420" y="130" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="480" y="151">Stored proc</text><text class="t-dim t-mid" x="480" y="167">SQL Server</text></g>
+                    <g class="st" data-s="eng"><rect class="box" x="600" y="130" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="660" y="151">Engineering</text><text class="t-dim t-mid" x="660" y="167">loss reports</text></g>
+
+                    <text class="t-dim t-mid" x="480" y="196">insert + report</text>
+
+                    <!-- reason list detail -->
+                    <path class="wire wire--dim dash" d="M210,178 V206"/>
+                    <rect class="box" x="150" y="206" width="120" height="86" rx="6"/>
+                    <text class="t-dim t-mid" x="210" y="224">fixed reason list</text>
+                    <rect class="box" x="162" y="234" width="96" height="9" rx="2"/>
+                    <rect class="box box--accent" x="162" y="248" width="96" height="9" rx="2"/>
+                    <rect class="box" x="162" y="262" width="96" height="9" rx="2"/>
+                    <rect class="box" x="162" y="276" width="96" height="9" rx="2"/>
+
+                    <!-- query dimensions -->
+                    <path class="wire wire--dim dash" d="M660,178 V206"/>
+                    <rect class="box" x="600" y="206" width="120" height="22" rx="4"/><text class="t-mid" x="660" y="221">by station</text>
+                    <rect class="box" x="600" y="234" width="120" height="22" rx="4"/><text class="t-mid" x="660" y="249">by reason</text>
+                    <rect class="box" x="600" y="262" width="120" height="22" rx="4"/><text class="t-mid" x="660" y="277">by shift</text>
+                </svg>
             </div>
+            <figcaption>Simplified. The HMI sends each report to a stored procedure and gets the database's reply back (dashed line).</figcaption>
+        </figure>
+    </div>
 
-            <section class="auto-panel">
-                <h2>Outcome <span class="tag">result</span></h2>
-                <p>Engineering was able to identify the most common reasons for material loss, and improve the process to reduce losses.</p>
-            </section>
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>Problem</h2></div>
+        <p class="dim" style="max-width:68ch">Valuable material was being lost along the line for unknown reasons. Existing systems only recorded a "scrapped" status, with no reason code. Engineering needed traceable data to improve the process.</p>
+    </section>
 
-            <div class="auto-grid-2">
-                <section class="auto-panel">
-                    <h2>What I took from it <span class="tag">practice</span></h2>
-                    <p>I was given the opportunity to own the entire project from start to finish, which provided a valuable leanring experience in project management. I was able to interface with people I normally wouldn't connect with, and got to manage parts of the project that I normally wouldn't be involved in.</p>
-                </section>
+    <section class="section wrap">
+        <div class="section-head"><span class="num">02</span><h2>What I built</h2></div>
+        <ol class="steps" style="max-width:72ch">
+            <li>A reporting HMI where the operator picks a loss reason in two taps. If reporting is a chore, operators stop doing it.</li>
+            <li>New SQL stored procedures for inserts and reporting, created with IT, so engineering can query losses by station, reason and shift.</li>
+            <li>The network path between the panel and the main line PLC, which supplies station and context data.</li>
+            <li>Database messaging from the HMI. A send that times out or is not acknowledged raises an error.</li>
+            <li>Operator training sessions, which I planned and ran.</li>
+        </ol>
+    </section>
 
-                <section class="auto-panel">
-                    <h2>Stack <span class="tag">tools</span></h2>
-                    <ul class="auto-stack">
-                        <li>TwinCAT HMI</li>
-                        <li>SQL Server</li>
-                        <li>Stored procedures</li>
-                        <li>PLC networking</li>
-                        <li>Structured Text</li>
-                        <li>Operator-first UX</li>
-                        <li>Operator training</li>
-                    </ul>
-                </section>
-            </div>
-        </article>
+    <section class="section wrap">
+        <div class="section-head"><span class="num">03</span><h2>Design decisions</h2></div>
+        <ul class="list" style="max-width:72ch">
+            <li>Terminals sit at the station, so a loss is reported where it happens.</li>
+            <li>Reasons come from a fixed list, because free text can't be aggregated.</li>
+            <li>The screen follows the line's colour rules: no red or yellow on a non-safety screen, and fully saturated colours that read the same on mismatched monitors.</li>
+        </ul>
+    </section>
 
-        <aside class="auto-nda">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span>Screenshots, tag names and schema details are withheld under my employer's confidentiality agreement. I'm glad to walk through the architecture in conversation.</span>
-        </aside>
+    <section class="section wrap">
+        <div class="section-head"><span class="num">04</span><h2>Result</h2></div>
+        <p class="dim" style="max-width:68ch">Engineering used the data to find the most common causes of material loss and changed the process to reduce them.</p>
+    </section>
 
-        <nav class="auto-casenav" aria-label="Other automation case studies">
-            <a href="PLC-Database-Executor.html" class="prev"><span class="dir">&larr; Previous</span><span class="name">PLC Database Executor</span></a>
-            <a href="Ignition-Temperature-HMI.html" class="next"><span class="dir">Next &rarr;</span><span class="name">Line Temperature HMI</span></a>
+    <section class="section wrap">
+        <div class="section-head"><span class="num">05</span><h2>What I took from it</h2></div>
+        <p class="dim" style="max-width:68ch">I owned the whole project from start to finish, which taught me a lot about project management. I worked with people I normally wouldn't, and managed parts of a project I usually wouldn't be involved in.</p>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">06</span><h2>Stack</h2></div>
+        <ul class="tags">
+            <li>TwinCAT HMI</li>
+            <li>SQL Server</li>
+            <li>Stored procedures</li>
+            <li>PLC networking</li>
+            <li>Structured Text</li>
+            <li>Operator-first UX</li>
+            <li>Operator training</li>
+        </ul>
+    </section>
+
+    <div class="wrap">
+        <p class="note note--quiet">Screenshots, tag names and schema details are withheld under my employer's confidentiality agreement. I'm glad to walk through the architecture in conversation.</p>
+        <nav class="pager" aria-label="Automation projects">
+            <a href="PLC-Database-Executor.html"><span>← Previous</span>PLC Database Executor</a>
+            <a href="Ignition-Temperature-HMI.html"><span>Next →</span>Line Temperature HMI</a>
         </nav>
-    </main>
+    </div>
+</main>
 
-    <footer id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-field">
-                <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
-                <span class="footer-label">stars</span>
-            </div>
-            <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
-                <span class="footer-label">nodes</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
-            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                new sky
-            </button>
-        </div>
-    </footer>
+<script>
+(function () {
+    var svg = document.getElementById('mlt-flow');
+    if (!svg) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
 
-    <script src="../script.js"></script>
+    var st = {}, ed = {};
+    svg.querySelectorAll('.st').forEach(function (g) { st[g.getAttribute('data-s')] = g; });
+    svg.querySelectorAll('.ed').forEach(function (p) { ed[p.getAttribute('data-e')] = p; });
+
+    // One report: operator -> HMI -> stored procedure, reply back, then engineering.
+    var seq = [['op', 'e-op'], ['hmi'], ['e-send'], ['sp'], ['e-reply'], ['hmi'], ['e-eng', 'eng'], [], []];
+    var i = 0, timer = null;
+    function flash(keys) {
+        keys.forEach(function (k) {
+            var el = st[k] || ed[k];
+            el.classList.add('is-on');
+            if (ed[k]) ed[k].setAttribute('marker-end', 'url(#mlt-arr-a)');
+            setTimeout(function () {
+                el.classList.remove('is-on');
+                if (ed[k]) ed[k].setAttribute('marker-end', 'url(#mlt-arr)');
+            }, 600);
+        });
+    }
+    function tick() {
+        flash(seq[i]);
+        i = (i + 1) % seq.length;
+        timer = setTimeout(tick, 650);
+    }
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (e.isIntersecting && !timer) { i = 0; tick(); }
+            else if (!e.isIntersecting && timer) { clearTimeout(timer); timer = null; }
+        });
+    }, { threshold: 0.3 });
+    io.observe(svg);
+})();
+</script>
 </body>
 </html>

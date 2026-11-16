@@ -1,851 +1,218 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="../" data-page="projects">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Alpine Charge | Jack Buhr</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Karla:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <meta name="description" content="Alpine Charge, a startup I co-founded that rents portable phone chargers to hikers from self-serve kiosks at trailheads in Lions Bay, BC.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
     <style>
-        .alpine-page {
-            --alpine-ink: oklch(0.93 0.02 155);
-            --alpine-muted: oklch(0.78 0.03 155);
-            --alpine-faint: oklch(0.62 0.035 155);
-            --alpine-panel: oklch(0.17 0.025 155 / 0.9);
-            --alpine-mint: oklch(0.86 0.09 165);
-            --alpine-forest: oklch(0.38 0.08 155);
-            --alpine-moss: oklch(0.55 0.09 150);
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            font-family: 'Karla', sans-serif;
-            color: var(--alpine-ink);
-        }
-
-        .alpine-page .hero {
-            max-width: 980px;
-            margin: 0 auto clamp(2rem, 6vw, 4rem);
-            text-align: left;
-        }
-
-        .alpine-page h1,
-        .alpine-page h2 {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-
-        .case-kicker {
-            color: var(--alpine-mint);
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.95rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .case-title {
-            font-size: clamp(2.8rem, 8vw, 5.8rem);
-            line-height: 0.92;
-            margin: 0.5rem 0 1rem;
-            color: var(--alpine-ink);
-        }
-
-        .case-deck {
-            max-width: 68ch;
-            color: var(--alpine-muted);
-            font-size: clamp(1.05rem, 2vw, 1.28rem);
-            line-height: 1.65;
-            margin: 0 0 1.25rem;
-        }
-
-        .case-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin: 0 0 1.35rem;
-        }
-
-        .meta-chip {
-            border: 1px solid oklch(0.42 0.06 155);
-            background: oklch(0.2 0.03 155 / 0.7);
-            border-radius: 4px;
-            color: var(--alpine-muted);
-            font-size: 0.85rem;
-            padding: 0.4rem 0.75rem;
-        }
-
-        .alpine-page .deep-dive-btn {
-            background-color: var(--alpine-forest);
-            color: var(--alpine-ink);
-        }
-
-        .alpine-page .deep-dive-btn:hover {
-            background-color: var(--alpine-moss);
-        }
-
-        .gallery-section {
-            max-width: 1200px;
-            margin: 0 auto clamp(2.5rem, 6vw, 4rem);
-            opacity: 0;
-            transform: translateY(16px);
-            animation: alpineReveal 0.75s var(--ease-out-expo) 0.12s forwards;
-        }
-
-        .alpine-body {
-            max-width: 72ch;
-            margin: 0 auto clamp(2.5rem, 6vw, 4rem);
-        }
-
-        .alpine-panel {
-            background:
-                radial-gradient(ellipse 70% 55% at 100% 0%, oklch(0.45 0.1 165 / 0.18), transparent 55%),
-                var(--alpine-panel);
-            border: 1px solid oklch(0.36 0.05 155);
-            border-radius: 6px;
-            padding: clamp(1.4rem, 3vw, 2.25rem);
-            opacity: 0;
-            transform: translateY(16px);
-            animation: alpineReveal 0.75s var(--ease-out-expo) 0.28s forwards;
-        }
-
-        .alpine-panel p {
-            color: var(--alpine-muted);
-            font-size: 1.05rem;
-            line-height: 1.75;
-            margin: 0 0 1.15rem;
-            max-width: 68ch;
-        }
-
-        .alpine-panel p:last-child {
-            margin-bottom: 0;
-        }
-
-        .gallery-header {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: var(--space-md);
-            margin-bottom: var(--space-lg);
-            padding: 0 0.25rem;
-        }
-
-        .gallery-header h2 {
-            margin: 0;
-            font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-            color: var(--alpine-ink);
-            line-height: 1.1;
-        }
-
-        .gallery-hint {
-            color: var(--alpine-faint);
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-
-        .gallery-track-wrap {
-            position: relative;
-        }
-
-        .gallery-track-wrap::before,
-        .gallery-track-wrap::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 10px;
-            width: 48px;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .gallery-track-wrap::before {
-            left: 0;
-            background: linear-gradient(90deg, oklch(0.12 0.02 155 / 0.95), transparent);
-        }
-
-        .gallery-track-wrap::after {
-            right: 0;
-            background: linear-gradient(270deg, oklch(0.12 0.02 155 / 0.95), transparent);
-        }
-
-        .gallery-track {
-            display: flex;
-            gap: var(--space-md);
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.25rem var(--space-md) 0.75rem;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .gallery-track::-webkit-scrollbar {
-            display: none;
-        }
-
-        .gallery-item {
-            flex: 0 0 auto;
-            width: min(280px, 72vw);
-            aspect-ratio: 4 / 3;
-            padding: 0;
-            border: 1px solid oklch(0.38 0.05 155);
-            border-radius: 6px;
-            overflow: hidden;
-            background: oklch(0.14 0.02 155);
-            cursor: zoom-in;
-            transition: border-color 0.25s var(--ease-out-expo), transform 0.25s var(--ease-out-expo);
-        }
-
-        .gallery-item:hover,
-        .gallery-item:focus-visible {
-            border-color: var(--alpine-mint);
-            transform: translateY(-3px);
-            outline: none;
-        }
-
-        .gallery-item img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.35s var(--ease-out-expo);
-        }
-
-        .gallery-item.is-graphic {
-            background: oklch(0.12 0.02 155);
-        }
-
-        .gallery-item.is-graphic img {
-            object-fit: contain;
-            padding: 0.75rem;
-        }
-
-        .gallery-item:hover img,
-        .gallery-item:focus-visible img {
-            transform: scale(1.04);
-        }
-
-        /* Lightbox */
-        .lightbox {
-            position: fixed;
-            inset: 0;
-            z-index: 2000;
-            display: grid;
-            place-items: center;
-            padding: var(--space-lg);
-            background: oklch(0.08 0.02 155 / 0.92);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.3s var(--ease-out-expo), visibility 0.3s;
-        }
-
-        .lightbox.is-open {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-
-        .lightbox-figure {
-            margin: 0;
-            max-width: min(1100px, 92vw);
-            max-height: 82vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-md);
-            transform: scale(0.96);
-            transition: transform 0.35s var(--ease-out-expo);
-        }
-
-        .lightbox.is-open .lightbox-figure {
-            transform: scale(1);
-        }
-
-        .lightbox-figure img {
-            display: block;
-            max-width: 100%;
-            max-height: 72vh;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            border: 1px solid oklch(0.4 0.05 155);
-            border-radius: 4px;
-            background: oklch(0.12 0.02 155);
-        }
-
-        .lightbox-caption {
-            color: var(--alpine-faint);
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 0.95rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .lightbox-btn {
-            position: absolute;
-            top: 50%;
-            translate: 0 -50%;
-            width: 48px;
-            height: 48px;
-            border: 1px solid oklch(0.45 0.06 155);
-            border-radius: 50%;
-            background: oklch(0.18 0.03 155 / 0.9);
-            color: var(--alpine-mint);
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            opacity: 0;
-            transform: scale(0.85);
-            transition: opacity 0.25s var(--ease-out-expo), transform 0.25s var(--ease-out-expo), background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .lightbox.is-open .lightbox-btn {
-            opacity: 1;
-            transform: scale(1);
-            transition-delay: 0.12s;
-        }
-
-        .lightbox-btn:hover,
-        .lightbox-btn:focus-visible {
-            background: var(--alpine-forest);
-            border-color: var(--alpine-mint);
-            outline: none;
-        }
-
-        .lightbox-prev {
-            left: max(1rem, 3vw);
-        }
-
-        .lightbox-next {
-            right: max(1rem, 3vw);
-        }
-
-        .lightbox-close {
-            top: max(1rem, 3vw);
-            right: max(1rem, 3vw);
-            translate: 0;
-        }
-
-        .lightbox.is-open .lightbox-close {
-            transition-delay: 0.08s;
-        }
-
-        @keyframes alpineReveal {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 720px) {
-            .alpine-page .hero {
-                text-align: center;
-            }
-
-            .case-deck {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .case-meta {
-                justify-content: center;
-            }
-
-            .gallery-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .gallery-hint {
-                white-space: normal;
-            }
-
-            .lightbox-btn {
-                width: 42px;
-                height: 42px;
-            }
-
-            .lightbox-prev {
-                left: 0.5rem;
-            }
-
-            .lightbox-next {
-                right: 0.5rem;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .alpine-panel,
-            .gallery-section {
-                animation: none;
-                opacity: 1;
-                transform: none;
-            }
-
-            .gallery-item,
-            .gallery-item img,
-            .lightbox,
-            .lightbox-figure,
-            .lightbox-btn {
-                transition: none;
-            }
-        }
-
-        /* ══════════════════════════════════════════════════════════════
-           PHONE LAYER — matches the breakpoints used by style.css so the
-           whole site scales consistently. Nothing below fires above 768px,
-           so the desktop layout is untouched.
-           ══════════════════════════════════════════════════════════════ */
-
-        @media (max-width: 768px) {
-            /* 0.95rem + 0.18em tracking ran the kicker edge-to-edge and
-               wrapped mid-phrase. */
-            .case-kicker {
-                font-size: 0.68rem;
-                letter-spacing: 0.13em;
-            }
-
-            .case-deck {
-                font-size: 0.9rem;
-                line-height: 1.55;
-                margin-bottom: 1rem;
-            }
-
-            .case-meta {
-                gap: 0.4rem;
-                margin-bottom: 0.9rem;
-            }
-
-            .meta-chip {
-                font-size: 0.72rem;
-                padding: 0.28rem 0.55rem;
-            }
-
-            /* Shared button is desktop-scaled (12px/24px, bold). */
-            .alpine-page .deep-dive-btn {
-                font-size: 0.82rem;
-                padding: 0.5rem 0.95rem;
-                margin-top: 0.5rem;
-            }
-
-            /* Section rhythm: the clamp() floors (2rem / 2.5rem) are a lot of
-               dead space on a 812px-tall screen. */
-            .alpine-page .hero,
-            .gallery-section,
-            .alpine-body {
-                margin-bottom: 1.75rem;
-            }
-
-            .gallery-header {
-                gap: 0.1rem;
-                margin-bottom: 0.8rem;
-                padding: 0;
-            }
-
-            .gallery-header h2 {
-                font-size: 1.35rem;
-            }
-
-            .gallery-hint {
-                font-size: 0.75rem;
-            }
-
-            /* 48px fades on each side masked 28% of a 343px-wide track. */
-            .gallery-track-wrap::before,
-            .gallery-track-wrap::after {
-                width: 20px;
-            }
-
-            .gallery-track {
-                gap: 10px;
-                padding: 0.2rem 10px 0.6rem;
-            }
-
-            /* 280px showed barely one card, so the strip did not read as a
-               scrollable carousel. Smaller cards give a clear second peek. */
-            .gallery-item {
-                width: min(196px, 56vw);
-                border-radius: 5px;
-            }
-
-            .gallery-item.is-graphic img {
-                padding: 0.45rem;
-            }
-
-            .alpine-panel {
-                padding: 1.1rem 1rem;
-            }
-
-            .alpine-panel p {
-                font-size: 0.9rem;
-                line-height: 1.62;
-                margin-bottom: 1rem;
-            }
-
-            /* Lightbox: smaller chrome so the controls stop covering the
-               photo, and room for the caption under it. */
-            .lightbox {
-                padding: 0.75rem;
-            }
-
-            .lightbox-figure {
-                max-width: 100%;
-                max-height: 78vh;
-                gap: 0.6rem;
-            }
-
-            .lightbox-figure img {
-                max-height: 66vh;
-            }
-
-            .lightbox-caption {
-                font-size: 0.78rem;
-                letter-spacing: 0.1em;
-            }
-
-            .lightbox-btn {
-                width: 36px;
-                height: 36px;
-            }
-
-            .lightbox-btn svg {
-                width: 15px;
-                height: 15px;
-            }
-
-            .lightbox-prev {
-                left: 0.4rem;
-            }
-
-            .lightbox-next {
-                right: 0.4rem;
-            }
-
-            .lightbox-close {
-                top: 0.6rem;
-                right: 0.6rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .gallery-item {
-                width: min(176px, 54vw);
-            }
-
-            .alpine-panel p {
-                font-size: 0.88rem;
-            }
-        }
-
-        /* Phone held sideways: 812px wide misses the 768px breakpoint, so the
-           desktop type scale applies against a 375px-tall viewport. Only the
-           vertical rhythm and the fixed-position lightbox need compacting. */
-        @media (orientation: landscape) and (max-height: 540px) {
-            .case-deck {
-                font-size: 1rem;
-                line-height: 1.5;
-            }
-
-            .alpine-page .hero,
-            .gallery-section,
-            .alpine-body {
-                margin-bottom: 1.5rem;
-            }
-
-            .gallery-item {
-                width: min(210px, 28vw);
-            }
-
-            .lightbox {
-                padding: 0.5rem;
-            }
-
-            .lightbox-figure {
-                max-height: 88vh;
-                gap: 0.35rem;
-            }
-
-            .lightbox-figure img {
-                max-height: 74vh;
-            }
-
-            .lightbox-caption {
-                font-size: 0.72rem;
-            }
-
-            .lightbox-btn {
-                width: 34px;
-                height: 34px;
-            }
-
-            .lightbox-close {
-                top: 0.5rem;
-                right: 0.5rem;
-            }
-        }
-
-        /* Touch: the lift/zoom is hover-only, and a tap leaves it stuck on.
-           Focus-visible keeps its own treatment for keyboard users. */
-        @media (hover: none) {
-            .gallery-item:hover,
-            .gallery-item:hover img {
-                transform: none;
-            }
+        /* Hero photo: a one-item gallery so it opens in the shared lightbox. */
+        .ac-hero { grid-template-columns: minmax(0, 1fr); }
+        .ac-hero button { aspect-ratio: 4 / 5; }
+        .ac-hero img { object-position: 50% 20%; }
+        .ac-hero-cap { margin-top: 0.7rem; font-family: var(--mono); font-size: 0.74rem; line-height: 1.5; color: var(--text-3); }
+        .ac-gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        @media (max-width: 620px) { .ac-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        /* Lifecycle diagram: wide version on desktop, stacked version on phones. */
+        .fig > svg.ac-life-tall { display: none; }
+        @media (max-width: 620px) {
+            .fig > svg.ac-life-wide { display: none; }
+            .fig > svg.ac-life-tall { display: block; max-width: 380px; margin-inline: auto; }
         }
     </style>
 </head>
 <body>
-    <div id="background-container">
-        <div id="stars-container"></div>
-        <div id="nodes-container"></div>
-    </div>
-
-    <header>
-        <nav>
-            <div class="logo">JB</div>
-            <div id="seed-display" class="seed-display">Seed: </div>
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../projects.html" class="active">Projects</a></li>
-                <li><a href="../skills.html">Skills</a></li>
-            </ul>
-        </nav>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html">← Projects</a>
+        <p class="kicker">Startup · Trailhead hardware</p>
+        <h1>Alpine Charge</h1>
+        <p class="lede">I co-founded Alpine Charging Solutions Inc. in March 2026. We run self-serve kiosks at trailheads that rent portable phone chargers to hikers, under a municipal contract with the Village of Lions Bay, BC.</p>
+        <dl class="facts">
+            <div><dt>Role</dt><dd>Co-founder</dd></div>
+            <div><dt>Founded</dt><dd>March 2026</dd></div>
+            <div><dt>Where</dt><dd>Lions Bay, BC</dd></div>
+            <div><dt>Status</dt><dd><span class="lamp pulse"></span>Operating</dd></div>
+        </dl>
     </header>
 
-    <main id="content-wrapper" class="alpine-page">
-        <section class="hero">
-            <div class="case-kicker">Startup · Trailhead infrastructure</div>
-            <h1 class="case-title">Alpine Charge</h1>
-            <p class="case-deck">Co-founded a BC startup that keeps hikers powered at the trailhead; we provide autonomous charging kiosks, municipal partnerships, and industrial IoT remote management.</p>
-            <div class="case-meta">
-                <span class="meta-chip">Founded Mar 2026</span>
-                <span class="meta-chip">Lions Bay, BC</span>
-                <span class="meta-chip">Active operations</span>
-            </div>
-            <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
-        </section>
-
-        <section class="gallery-section" aria-labelledby="gallery-heading">
-            <div class="gallery-header">
-                <h2 id="gallery-heading">Gallery</h2>
-                <span class="gallery-hint">Click to enlarge</span>
-            </div>
-            <div class="gallery-track-wrap">
-                <div class="gallery-track" role="list" id="alpine-gallery" aria-label="Alpine Charge photo gallery">
-                    <button type="button" class="gallery-item is-graphic" role="listitem" data-index="0" aria-label="View station rendering">
-                        <img src="../Images/Galleries/Alpine%20Charge/Station.png" alt="Alpine Charge trailhead charging station" loading="eager" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item is-graphic" role="listitem" data-index="1" aria-label="View product label">
-                        <img src="../Images/Galleries/Alpine%20Charge/Label-cornercut.png" alt="Alpine Charge product label design" loading="lazy" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item is-graphic" role="listitem" data-index="2" aria-label="View kiosk screen design">
-                        <img src="../Images/Galleries/Alpine%20Charge/Alpine%20Screen%201.2%20copy%20(1).png" alt="Alpine Charge kiosk screen interface" loading="lazy" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item" role="listitem" data-index="3" aria-label="View trailhead installation photo 1">
-                        <img src="../Images/Galleries/Alpine%20Charge/20260326_105125.jpg" alt="Alpine Charge kiosk installed at a trailhead" loading="lazy" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item" role="listitem" data-index="4" aria-label="View trailhead installation photo 2">
-                        <img src="../Images/Galleries/Alpine%20Charge/20260326_105143.jpg" alt="Close-up of Alpine Charge trailhead kiosk" loading="lazy" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item" role="listitem" data-index="5" aria-label="View evening trailhead photo">
-                        <img src="../Images/Galleries/Alpine%20Charge/20260323_201846.jpg" alt="Alpine Charge kiosk at dusk" loading="lazy" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item" role="listitem" data-index="6" aria-label="View trailhead context photo">
-                        <img src="../Images/Galleries/Alpine%20Charge/20260328_200045.jpg" alt="Alpine Charge station in trailhead setting" loading="lazy" width="560" height="420">
-                    </button>
-                    <button type="button" class="gallery-item" role="listitem" data-index="7" aria-label="View field installation photo">
-                        <img src="../Images/Galleries/Alpine%20Charge/20250908_172455.jpg" alt="Alpine Charge field installation" loading="lazy" width="560" height="420">
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <article class="alpine-body">
-            <section class="alpine-panel">
-                <p>In March 2026, I co-founded Alpine Charge (Alpine Charging Solutions Inc.), a BC-based startup dedicated to keeping hikers safe and connected. We provide portable phone chargers via autonomous kiosks installed directly at popular trailheads (see gallery for photos).</p>
-                <p>Managing this venture has involved overseeing the entire product lifecycle; from negotiating hardware procurement with international suppliers to drafting and securing a municipal contract with the Village of Lions Bay. We coordinated directly with local public works and electrical departments to ensure seamless installation. The kiosks are powered by industrial IoT networking for remote management, featuring in-house designed branding and signage.</p>
-                <p>We are currently in the active operations phase, continuously monitoring and optimizing the project's performance.</p>
-            </section>
-        </article>
-    </main>
-
-    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Image gallery viewer">
-        <button type="button" class="lightbox-btn lightbox-close" id="lightbox-close" aria-label="Close gallery">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-        <button type="button" class="lightbox-btn lightbox-prev" id="lightbox-prev" aria-label="Previous image">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <figure class="lightbox-figure">
-            <img id="lightbox-image" src="" alt="">
-            <figcaption class="lightbox-caption" id="lightbox-caption"></figcaption>
-        </figure>
-        <button type="button" class="lightbox-btn lightbox-next" id="lightbox-next" aria-label="Next image">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
+    <div class="wrap">
+        <ul class="keypoints" data-reveal>
+            <li>We drafted and secured a contract with the Village of Lions Bay to put kiosks at the trailhead.</li>
+            <li>We sourced the kiosks from international suppliers and installed them with the village's public works and electrical departments.</li>
+            <li>The kiosks are managed remotely over an industrial IoT network and are operating today.</li>
+        </ul>
     </div>
 
-    <footer id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-field">
-                <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>At the trailhead</h2></div>
+        <div class="split split--center">
+            <div data-reveal>
+                <div class="gallery ac-hero">
+                    <button type="button" data-full="../assets/img/alpine/photo-3.jpg" data-caption="A kiosk installed at the trailhead">
+                        <img src="../assets/img/alpine/photo-3.jpg" alt="Black Alpine Charge kiosk on a concrete pad at a forested trailhead, with a screen on top, three bays of power banks and a card terminal on the side">
+                    </button>
+                </div>
+                <p class="ac-hero-cap">A kiosk installed at the trailhead: screen on top, three bays of power banks, card terminal on the side.</p>
             </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
-                <span class="footer-label">stars</span>
+            <div data-reveal style="--d:2">
+                <p class="dim">Hikers rent a power bank at the start of the trail and return it to the kiosk afterwards. The kiosk runs unattended.</p>
+                <ol class="steps mt-2">
+                    <li>Pay at the card terminal on the side of the kiosk.</li>
+                    <li>The kiosk unlocks a power bank from one of its bays.</li>
+                    <li>Take it on the trail. Lightning, USB-C and Micro USB cables are built in.</li>
+                    <li>Return it to any empty slot and push it in until it locks.</li>
+                </ol>
+                <p class="dim mt-2">We designed the branding in-house: the logo, the screen artwork, the signage and the label on each power bank.</p>
             </div>
-            <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
-                <span class="footer-label">nodes</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
-            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                new sky
+        </div>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">02</span><h2>What I handled</h2></div>
+        <p class="section-intro">As co-founder I oversaw the whole product lifecycle, from buying hardware to keeping it running.</p>
+
+        <figure class="fig">
+            <svg class="dg ac-life-wide" viewBox="0 0 720 196" role="img" aria-label="Lifecycle: procurement from international suppliers, municipal contract with the Village of Lions Bay, installation with public works and electrical departments, remote management over an industrial IoT network, then active operations. Branding and signage were designed in-house alongside.">
+                <defs>
+                    <marker id="acw-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-accent"/></marker>
+                </defs>
+                <!-- connectors -->
+                <path class="wire wire--accent draw" pathLength="1" d="M122 70 H146" marker-end="url(#acw-arr)" style="--d:1"/>
+                <path class="wire wire--accent draw" pathLength="1" d="M272 70 H296" marker-end="url(#acw-arr)" style="--d:2"/>
+                <path class="wire wire--accent draw" pathLength="1" d="M422 70 H446" marker-end="url(#acw-arr)" style="--d:3"/>
+                <path class="wire wire--accent draw" pathLength="1" d="M572 70 H596" marker-end="url(#acw-arr)" style="--d:4"/>
+
+                <g class="pop" style="--d:0">
+                    <rect class="box box--accent" x="2" y="20" width="120" height="100" rx="6"/>
+                    <text x="14" y="42" class="t-accent">01</text>
+                    <text x="14" y="64" class="t-strong">Procurement</text>
+                    <text x="14" y="88" class="t-dim">kiosks from</text>
+                    <text x="14" y="103" class="t-dim">intl. suppliers</text>
+                </g>
+                <g class="pop" style="--d:1">
+                    <rect class="box box--accent" x="152" y="20" width="120" height="100" rx="6"/>
+                    <text x="164" y="42" class="t-accent">02</text>
+                    <text x="164" y="64" class="t-strong">Contract</text>
+                    <text x="164" y="88" class="t-dim">Village of</text>
+                    <text x="164" y="103" class="t-dim">Lions Bay</text>
+                </g>
+                <g class="pop" style="--d:2">
+                    <rect class="box box--accent" x="302" y="20" width="120" height="100" rx="6"/>
+                    <text x="314" y="42" class="t-accent">03</text>
+                    <text x="314" y="64" class="t-strong">Installation</text>
+                    <text x="314" y="88" class="t-dim">public works,</text>
+                    <text x="314" y="103" class="t-dim">electrical dept.</text>
+                </g>
+                <g class="pop" style="--d:3">
+                    <rect class="box box--accent" x="452" y="20" width="120" height="100" rx="6"/>
+                    <text x="464" y="42" class="t-accent">04</text>
+                    <text x="464" y="64" class="t-strong">Remote mgmt</text>
+                    <text x="464" y="88" class="t-dim">industrial IoT</text>
+                    <text x="464" y="103" class="t-dim">network</text>
+                </g>
+                <g class="pop" style="--d:4">
+                    <rect class="box box--ok" x="602" y="20" width="116" height="100" rx="6"/>
+                    <text x="614" y="42" class="t-ok">05</text>
+                    <text x="614" y="64" class="t-strong">Operations</text>
+                    <circle cx="619" cy="84" r="4" class="fill-ok pulse"/>
+                    <text x="629" y="88" class="t-ok">active</text>
+                </g>
+
+                <!-- branding runs alongside every stage -->
+                <g class="pop" style="--d:5">
+                    <rect class="box box--ghost" x="2" y="144" width="716" height="40" rx="6"/>
+                    <text x="16" y="168">Alongside</text>
+                    <text x="104" y="168" class="t-dim">branding, logo, kiosk screen artwork, signage and power bank labels, all designed in-house</text>
+                </g>
+            </svg>
+
+            <svg class="dg ac-life-tall" viewBox="0 0 340 520" role="img" aria-label="Lifecycle: procurement, municipal contract with the Village of Lions Bay, installation with public works and electrical departments, remote management over an industrial IoT network, then active operations. Branding designed in-house alongside.">
+                <defs>
+                    <marker id="act-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-accent"/></marker>
+                </defs>
+                <path class="wire wire--accent" d="M40 64 V80" marker-end="url(#act-arr)"/>
+                <path class="wire wire--accent" d="M40 148 V164" marker-end="url(#act-arr)"/>
+                <path class="wire wire--accent" d="M40 232 V248" marker-end="url(#act-arr)"/>
+                <path class="wire wire--accent" d="M40 316 V332" marker-end="url(#act-arr)"/>
+
+                <rect class="box box--accent" x="2" y="2" width="336" height="62" rx="6"/>
+                <text x="16" y="28" class="t-accent">01</text>
+                <text x="48" y="28" class="t-strong">Procurement</text>
+                <text x="48" y="48" class="t-dim">kiosks from international suppliers</text>
+
+                <rect class="box box--accent" x="2" y="86" width="336" height="62" rx="6"/>
+                <text x="16" y="112" class="t-accent">02</text>
+                <text x="48" y="112" class="t-strong">Municipal contract</text>
+                <text x="48" y="132" class="t-dim">Village of Lions Bay</text>
+
+                <rect class="box box--accent" x="2" y="170" width="336" height="62" rx="6"/>
+                <text x="16" y="196" class="t-accent">03</text>
+                <text x="48" y="196" class="t-strong">Installation</text>
+                <text x="48" y="216" class="t-dim">with public works and electrical</text>
+
+                <rect class="box box--accent" x="2" y="254" width="336" height="62" rx="6"/>
+                <text x="16" y="280" class="t-accent">04</text>
+                <text x="48" y="280" class="t-strong">Remote management</text>
+                <text x="48" y="300" class="t-dim">industrial IoT network</text>
+
+                <rect class="box box--ok" x="2" y="338" width="336" height="62" rx="6"/>
+                <text x="16" y="364" class="t-ok">05</text>
+                <text x="48" y="364" class="t-strong">Operations</text>
+                <circle cx="52" cy="380" r="4" class="fill-ok pulse"/>
+                <text x="62" y="384" class="t-ok">active</text>
+
+                <rect class="box box--ghost" x="2" y="428" width="336" height="80" rx="6"/>
+                <text x="16" y="454">Alongside</text>
+                <text x="16" y="475" class="t-dim">branding, logo, screen artwork,</text>
+                <text x="16" y="492" class="t-dim">signage and labels, designed in-house</text>
+            </svg>
+            <figcaption>The stages I worked through, in order. Branding ran alongside all of them.</figcaption>
+        </figure>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">03</span><h2>Photos</h2><span class="aside">Tap to enlarge</span></div>
+        <div class="gallery ac-gallery">
+            <button type="button" data-full="../assets/img/alpine/photo-4.jpg" data-caption="The kiosk on its pad beside the gravel access road">
+                <img src="../assets/img/alpine/photo-4.jpg" alt="Wider view of the kiosk on a concrete pad beside a gravel road in the forest" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/photo-1.jpg" data-caption="Opened up before installation: controller at the top, a circuit board for each of the three bays">
+                <img src="../assets/img/alpine/photo-1.jpg" alt="Kiosk standing indoors with its side door open, showing a metal controller box at the top and three blue circuit boards below" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/photo-5.jpg" data-caption="The screen at night during setup, showing offline while it connects to the server">
+                <img src="../assets/img/alpine/photo-5.jpg" alt="Kiosk screen glowing in the dark with an Offline badge over the rental artwork" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/kiosk-screen.jpg" data-caption="Screen artwork designed in-house">
+                <img src="../assets/img/alpine/kiosk-screen.jpg" alt="Green kiosk screen artwork reading Don't Run Out, Rent a Power Bank, with a hiker photo, how-it-works steps and included cables" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/label.png" data-caption="Power bank label designed in-house, with rental and return terms and a support QR code">
+                <img src="../assets/img/alpine/label.png" alt="Dark green power bank label with the Alpine Charge logo, rental and returns sections and a support QR code" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/photo-2.jpg" data-caption="Label sheets printed and ready to cut">
+                <img src="../assets/img/alpine/photo-2.jpg" alt="Printed sheets of Alpine Charge labels spread on a wooden table next to a paper cutter" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine/station.jpg" data-caption="Studio image of the kiosk model">
+                <img src="../assets/img/alpine/station.jpg" alt="Black charging kiosk photographed against a black background" loading="lazy">
+            </button>
+            <button type="button" data-full="../assets/img/alpine-logo.png" data-caption="The Alpine Charge logo">
+                <img src="../assets/img/alpine-logo.png" alt="Alpine Charge logo: a green battery wearing ski goggles, smiling, with a lightning bolt" loading="lazy">
             </button>
         </div>
-    </footer>
 
-    <script>
-        (function () {
-            const track = document.getElementById('alpine-gallery');
-            const originals = Array.from(track.querySelectorAll('.gallery-item'));
-            const lightbox = document.getElementById('lightbox');
-            const lightboxImage = document.getElementById('lightbox-image');
-            const lightboxCaption = document.getElementById('lightbox-caption');
-            const btnClose = document.getElementById('lightbox-close');
-            const btnPrev = document.getElementById('lightbox-prev');
-            const btnNext = document.getElementById('lightbox-next');
-            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const speed = 0.35;
-            let current = 0;
-            let lastFocus = null;
-            let paused = false;
-            let resumeTimer = null;
-
-            // Duplicate slides for a seamless loop
-            originals.forEach(function (el) {
-                const clone = el.cloneNode(true);
-                clone.setAttribute('aria-hidden', 'true');
-                clone.tabIndex = -1;
-                clone.dataset.clone = 'true';
-                track.appendChild(clone);
-            });
-
-            const items = originals;
-
-            function pauseAuto() {
-                paused = true;
-                clearTimeout(resumeTimer);
-            }
-
-            function scheduleResume(delay) {
-                clearTimeout(resumeTimer);
-                resumeTimer = setTimeout(function () {
-                    if (!lightbox.classList.contains('is-open')) paused = false;
-                }, delay);
-            }
-
-            function tick() {
-                if (!reduceMotion && !paused && track.scrollWidth > track.clientWidth) {
-                    track.scrollLeft += speed;
-                    const loopAt = track.scrollWidth / 2;
-                    if (track.scrollLeft >= loopAt) {
-                        track.scrollLeft -= loopAt;
-                    }
-                }
-                requestAnimationFrame(tick);
-            }
-
-            track.addEventListener('pointerenter', pauseAuto);
-            track.addEventListener('pointerleave', function () { scheduleResume(400); });
-            track.addEventListener('focusin', pauseAuto);
-            track.addEventListener('focusout', function () { scheduleResume(400); });
-            track.addEventListener('wheel', function () {
-                pauseAuto();
-                scheduleResume(1800);
-            }, { passive: true });
-            track.addEventListener('touchstart', function () {
-                pauseAuto();
-            }, { passive: true });
-            track.addEventListener('touchend', function () { scheduleResume(1800); });
-
-            if (!reduceMotion) requestAnimationFrame(tick);
-
-            function getSlide(index) {
-                const btn = items[index];
-                const img = btn.querySelector('img');
-                return {
-                    src: img.currentSrc || img.src,
-                    alt: img.alt
-                };
-            }
-
-            function show(index) {
-                current = (index + items.length) % items.length;
-                const slide = getSlide(current);
-                lightboxImage.src = slide.src;
-                lightboxImage.alt = slide.alt;
-                lightboxCaption.textContent = (current + 1) + ' / ' + items.length;
-            }
-
-            function open(index) {
-                lastFocus = document.activeElement;
-                pauseAuto();
-                show(index);
-                lightbox.classList.add('is-open');
-                lightbox.setAttribute('aria-hidden', 'false');
-                document.body.style.overflow = 'hidden';
-                btnClose.focus();
-            }
-
-            function close() {
-                lightbox.classList.remove('is-open');
-                lightbox.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
-                scheduleResume(600);
-                if (lastFocus && typeof lastFocus.focus === 'function') {
-                    lastFocus.focus();
-                }
-            }
-
-            track.addEventListener('click', function (e) {
-                const btn = e.target.closest('.gallery-item');
-                if (!btn) return;
-                open(Number(btn.dataset.index));
-            });
-
-            btnClose.addEventListener('click', close);
-            btnPrev.addEventListener('click', function () { show(current - 1); });
-            btnNext.addEventListener('click', function () { show(current + 1); });
-
-            lightbox.addEventListener('click', function (e) {
-                if (e.target === lightbox) close();
-            });
-
-            document.addEventListener('keydown', function (e) {
-                if (!lightbox.classList.contains('is-open')) return;
-                if (e.key === 'Escape') close();
-                if (e.key === 'ArrowLeft') {
-                    show(current - 1);
-                    e.preventDefault();
-                }
-                if (e.key === 'ArrowRight') {
-                    show(current + 1);
-                    e.preventDefault();
-                }
-            });
-        })();
-    </script>
-    <script src="../script.js"></script>
+        <ul class="tags mt-3">
+            <li>Hardware procurement</li>
+            <li>Municipal contracting</li>
+            <li>Site installation</li>
+            <li>Industrial IoT</li>
+            <li>Remote management</li>
+            <li>Branding and signage</li>
+        </ul>
+    </section>
+</main>
 </body>
 </html>

@@ -1,515 +1,409 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="../" data-page="projects">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Crypto ASIC | Jack Buhr</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="I ran an IceRiver KS3M Kaspa miner at home from October 2023 to July 2024 and sold it at a 200% return, plus my thoughts on Kaspa.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
     <style>
-        .asic-page {
-            --asic-ink: oklch(0.93 0.02 75);
-            --asic-muted: oklch(0.78 0.03 75);
-            --asic-faint: oklch(0.64 0.03 75);
-            --asic-panel: oklch(0.18 0.02 55 / 0.88);
-            --asic-accent: oklch(0.78 0.14 65);
-            --asic-copper: oklch(0.68 0.13 45);
-            --asic-link: oklch(0.82 0.12 85);
-            font-family: 'Figtree', sans-serif;
-            color: var(--asic-ink);
+        /* ---- Page-specific rules (built from site tokens) ---- */
+        .head-links { margin-top: 1.25rem; }
+
+        /* Venture timeline */
+        .tl { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; position: relative; }
+        .tl::before { content: ''; position: absolute; left: 6px; right: 6px; top: 6px; height: 2px; background: var(--line-2); }
+        .js .tl::before { transform: scaleX(0); transform-origin: left; }
+        .js .is-in .tl::before { transform: none; transition: transform 1.4s var(--ease); }
+        .tl li { position: relative; padding-top: 1.6rem; }
+        .tl li::before { content: ''; position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-2); border: 2px solid var(--line-2); box-sizing: border-box; }
+        .tl li.tl--accent::before { background: var(--accent); border-color: var(--accent); }
+        .tl li.tl--ok::before { background: var(--ok); border-color: var(--ok); }
+        .tl .tl-date { display: block; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.06em; color: var(--text-3); text-transform: uppercase; }
+        .tl .tl-what { display: block; color: var(--text); font-weight: 500; line-height: 1.35; margin-top: 0.2rem; }
+        .tl .tl-sub { display: block; color: var(--text-3); font-size: 0.86rem; line-height: 1.4; margin-top: 0.2rem; }
+        .js .tl li { opacity: 0; }
+        .js .is-in .tl li { opacity: 1; transition: opacity 0.5s ease calc(var(--d, 0) * 220ms + 200ms); }
+        @media (max-width: 760px) {
+            .tl { grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
+            .tl::before { left: 6px; right: auto; top: 6px; bottom: 6px; width: 2px; height: auto; }
+            .js .tl::before { transform: scaleY(0); transform-origin: top; }
+            .tl li { padding: 0 0 0 1.75rem; }
         }
 
-        .asic-page .hero {
-            margin-bottom: clamp(2rem, 6vw, 4rem);
-            text-align: left;
-            max-width: 980px;
-            margin-left: auto;
-            margin-right: auto;
+        /* Prose beside a figure */
+        .pf { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(1.25rem, 3.5vw, 2.75rem); align-items: start; margin-bottom: 1.15rem; }
+        .pf + .pf { margin-top: 1.25rem; }
+        .pf .prose { max-width: none; }
+        .pf .pf-side { position: sticky; top: calc(var(--nav-h) + 1.25rem); }
+        .pf .pf-side > * + * { margin-top: 1rem; }
+        @media (max-width: 860px) {
+            .pf { grid-template-columns: minmax(0, 1fr); }
+            .pf .pf-side { position: static; }
+        }
+        .prose-col { max-width: 68ch; }
+
+        /* Photos */
+        .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .photos figure { margin: 0; }
+        .photos .wide { grid-column: 1 / -1; }
+        .photos.gallery button { aspect-ratio: 3 / 4; }
+        .photos.gallery .wide button { aspect-ratio: 3 / 2; }
+        .photos.gallery img[data-top] { object-position: center top; }
+        .photos figcaption { margin-top: 0.45rem; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); line-height: 1.4; }
+
+        /* Chart legend */
+        .legend { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; margin: 0 0 0.75rem; padding: 0; list-style: none; font-family: var(--mono); font-size: 0.72rem; color: var(--text-2); }
+        .legend li { display: inline-flex; align-items: center; gap: 0.45rem; }
+        .legend i { display: inline-block; width: 14px; height: 2px; border-radius: 1px; }
+        .legend .sw-accent { background: var(--accent); }
+        .legend .sw-cool { background: var(--cool); }
+        .dg .line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .dg .line--accent { stroke: var(--accent); }
+        .dg .line--cool { stroke: var(--cool); }
+        .dg .dot-ring { stroke: var(--surface); stroke-width: 2; }
+        .dg .hit { fill: transparent; cursor: crosshair; }
+        .dg .xhair { stroke: var(--text-3); stroke-width: 1; }
+        .dg .tip-bg { fill: var(--bg-2); stroke: var(--line-2); }
+        .dg .zone { fill: var(--accent-soft); }
+
+        /* Ferry metaphor */
+        .ferries { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .ferry-a { animation: ferryA 11s var(--ease) infinite; }
+        @keyframes ferryA {
+            0%, 32% { transform: translateX(0); opacity: 1; }
+            70% { transform: translateX(166px); opacity: 1; }
+            78% { transform: translateX(166px); opacity: 0; }
+            80% { transform: translateX(0); opacity: 0; }
+            90%, 100% { transform: translateX(0); opacity: 1; }
+        }
+        .ferry-b { animation: ferryB 7s linear infinite; }
+        @keyframes ferryB {
+            0% { transform: translateX(calc(var(--o) * -1px)); opacity: 0; }
+            6% { opacity: 1; }
+            94% { opacity: 1; }
+            100% { transform: translateX(calc((198 - var(--o)) * 1px)); opacity: 0; }
         }
 
-        .asic-page h1,
-        .asic-page h2,
-        .asic-page h3 {
-            font-family: 'Rajdhani', sans-serif;
-            letter-spacing: 0.02em;
-            font-weight: 700;
-        }
+        .refs { list-style: none; margin: 0; padding: 0; counter-reset: ref; font-family: var(--mono); font-size: 0.78rem; line-height: 1.6; }
+        .refs li { counter-increment: ref; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); color: var(--text-3); margin-bottom: 0.35rem; }
+        .refs li::before { content: '[' counter(ref) ']'; color: var(--text-3); }
+        .refs a { overflow-wrap: anywhere; }
 
-        .case-kicker {
-            color: var(--asic-accent);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.9rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .case-title {
-            font-size: clamp(2.8rem, 7vw, 5.5rem);
-            line-height: 0.95;
-            margin: 0.5rem 0 1rem;
-            color: var(--asic-ink);
-        }
-
-        .case-deck {
-            max-width: 68ch;
-            color: var(--asic-muted);
-            font-size: clamp(1.05rem, 2vw, 1.25rem);
-            line-height: 1.65;
-            margin: 0 0 1.25rem;
-        }
-
-        .case-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem 1.25rem;
-            margin: 0 0 0.5rem;
-        }
-
-        .case-links a {
-            color: var(--asic-link);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            border-bottom: 1px solid oklch(0.78 0.14 65 / 0.35);
-            transition: color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .case-links a:hover {
-            color: var(--asic-accent);
-            border-color: var(--asic-accent);
-        }
-
-        .asic-page .deep-dive-btn {
-            background-color: var(--asic-copper);
-            color: oklch(0.14 0.02 55);
-        }
-
-        .asic-page .deep-dive-btn:hover {
-            background-color: var(--asic-accent);
-        }
-
-        .photo-pair {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: clamp(1rem, 3vw, 1.75rem);
-            max-width: 1100px;
-            margin: 0 auto clamp(2.5rem, 6vw, 4rem);
-        }
-
-        .photo-figure {
-            margin: 0;
-            width: min(521px, 100%);
-            opacity: 0;
-            transform: translateY(18px);
-            animation: asicReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .photo-figure:nth-child(2) {
-            animation-delay: 0.12s;
-        }
-
-        .photo-figure img {
-            display: block;
-            width: 100%;
-            aspect-ratio: 521 / 938;
-            height: auto;
-            object-fit: cover;
-            border: 1px solid oklch(0.4 0.04 55);
-            background: oklch(0.12 0.015 55);
-        }
-
-        .photo-figure figcaption {
-            margin-top: 0.65rem;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.95rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--asic-faint);
-            font-weight: 600;
-        }
-
-        .asic-body {
-            max-width: 72ch;
-            margin: 0 auto;
-        }
-
-        .asic-panel {
-            background: var(--asic-panel);
-            border: 1px solid oklch(0.36 0.04 55);
-            border-radius: 4px;
-            padding: clamp(1.4rem, 3vw, 2.25rem);
-            margin-bottom: clamp(1.5rem, 3vw, 2rem);
-            opacity: 0;
-            transform: translateY(16px);
-            animation: asicReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
-        }
-
-        .asic-panel.delay-2 {
-            animation-delay: 0.32s;
-        }
-
-        .asic-panel.delay-3 {
-            animation-delay: 0.44s;
-        }
-
-        .asic-body p {
-            color: var(--asic-muted);
-            font-size: 1.05rem;
-            line-height: 1.75;
-            margin: 0 0 1.15rem;
-            max-width: 68ch;
-        }
-
-        .asic-body p:last-child {
-            margin-bottom: 0;
-        }
-
-        .asic-body a {
-            color: var(--asic-link);
-            text-decoration: underline;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 3px;
-        }
-
-        .asic-body a:hover {
-            color: var(--asic-accent);
-        }
-
-        .asic-body h2 {
-            font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-            color: var(--asic-ink);
-            margin: 0 0 1rem;
-            line-height: 1.1;
-        }
-
-        .asic-body h3 {
-            font-size: clamp(1.25rem, 2.5vw, 1.55rem);
-            color: var(--asic-accent);
-            margin: 1.75rem 0 0.75rem;
-            line-height: 1.2;
-        }
-
-        .refs {
-            margin-top: 1.5rem;
-            padding-top: 1.25rem;
-            border-top: 1px solid oklch(0.36 0.04 55);
-        }
-
-        .refs h2 {
-            font-size: 1.1rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--asic-faint);
-            margin-bottom: 0.75rem;
-        }
-
-        .refs ol {
-            margin: 0;
-            padding-left: 1.25rem;
-            color: var(--asic-muted);
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .refs a {
-            word-break: break-word;
-        }
-
-        @keyframes asicReveal {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 720px) {
-            .asic-page .hero {
-                text-align: center;
-            }
-
-            .case-deck {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .case-links {
-                justify-content: center;
-            }
-
-            .photo-figure figcaption {
-                text-align: center;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .photo-figure,
-            .asic-panel {
-                animation: none;
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        /* ══════════════════════════════════════════════════════════════
-           PHONE LAYER — matches the breakpoints used by style.css so the
-           whole site scales consistently. Nothing below fires above 768px,
-           so the desktop layout is untouched.
-           ══════════════════════════════════════════════════════════════ */
-
-        @media (max-width: 768px) {
-            /* 0.9rem + 0.18em tracking ran the kicker edge-to-edge. */
-            .case-kicker {
-                font-size: 0.66rem;
-                letter-spacing: 0.13em;
-            }
-
-            .case-deck {
-                font-size: 0.9rem;
-                line-height: 1.55;
-                margin-bottom: 0.9rem;
-            }
-
-            .case-links {
-                gap: 0.45rem 1rem;
-            }
-
-            .case-links a {
-                font-size: 0.85rem;
-            }
-
-            /* Shared button is desktop-scaled (12px/24px, bold). */
-            .asic-page .deep-dive-btn {
-                font-size: 0.82rem;
-                padding: 0.5rem 0.95rem;
-                margin-top: 0.5rem;
-            }
-
-            .asic-page .hero {
-                margin-bottom: 1.5rem;
-            }
-
-            /* The pair is a before/after comparison, but at 343px each the two
-               521x938 portraits stacked to ~1300px of scrolling. Side by side
-               halves the width, drops the block to ~330px, and puts the stock
-               and upgraded units next to each other where they compare. */
-            .photo-pair {
-                flex-wrap: nowrap;
-                align-items: flex-start;
-                gap: 0.55rem;
-                margin-bottom: 1.75rem;
-            }
-
-            .photo-figure {
-                width: auto;
-                flex: 1 1 0;
-                min-width: 0;
-            }
-
-            .photo-figure figcaption {
-                margin-top: 0.4rem;
-                font-size: 0.66rem;
-                letter-spacing: 0.05em;
-                line-height: 1.3;
-            }
-
-            .asic-panel {
-                padding: 1.1rem 1rem;
-                margin-bottom: 1.25rem;
-            }
-
-            /* Long-form article: 1.05rem/1.75 is a very tall column here. */
-            .asic-body p {
-                font-size: 0.9rem;
-                line-height: 1.62;
-                margin-bottom: 1rem;
-            }
-
-            .asic-body h2 {
-                font-size: 1.3rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .asic-body h3 {
-                font-size: 1.08rem;
-                margin: 1.35rem 0 0.6rem;
-            }
-
-            /* Reference titles carry em dashes and slashes that can't break. */
-            .asic-body a {
-                overflow-wrap: anywhere;
-            }
-
-            .refs {
-                margin-top: 1.15rem;
-                padding-top: 1rem;
-            }
-
-            .refs h2 {
-                font-size: 0.95rem;
-            }
-
-            .refs ol {
-                font-size: 0.85rem;
-                line-height: 1.6;
-                padding-left: 1.1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .photo-figure figcaption {
-                font-size: 0.62rem;
-            }
-
-            .asic-body p {
-                font-size: 0.88rem;
-            }
-        }
-
-        /* Phone held sideways: 812px wide misses the 768px breakpoint, so the
-           desktop scale applies against a 375px-tall viewport. The photo pair
-           is the only thing that must change — at desktop sizing the two
-           521px figures wrap and stack to ~1900px. */
-        @media (orientation: landscape) and (max-height: 540px) {
-            .case-deck {
-                font-size: 1rem;
-                line-height: 1.5;
-            }
-
-            .asic-page .hero {
-                margin-bottom: 1.5rem;
-            }
-
-            .photo-pair {
-                flex-wrap: nowrap;
-                align-items: flex-start;
-                justify-content: center;
-                gap: 0.75rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .photo-figure {
-                width: auto;
-                flex: 0 1 190px;
-                min-width: 0;
-            }
-
-            .photo-figure figcaption {
-                margin-top: 0.4rem;
-                font-size: 0.72rem;
-            }
-
-            .asic-panel {
-                margin-bottom: 1.25rem;
-            }
-        }
+        .prose a { overflow-wrap: anywhere; }
     </style>
 </head>
 <body>
-    <div id="background-container">
-        <div id="stars-container"></div>
-        <div id="nodes-container"></div>
-    </div>
-
-    <header>
-        <nav>
-            <div class="logo">JB</div>
-            <div id="seed-display" class="seed-display">Seed: </div>
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../projects.html" class="active">Projects</a></li>
-                <li><a href="../skills.html">Skills</a></li>
-            </ul>
-        </nav>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html">← Projects</a>
+        <p class="kicker">Hardware operations · Market timing</p>
+        <h1>Crypto ASIC</h1>
+        <p class="lede">Home operation of an IceRiver KS3M Kaspa miner from October &rsquo;23 to July &rsquo;24 — with airflow upgrades, a resale-vs-yield risk model, and a timed exit that closed at a 200% return.</p>
+        <div class="btn-row head-links">
+            <a class="btn btn--ghost btn--sm" href="https://kaspa.org/" target="_blank" rel="noopener noreferrer">Kaspa ↗</a>
+            <a class="btn btn--ghost btn--sm" href="https://kas.humpool.com/account?login=kaspa%3Aqplgh2y24zss7eq0p0gdg57e3mtte64yjhfhj79hp0ff03nm9ly5zmx4tex3m" target="_blank" rel="noopener noreferrer">My mining pool ID ↗</a>
+        </div>
+        <dl class="facts">
+            <div><dt>Miner</dt><dd>IceRiver KS3M</dd></div>
+            <div><dt>Output</dt><dd>6 TH/s at 3400 W</dd></div>
+            <div><dt>When</dt><dd>Oct &rsquo;23 to Jul &rsquo;24</dd></div>
+            <div><dt>Result</dt><dd><span data-count="200" data-suffix="%">200%</span> return over 10 months</dd></div>
+        </dl>
     </header>
 
-    <main id="content-wrapper" class="asic-page">
-        <section class="hero">
-            <div class="case-kicker">Hardware operations · Market timing</div>
-            <h1 class="case-title">Crypto ASIC</h1>
-            <p class="case-deck">Home operation of an IceRiver KS3M Kaspa miner from October &rsquo;23 to July &rsquo;24 — with airflow upgrades, a resale-vs-yield risk model, and a timed exit that closed at a 200% return.</p>
-            <div class="case-links">
-                <a href="https://kaspa.org/" target="_blank" rel="noopener noreferrer">Kaspa</a>
-                <a href="https://kas.humpool.com/account?login=kaspa%3Aqplgh2y24zss7eq0p0gdg57e3mtte64yjhfhj79hp0ff03nm9ly5zmx4tex3m" target="_blank" rel="noopener noreferrer">My mining pool ID</a>
-            </div>
-            <a href="../projects.html" class="deep-dive-btn">&larr; Back to Projects</a>
-        </section>
+    <div class="wrap">
+        <figure class="fig" data-reveal>
+            <div class="fig-title">The venture</div>
+            <ol class="tl">
+                <li style="--d:0"><span class="tl-date">Oct &rsquo;23</span><span class="tl-what">Bought an IceRiver KS3M</span><span class="tl-sub">6 TH/s, 3400 W</span></li>
+                <li style="--d:1"><span class="tl-date">Upgrade</span><span class="tl-what">Airflow manifold and exhaust fan</span><span class="tl-sub">Cooler and quieter</span></li>
+                <li class="tl--accent" style="--d:2"><span class="tl-date">Jun &rsquo;24</span><span class="tl-what">Model says sell</span><span class="tl-sub">Resale value passes projected yield</span></li>
+                <li class="tl--ok" style="--d:3"><span class="tl-date">Jul &rsquo;24</span><span class="tl-what">Sold the miner</span><span class="tl-sub">200% return over 10 months</span></li>
+            </ol>
+        </figure>
+    </div>
 
-        <div class="photo-pair">
-            <figure class="photo-figure">
-                <img src="../Images/Miner1.png" alt="IceRiver KS3M ASIC miner in stock configuration" width="521" height="938">
-                <figcaption>KS3M Stock</figcaption>
-            </figure>
-            <figure class="photo-figure">
-                <img src="../Images/Miner2.png" alt="IceRiver KS3M ASIC miner with upgraded airflow ducting" width="521" height="938">
-                <figcaption>KS3M with upgraded airflow</figcaption>
-            </figure>
-        </div>
+    <!-- ============ 01: what I did ============ -->
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>The operation</h2></div>
 
-        <article class="asic-body">
-            <section class="asic-panel">
+        <div class="pf">
+            <div class="prose">
                 <p>Between October &rsquo;23 and July &rsquo;24, I operated an ASIC (Application Specific Integrated Circuit) crypto currency miner at my home. The miner was optimised for the Kaspa crypto currency, a promising cutting edge new-tech coin from 2021.</p>
                 <p>At the time, Kaspa was the most profitable coin to mine, and remained as such for almost a year. To capitalise on this, I purchased an IceRiver KS3M in October &rsquo;23. The KS3M is capable of 6 Terahashes per second (TH/s) with a 3400W power draw. To improve temperature management and reduce noise pollution (my mom was complaining), I upgraded the stock system with a FruitionDesign airflow manifold paired with a high-power low-dB exhaust fan.</p>
+            </div>
+            <div class="pf-side" data-reveal>
+                <div class="photos gallery">
+                    <figure>
+                        <button data-caption="KS3M Stock"><img src="../assets/img/miner-stock.jpg" alt="IceRiver KS3M ASIC miner in stock configuration, two front fans, on a wooden shelf" width="494" height="584" loading="lazy"></button>
+                        <figcaption>KS3M Stock</figcaption>
+                    </figure>
+                    <figure>
+                        <button data-caption="KS3M with upgraded airflow"><img data-top src="../assets/img/miner-airflow.jpg" alt="IceRiver KS3M with a manifold on its exhaust feeding a long black flexible duct down to the floor" width="521" height="938" loading="lazy"></button>
+                        <figcaption>KS3M with upgraded airflow</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <div class="pf">
+            <div class="prose">
                 <p>I knew that profitability couldn&rsquo;t last, and would fall as the network hashrate equalized. Such profitability was only present because of Kaspa&rsquo;s youth as a coin and new hardware-level efficiency in its mining algorithm KHeavyHash. To manage risk, I built a tracking model to weigh the secondhand resale value of the ASIC with its projected future yield. In June of 2024 it became more valuable to sell than keep, as it would no longer ever mine enough coins to surpass the sale value.</p>
                 <p>The secondary market for ASICs was highly elevated due to retail FOMO (Fear Of Missing Out). I capitalized on this sentiment, exiting at an optimal moment. I closed the venture with a 200% return over a 10-month period. My exit thesis was ultimately validated; the broader market, Kaspa in particular, entered a severe downturn, which would have driven the operational return into the negative had I continued holding the hardware.</p>
-            </section>
+            </div>
+            <div class="pf-side">
+                <figure class="fig" data-reveal>
+                    <div class="fig-title">Sell or keep</div>
+                    <ul class="legend" aria-hidden="true">
+                        <li><i class="sw-accent"></i>Projected remaining yield</li>
+                        <li><i class="sw-cool"></i>Resale value</li>
+                    </ul>
+                    <svg class="dg" viewBox="0 0 440 262" role="img" aria-label="Illustrative chart: the miner's projected remaining yield starts well above its resale value and falls faster. The lines cross in June 2024, after which selling is worth more than keeping.">
+                        <rect class="zone" x="48" y="30" width="316.6" height="196"/>
+                        <text class="t-dim" x="96" y="138">keep: yield &gt; resale</text>
+                        <line class="gridline" x1="48" y1="226" x2="424" y2="226"/>
+                        <line class="axis" x1="48" y1="30" x2="48" y2="226"/>
+                        <text class="t-dim" transform="translate(36 128) rotate(-90)" text-anchor="middle">value</text>
+                        <path class="line line--cool draw" pathLength="1" style="--d:1" d="M48 155.4 L424 192.7"/>
+                        <path class="line line--accent draw" pathLength="1" d="M48 39.8 L67.8 45.9 L87.6 52.4 L107.4 59.3 L127.2 66.6 L146.9 74.3 L166.7 82.5 L186.5 91 L206.3 100 L226.1 109.4 L245.9 119.2 L265.7 129.4 L285.5 140 L305.3 151 L325.1 162.5 L344.8 174.3 L364.6 186.6 L384.4 199.2 L404.2 212.3 L424 225.8"/>
+                        <g class="pop" style="--d:6">
+                            <line class="wire wire--dim" x1="364.6" y1="62" x2="364.6" y2="226" stroke-dasharray="3 3"/>
+                            <circle class="fill-accent dot-ring" cx="364.6" cy="186.6" r="5"/>
+                            <text class="t-strong t-end" x="358" y="58">Jun &rsquo;24: sell</text>
+                            <text x="196" y="88">projected yield</text>
+                            <text x="100" y="184">resale value</text>
+                            <text class="t-dim" x="372" y="214">sell</text>
+                        </g>
+                        <text class="t-dim" x="48" y="244">Oct &rsquo;23</text>
+                        <text class="t-dim t-mid" x="166.7" y="244">Jan &rsquo;24</text>
+                        <text class="t-dim t-mid" x="285.5" y="244">Apr &rsquo;24</text>
+                        <text class="t-dim t-end" x="424" y="244">Jul &rsquo;24</text>
+                        <line class="axis" x1="364.6" y1="226" x2="364.6" y2="231"/>
+                    </svg>
+                    <figcaption>Illustrative. The shape of my tracking model, not its numbers: once the miner could no longer earn more than it would sell for, selling won.</figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
 
-            <section class="asic-panel delay-2">
-                <h2>My thoughts on Kaspa</h2>
-                <p>Along with the profitability at the time, I had thought Kaspa was a high potential coin for several reasons. Crypto alt-coins (not Bitcoin or Ethereum) extensively suffer from developer teams operating with purely profit-driven motives. This often manifests in heavy insider selling, pre-mined allocations, and venture-capital-centric tokenomics. Kaspa, however, was purposefully fair-launched, which means it did not allocate coins unfairly to developers or early adopters, and it launched to the public on the first day, rather than allowing a select few to mine coins with no competition. This equitable distribution boded well for the network&rsquo;s longevity.</p>
-                <p>The technology of the coin is highly innovative, being the first to use a GHOSTDAG, a technically superior version of the Bitcoin architecture. Kaspa largely solves several core Bitcoin issues, including speed and scalability.</p>
-                <p>The mining profitability and technological advancements garnered massive hype, and more people knew of Kaspa than other coins in a similar market-cap range.</p>
-                <p>Despite these strengths, I ultimately believe the coin will struggle long-term, and the core issues come down to developer psychology and network economics.</p>
+    <!-- ============ 02: opinion ============ -->
+    <section class="section wrap">
+        <div class="section-head"><span class="num">02</span><h2>My thoughts on Kaspa</h2><span class="aside">Opinion</span></div>
 
-                <h3>Issue #1: Aggressive (Hopeful) Emission Schedule</h3>
+        <div class="prose prose-col">
+            <p>Along with the profitability at the time, I had thought Kaspa was a high potential coin for several reasons. Crypto alt-coins (not Bitcoin or Ethereum) extensively suffer from developer teams operating with purely profit-driven motives. This often manifests in heavy insider selling, pre-mined allocations, and venture-capital-centric tokenomics. Kaspa, however, was purposefully fair-launched, which means it did not allocate coins unfairly to developers or early adopters, and it launched to the public on the first day, rather than allowing a select few to mine coins with no competition. This equitable distribution boded well for the network&rsquo;s longevity.</p>
+            <p>The technology of the coin is highly innovative, being the first to use a GHOSTDAG, a technically superior version of the Bitcoin architecture. Kaspa largely solves several core Bitcoin issues, including speed and scalability.</p>
+            <p>The mining profitability and technological advancements garnered massive hype, and more people knew of Kaspa than other coins in a similar market-cap range.</p>
+            <p>Despite these strengths, I ultimately believe the coin will struggle long-term, and the core issues come down to developer psychology and network economics.</p>
+        </div>
+
+        <div class="prose prose-col mt-3"><h3>Issue #1: Aggressive (Hopeful) Emission Schedule</h3></div>
+        <div class="pf">
+            <div class="prose">
                 <p>The precedent set by Bitcoin for Proof-of-Work networks is to provide miners with a block reward. In reality, &ldquo;mining&rdquo; is the act of securing the network by cryptographically validating that transactions are legitimate. Miners are compensated in two ways: the fixed block reward, and the variable &ldquo;gas&rdquo; fees paid by users to send funds.</p>
                 <p>To create scarcity, these block rewards periodically cut in half. Bitcoin&rsquo;s halving period occurs every four years, providing ample time for the asset&rsquo;s price to appreciate and offset the reduced reward. Kaspa, conversely, operates on an aggressive one-year halving schedule that compounds smoothly every month, resulting in a 5.6% monthly reward reduction.</p>
-                <p>In order to retain miner interest against a rapidly decaying reward, the token price must increase at an incredible rate. If it doesn&rsquo;t, mining profits fall below local electricity costs, and operators power down. We are already seeing this play out: Kaspa has fallen roughly 86% from its August 2024 peak <a href="https://www.coingecko.com/en/coins/kaspa?chart=type%3Dprice%26mode%3Dline%26timeframe%3Dmax" target="_blank" rel="noopener noreferrer">[1]</a>. This triggers a self-sustaining downward spiral, where declining prices price-out current miners, and the dropping network security deters new investment.</p>
+            </div>
+            <div class="pf-side">
+                <figure class="fig" data-reveal>
+                    <div class="fig-title">Block reward vs years since launch</div>
+                    <ul class="legend" aria-hidden="true">
+                        <li><i class="sw-accent"></i>Kaspa: halves yearly, cut monthly</li>
+                        <li><i class="sw-cool"></i>Bitcoin: halves every 4 years</li>
+                    </ul>
+                    <svg class="dg" id="emit" viewBox="0 0 440 272" role="img" aria-label="Block reward as a share of the launch reward over 16 years. Bitcoin's reward steps down by half every four years: 100%, 50%, 25%, 12.5%, 6.25%. Kaspa's falls 5.6% every month, so it is at 50% after one year and about 6% after four years.">
+                        <line class="gridline" x1="48" y1="34" x2="424" y2="34"/>
+                        <line class="gridline" x1="48" y1="140" x2="424" y2="140"/>
+                        <line class="gridline" x1="48" y1="193" x2="424" y2="193"/>
+                        <line class="axis" x1="48" y1="246" x2="424" y2="246"/>
+                        <text class="t-dim t-end" x="40" y="38">100%</text>
+                        <text class="t-dim t-end" x="40" y="144">50%</text>
+                        <text class="t-dim t-end" x="40" y="197">25%</text>
+                        <text class="t-dim t-end" x="40" y="250">0</text>
+                        <text class="t-dim t-mid" x="48" y="264">0</text>
+                        <text class="t-dim t-mid" x="142" y="264">4</text>
+                        <text class="t-dim t-mid" x="236" y="264">8</text>
+                        <text class="t-dim t-mid" x="330" y="264">12</text>
+                        <text class="t-dim t-mid" x="424" y="264">16 yrs</text>
+                        <path class="line line--cool draw" pathLength="1" style="--d:1" d="M48 34 H142 V140 H236 V193 H330 V219.5 H424"/>
+                        <path class="line line--accent draw" pathLength="1" d="M48 34 L50 45.9 L51.9 57.1 L53.9 67.7 L55.8 77.7 L57.8 87.2 L59.8 96.1 L61.7 104.5 L63.7 112.4 L65.6 119.9 L67.6 127 L69.5 133.7 L71.5 140 L73.5 145.9 L75.4 151.6 L77.4 156.9 L79.3 161.9 L81.3 166.6 L83.2 171 L85.2 175.3 L87.2 179.2 L89.1 183 L91.1 186.5 L93 189.8 L95 193 L97 196 L98.9 198.8 L100.9 201.4 L102.8 203.9 L104.8 206.3 L106.8 208.5 L108.7 210.6 L110.7 212.6 L112.6 214.5 L114.6 216.3 L116.5 217.9 L118.5 219.5 L120.5 221 L122.4 222.4 L124.4 223.7 L126.3 225 L128.3 226.1 L130.2 227.3 L132.2 228.3 L134.2 229.3 L136.1 230.2 L138.1 231.1 L140 232 L142 232.8 L149.8 235.5 L157.7 237.7 L165.5 239.4 L173.3 240.7 L181.2 241.8 L189 242.7 L196.8 243.4 L204.7 243.9 L212.5 244.3 L220.3 244.7 L228.2 245 L236 245.2 L259.5 245.6 L283 245.8 L330 245.9 L424 246"/>
+                        <g class="pop" style="--d:6">
+                            <circle class="fill-cool dot-ring" cx="142" cy="140" r="4.5"/>
+                            <circle class="fill-accent dot-ring" cx="142" cy="232.8" r="4.5"/>
+                            <text x="156" y="78">After 4 years: Bitcoin at 50%,</text>
+                            <text x="156" y="93">Kaspa at about 6%</text>
+                        </g>
+                        <g id="emit-tip" style="display:none" pointer-events="none">
+                            <line class="xhair" x1="0" y1="34" x2="0" y2="246"/>
+                            <circle class="fill-cool dot-ring" r="4" data-k="b"/>
+                            <circle class="fill-accent dot-ring" r="4" data-k="k"/>
+                            <rect class="tip-bg" rx="6" width="132" height="54"/>
+                            <text data-k="t1"></text>
+                            <text data-k="t2"></text>
+                            <text data-k="t3"></text>
+                        </g>
+                        <rect class="hit" x="48" y="30" width="376" height="220"/>
+                    </svg>
+                    <figcaption>Block reward as a share of the launch reward, computed from the schedules in the text: Bitcoin halves every four years; Kaspa halves yearly in monthly steps of 0.5<sup>1/12</sup> &asymp; 0.944, a 5.6% cut each month.</figcaption>
+                </figure>
+            </div>
+        </div>
 
-                <h3>Issue #2: Inherent Unsustainability</h3>
-                <p>The ultimate goal for any Proof-of-Work coin is to transition into a self-sustaining ecosystem. By the time the final Bitcoin block reward is issued in 2140, the network expects to secure itself entirely through user transaction fees. Kaspa, due to its aggressive schedule, will issue its final block reward around 2037 <a href="https://wiki.kaspa.org/en/tokenomics#:~:text=a%20Nakamoto%27s%20philosophy.-,WHAT%20IS%20THE%20MONETARY%20POLICY%3F,variability%20will%20be%20much%20higher%20for%20other%20reasons%20down%20the%20line.,-WHAT%20IS%20THE" target="_blank" rel="noopener noreferrer">[2]</a>—a mere 16 years after inception.</p>
+        <div class="pf">
+            <div class="prose">
+                <p>In order to retain miner interest against a rapidly decaying reward, the token price must increase at an incredible rate. If it doesn&rsquo;t, mining profits fall below local electricity costs, and operators power down. We are already seeing this play out: Kaspa has fallen roughly 86% from its August 2024 peak <a href="https://www.coingecko.com/en/coins/kaspa?chart=type%3Dprice%26mode%3Dline%26timeframe%3Dmax" target="_blank" rel="noopener noreferrer">[1]</a>. This triggers a self-sustaining downward spiral, where declining prices price-out current miners, and the dropping network security deters new investment.</p>
+            </div>
+            <div class="pf-side">
+                <figure class="fig" data-reveal>
+                    <div class="fig-title">The downward spiral</div>
+                    <svg class="dg" viewBox="0 0 420 330" role="img" aria-label="A loop of five steps: price falls, mining profit drops below electricity cost, miners power down, network security drops, new investment is deterred, and the price falls again.">
+                        <ellipse class="wire wire--dim flow flow--slow" cx="210" cy="182" rx="135" ry="112"/>
+                        <path class="fill-dim" d="M-6 -5 L6 0 L-6 5 Z" transform="translate(289.4 91.4) rotate(31)"/>
+                        <path class="fill-dim" d="M-6 -5 L6 0 L-6 5 Z" transform="translate(338.4 216.6) rotate(111)"/>
+                        <path class="fill-dim" d="M-6 -5 L6 0 L-6 5 Z" transform="translate(210 294) rotate(180)"/>
+                        <path class="fill-dim" d="M-6 -5 L6 0 L-6 5 Z" transform="translate(81.6 216.6) rotate(-111)"/>
+                        <path class="fill-dim" d="M-6 -5 L6 0 L-6 5 Z" transform="translate(130.6 91.4) rotate(-31)"/>
+
+                        <rect class="box box--bad" x="150" y="50" width="120" height="40" rx="6"/>
+                        <text class="t-strong t-mid" x="210" y="75">Price falls</text>
+
+                        <rect class="box pop" style="--d:1" x="276" y="124" width="128" height="46" rx="6"/>
+                        <text class="t-mid pop" style="--d:1" x="340" y="143">Mining profit</text>
+                        <text class="t-mid pop" style="--d:1" x="340" y="159">&lt; electricity cost</text>
+
+                        <rect class="box pop" style="--d:2" x="229" y="252" width="122" height="40" rx="6"/>
+                        <text class="t-mid pop" style="--d:2" x="290" y="276">Miners power down</text>
+
+                        <rect class="box pop" style="--d:3" x="69" y="252" width="122" height="40" rx="6"/>
+                        <text class="t-mid pop" style="--d:3" x="130" y="268">Network security</text>
+                        <text class="t-mid pop" style="--d:3" x="130" y="283">drops</text>
+
+                        <rect class="box pop" style="--d:4" x="16" y="124" width="128" height="46" rx="6"/>
+                        <text class="t-mid pop" style="--d:4" x="80" y="143">New investment</text>
+                        <text class="t-mid pop" style="--d:4" x="80" y="159">deterred</text>
+
+                        <text class="t-dim t-mid" x="210" y="178">self-sustaining</text>
+                        <text class="t-dim t-mid" x="210" y="194">loop</text>
+                    </svg>
+                    <figcaption>Issue #1 as a loop. Each step feeds the next.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="prose prose-col mt-3"><h3>Issue #2: Inherent Unsustainability</h3></div>
+        <div class="prose prose-col">
+            <p>The ultimate goal for any Proof-of-Work coin is to transition into a self-sustaining ecosystem. By the time the final Bitcoin block reward is issued in 2140, the network expects to secure itself entirely through user transaction fees. Kaspa, due to its aggressive schedule, will issue its final block reward around 2037 <a href="https://wiki.kaspa.org/en/tokenomics#:~:text=a%20Nakamoto%27s%20philosophy.-,WHAT%20IS%20THE%20MONETARY%20POLICY%3F,variability%20will%20be%20much%20higher%20for%20other%20reasons%20down%20the%20line.,-WHAT%20IS%20THE" target="_blank" rel="noopener noreferrer">[2]</a>—a mere 16 years after inception.</p>
+        </div>
+        <dl class="stats prose-col mt-2 mb-2" data-reveal>
+            <div class="stat"><span class="stat-num">2140</span><span class="stat-label">final Bitcoin block reward</span></div>
+            <div class="stat stat--accent"><span class="stat-num">~2037</span><span class="stat-label">final Kaspa block reward, 16 years after inception</span></div>
+        </dl>
+
+        <div class="pf">
+            <div class="prose">
                 <p>To understand why this is a problem, I like to use a ferry metaphor. Imagine each block is a ferry traveling from &ldquo;waiting to be sent&rdquo; to &ldquo;received.&rdquo; The ferry carries passengers (transactions) who are instructed to bribe the ferry manager (the miner). Whoever brings the largest bribe gets a seat until the boat is full. Since that bribe goes directly to the miner, it provides the financial incentive to keep operating the ferry even after the block rewards disappear.</p>
                 <p>But Kaspa&rsquo;s entire value proposition is that it has revolutionized block speed. Because the network is so incredibly fast, there are thousands of ferries leaving the dock at any given moment. Consequently, there is zero incentive for a passenger to offer a large bribe. If the current ferry is full, you can simply wait a fraction of a second for the next one.</p>
                 <p>Because Kaspa solved the scalability problem so well, block space is no longer scarce. Therefore, in a hypothetical future where Kaspa survives beyond its final halving, even extreme global adoption won&rsquo;t drive gas fees high enough to incentivize miners. Without a financial incentive to secure the network, the longevity of the project comes into serious question.</p>
-            </section>
-
-            <section class="asic-panel delay-3 refs">
-                <h2>References</h2>
-                <ol>
-                    <li><a href="https://www.coingecko.com/en/coins/kaspa?chart=type%3Dprice%26mode%3Dline%26timeframe%3Dmax" target="_blank" rel="noopener noreferrer">CoinGecko — Kaspa price chart (max)</a></li>
-                    <li><a href="https://wiki.kaspa.org/en/tokenomics#:~:text=a%20Nakamoto%27s%20philosophy.-,WHAT%20IS%20THE%20MONETARY%20POLICY%3F,variability%20will%20be%20much%20higher%20for%20other%20reasons%20down%20the%20line.,-WHAT%20IS%20THE" target="_blank" rel="noopener noreferrer">Kaspa Wiki — Monetary policy / tokenomics</a></li>
-                </ol>
-            </section>
-        </article>
-    </main>
-
-    <footer id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-field">
-                <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
             </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
-                <span class="footer-label">stars</span>
+            <div class="pf-side">
+                <figure class="fig" data-reveal>
+                    <div class="fig-title">The ferry metaphor</div>
+                    <div class="ferries">
+                        <svg class="dg" viewBox="0 0 360 196" role="img" aria-label="One ferry at a time: a long queue of passengers waits on the dock, and only the highest bribes get the four seats on the ferry.">
+                            <defs><marker id="asic-fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="fill-dim"/></marker></defs>
+                            <text class="t-strong" x="0" y="14">One ferry at a time</text>
+                            <rect class="box" x="0" y="34" width="58" height="128" rx="6"/>
+                            <rect class="box" x="302" y="34" width="58" height="128" rx="6"/>
+                            <line class="gridline" x1="64" y1="70" x2="296" y2="70" stroke-dasharray="10 8"/>
+                            <line class="gridline" x1="64" y1="134" x2="296" y2="134" stroke-dasharray="10 8"/>
+                            <line class="wire wire--dim" x1="150" y1="50" x2="270" y2="50" marker-end="url(#asic-fa)"/>
+                            <!-- queue: dot size = bribe size -->
+                            <g class="fill-dim">
+                                <circle cx="14" cy="50" r="4"/><circle cx="29" cy="50" r="3"/><circle cx="44" cy="50" r="5"/>
+                                <circle cx="14" cy="70" r="3"/><circle cx="29" cy="70" r="5"/><circle cx="44" cy="70" r="3"/>
+                                <circle cx="14" cy="90" r="5"/><circle cx="29" cy="90" r="3"/><circle cx="44" cy="90" r="4"/>
+                                <circle cx="14" cy="110" r="3"/><circle cx="29" cy="110" r="4"/><circle cx="44" cy="110" r="3"/>
+                                <circle cx="14" cy="130" r="4"/><circle cx="29" cy="130" r="3"/><circle cx="44" cy="130" r="5"/>
+                                <circle cx="14" cy="148" r="3"/><circle cx="29" cy="148" r="4"/><circle cx="44" cy="148" r="3"/>
+                            </g>
+                            <g class="ferry-a">
+                                <rect class="box box--accent" x="66" y="87" width="74" height="26" rx="6"/>
+                                <circle class="fill-accent" cx="80" cy="100" r="6"/>
+                                <circle class="fill-accent" cx="96" cy="100" r="6"/>
+                                <circle class="fill-accent" cx="112" cy="100" r="6"/>
+                                <circle class="fill-accent" cx="128" cy="100" r="6"/>
+                            </g>
+                            <text class="t-dim" x="68" y="84">biggest bribes board</text>
+                            <text class="t-dim" x="0" y="180">waiting to be sent</text>
+                            <text class="t-dim t-end" x="360" y="180">received</text>
+                        </svg>
+                        <svg class="dg" viewBox="0 0 360 196" role="img" aria-label="Kaspa: many ferries leave all the time, the dock has no queue, and no passenger needs to bribe for a seat.">
+                            <text class="t-strong" x="0" y="14">Kaspa: ferries leave constantly</text>
+                            <rect class="box" x="0" y="34" width="68" height="128" rx="6"/>
+                            <rect class="box" x="302" y="34" width="58" height="128" rx="6"/>
+                            <circle class="fill-dim" cx="34" cy="98" r="3"/>
+                            <text class="t-dim t-mid" x="34" y="122">no queue</text>
+                            <g class="ferry-b" style="--o:18; animation-delay:-0.64s"><rect class="box box--cool" x="78" y="50" width="44" height="18" rx="5"/><circle class="fill-dim" cx="92" cy="59" r="3"/></g>
+                            <g class="ferry-b" style="--o:120; animation-delay:-4.24s"><rect class="box box--cool" x="180" y="50" width="44" height="18" rx="5"/><circle class="fill-dim" cx="194" cy="59" r="3"/><circle class="fill-dim" cx="206" cy="59" r="3"/></g>
+                            <g class="ferry-b" style="--o:70; animation-delay:-2.47s"><rect class="box box--cool" x="130" y="89" width="44" height="18" rx="5"/><circle class="fill-dim" cx="144" cy="98" r="3"/></g>
+                            <g class="ferry-b" style="--o:170; animation-delay:-6.01s"><rect class="box box--cool" x="230" y="89" width="44" height="18" rx="5"/><circle class="fill-dim" cx="244" cy="98" r="3"/></g>
+                            <g class="ferry-b" style="--o:40; animation-delay:-1.41s"><rect class="box box--cool" x="100" y="128" width="44" height="18" rx="5"/></g>
+                            <g class="ferry-b" style="--o:140; animation-delay:-4.95s"><rect class="box box--cool" x="200" y="128" width="44" height="18" rx="5"/><circle class="fill-dim" cx="214" cy="137" r="3"/></g>
+                            <text class="t-dim" x="68" y="182">no reason to bribe</text>
+                            <text class="t-dim t-end" x="360" y="182">received</text>
+                        </svg>
+                    </div>
+                    <figcaption>Dot size is the size of a passenger&rsquo;s bribe. With one ferry, seats are scarce and the miner earns the bribes. With constant ferries, nobody needs to pay.</figcaption>
+                </figure>
             </div>
-            <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
-                <span class="footer-label">nodes</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
-            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                new sky
-            </button>
         </div>
-    </footer>
+    </section>
 
-    <script src="../script.js"></script>
+    <section class="section wrap">
+        <div class="prose prose-col"><h3>References</h3></div>
+        <ol class="refs mt-1">
+            <li><a href="https://www.coingecko.com/en/coins/kaspa?chart=type%3Dprice%26mode%3Dline%26timeframe%3Dmax" target="_blank" rel="noopener noreferrer">CoinGecko — Kaspa price chart (max)</a></li>
+            <li><a href="https://wiki.kaspa.org/en/tokenomics#:~:text=a%20Nakamoto%27s%20philosophy.-,WHAT%20IS%20THE%20MONETARY%20POLICY%3F,variability%20will%20be%20much%20higher%20for%20other%20reasons%20down%20the%20line.,-WHAT%20IS%20THE" target="_blank" rel="noopener noreferrer">Kaspa Wiki — Monetary policy / tokenomics</a></li>
+        </ol>
+    </section>
+</main>
+
+<script>
+(function () {
+    // Hover readout for the emission chart: values computed from the schedules.
+    var svg = document.getElementById('emit');
+    if (!svg) return;
+    var tip = document.getElementById('emit-tip');
+    var hit = svg.querySelector('.hit');
+    var q = function (k) { return tip.querySelector('[data-k="' + k + '"]'); };
+    var X = function (t) { return 48 + t * 376 / 16; };
+    var Y = function (v) { return 246 - v * 212; };
+    function pct(v) { return v >= 0.1 ? (v * 100).toFixed(1) + '%' : (v * 100).toFixed(2) + '%'; }
+    function move(e) {
+        var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+        var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+        var m = Math.round(Math.max(0, Math.min(192, (p.x - 48) / 376 * 192)));
+        var t = m / 12, b = Math.pow(0.5, Math.floor(t / 4 + 1e-9)), k = Math.pow(0.5, m / 12);
+        if (m === 192) b = Math.pow(0.5, 3);
+        var x = X(t);
+        tip.querySelector('.xhair').setAttribute('x1', x); tip.querySelector('.xhair').setAttribute('x2', x);
+        q('b').setAttribute('cx', x); q('b').setAttribute('cy', Y(b));
+        q('k').setAttribute('cx', x); q('k').setAttribute('cy', Y(k));
+        var bx = x > 280 ? x - 140 : x + 8, by = 40;
+        var r = tip.querySelector('.tip-bg'); r.setAttribute('x', bx); r.setAttribute('y', by);
+        var y0 = Math.floor(t), mo = m % 12;
+        q('t1').textContent = 'Year ' + y0 + (mo ? ', month ' + mo : '');
+        q('t2').textContent = 'Bitcoin ' + pct(b);
+        q('t3').textContent = 'Kaspa   ' + pct(k);
+        ['t1', 't2', 't3'].forEach(function (n, i) { q(n).setAttribute('x', bx + 10); q(n).setAttribute('y', by + 17 + i * 15); });
+        tip.style.display = '';
+    }
+    hit.addEventListener('pointermove', move);
+    hit.addEventListener('pointerleave', function () { tip.style.display = 'none'; });
+})();
+</script>
 </body>
 </html>

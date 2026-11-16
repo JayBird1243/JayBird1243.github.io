@@ -1,640 +1,345 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="../" data-page="projects">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Autonomous Driving | Jack Buhr</title>
-    <link rel="stylesheet" href="../style.css">
+    <meta name="description" content="A team-built robot taxi on a Raspberry Pi. I wrote its pathfinding, position tracking and fare selection, and built its brake and turn lights.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
     <style>
-        /* ─── Contribution highlight ─── */
-        .contribution-banner {
-            display: inline-block;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--primary-color);
-            background: rgba(160, 57, 198, 0.1);
-            border: 1px solid rgba(160, 57, 198, 0.35);
-            border-radius: 4px;
-            padding: 3px 10px;
-            margin-bottom: 1.25rem;
-        }
-
-        .contributions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.25rem;
-            margin-top: 1.5rem;
-        }
-
-        /* Prevent grid overflow on narrow viewports */
-        .contributions-grid > *,
-        .tech-tags > * {
-            min-width: 0;
-        }
-
-        .contribution-card {
-            background: rgba(160, 57, 198, 0.06);
-            border: 1px solid rgba(160, 57, 198, 0.25);
-            border-radius: 10px;
-            padding: 1.4rem;
-            transition: border-color 0.25s ease, box-shadow 0.25s ease;
-            overflow-wrap: break-word;
-            word-break: break-word;
-        }
-
-        .contribution-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 20px rgba(160, 57, 198, 0.15);
-        }
-
-        .contribution-card.primary {
-            background: rgba(160, 57, 198, 0.09);
-        }
-
-        /* Collaborative cards are visually secondary */
-        .contribution-card.collaborative {
-            background: rgba(22, 27, 34, 0.5);
-            border-color: rgba(160, 57, 198, 0.15);
-        }
-
-        .contribution-card .card-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: rgba(160, 57, 198, 0.7);
-            margin-bottom: 0.5rem;
-        }
-
-        .contribution-card.collaborative .card-label {
-            color: rgba(160, 57, 198, 0.45);
-        }
-
-        .contribution-card h3 {
-            color: white;
-            font-size: 1.05rem;
-            margin: 0 0 0.6rem 0;
-        }
-
-        .contribution-card.collaborative h3 {
-            color: rgba(201, 209, 217, 0.8);
-        }
-
-        /* Bold lead line in each card for scan speed */
-        .contribution-card .card-lead {
-            color: rgba(201, 209, 217, 0.95);
-            font-size: 0.9rem;
-            font-weight: 600;
-            line-height: 1.5;
-            margin: 0 0 0.6rem 0;
-        }
-
-        .contribution-card .card-detail {
-            color: rgba(201, 209, 217, 0.65);
-            font-size: 0.875rem;
-            line-height: 1.65;
-            margin: 0;
-        }
-
-        /* ─── Tabs ─── */
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-color);
-            padding: 8px 18px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: 5px;
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            background: rgba(160, 57, 198, 0.1);
-            color: var(--primary-color);
-        }
-
-        .tab-btn:focus-visible {
-            outline: 2px solid var(--primary-color);
-            outline-offset: 2px;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeUp 0.3s ease;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(6px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .tab-content.active {
-                animation: none;
-            }
-        }
-
-        .tab-content h3 {
-            color: white;
-            font-size: 1.1rem;
-            margin-top: 0;
-            margin-bottom: 0.75rem;
-        }
-
-        .tab-content p,
-        .tab-content li {
-            font-size: 0.92rem;
-            line-height: 1.7;
-            color: var(--text-color);
-            max-width: 72ch;
-        }
-
-        /* ─── Tech tags ─── */
-        .tech-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 1rem;
-        }
-
-        .tech-tag {
-            background: rgba(160, 57, 198, 0.08);
-            color: rgba(201, 209, 217, 0.8);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.82rem;
-            border: 1px solid rgba(160, 57, 198, 0.18);
-            white-space: nowrap;
-        }
-
-        /* ─── Stat strip ─── */
-        .stat-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .stat-value {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.25rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 700;
-        }
-
-        .stat-label {
-            font-size: 0.72rem;
-            color: rgba(201, 209, 217, 0.45);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        /* ─── Outcome callout ─── */
-        .outcome-callout {
-            background: rgba(22, 27, 34, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem 1.25rem;
-            font-size: 0.88rem;
-            color: rgba(201, 209, 217, 0.65);
-            line-height: 1.65;
-            margin-top: 1rem;
-        }
-
-        /* ─── Section intro copy ─── */
-        .section-intro {
-            font-size: 0.9rem;
-            color: rgba(201, 209, 217, 0.6);
-            margin-bottom: 1.5rem;
-            margin-top: 0;
-        }
-
-        /* ══════════════════════════════════════════════════════════════
-           Phone layout. Breakpoints match the global responsive layer in
-           style.css so the whole site behaves consistently. Desktop is
-           untouched — every rule below is inside a phone-only query.
-           ══════════════════════════════════════════════════════════════ */
-        @media (max-width: 768px) {
-            /* Stat strip: as a wrapping flex row with a 2rem gap the four
-               items land in a ragged two-up block whose labels never line
-               up. A fixed two-column grid keeps them aligned. */
-            .stat-strip {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 0.9rem 0.75rem;
-                margin-top: 1.1rem;
-                padding-top: 1.1rem;
-            }
-
-            .stat-value {
-                font-size: 1.05rem;
-            }
-
-            .stat-label {
-                font-size: 0.64rem;
-                letter-spacing: 0.06em;
-            }
-
-            /* Contribution cards already stack (auto-fit / 260px), but the
-               desktop padding and type eat the narrow column. Trade chrome
-               for text width. */
-            .contributions-grid {
-                grid-template-columns: 1fr;
-                gap: 0.85rem;
-                margin-top: 1.1rem;
-            }
-
-            .contribution-card {
-                padding: 0.95rem 0.9rem;
-                border-radius: 8px;
-            }
-
-            .contribution-banner {
-                font-size: 0.6rem;
-                padding: 2px 8px;
-                margin-bottom: 0.9rem;
-            }
-
-            .contribution-card .card-label {
-                font-size: 0.58rem;
-                margin-bottom: 0.35rem;
-            }
-
-            .contribution-card h3 {
-                font-size: 0.95rem;
-                margin-bottom: 0.45rem;
-            }
-
-            .contribution-card .card-lead {
-                font-size: 0.82rem;
-                line-height: 1.45;
-                margin-bottom: 0.5rem;
-            }
-
-            .contribution-card .card-detail {
-                font-size: 0.79rem;
-                line-height: 1.55;
-            }
-
-            .section-intro {
-                font-size: 0.82rem;
-                margin-bottom: 1rem;
-            }
-
-            /* Four tab buttons wrap into an uneven two-row block at desktop
-               sizing. A 2x2 grid gives equal, predictable tap targets. */
-            .tabs {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 6px;
-                margin-bottom: 1.1rem;
-                padding-bottom: 10px;
-            }
-
-            .tab-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-width: 0;
-                min-height: 34px;
-                padding: 6px;
-                font-size: 0.76rem;
-                line-height: 1.2;
-                border-radius: 6px;
-                text-align: center;
-                overflow-wrap: anywhere;
-            }
-
-            .tab-content h3 {
-                font-size: 0.98rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .tab-content p,
-            .tab-content li {
-                font-size: 0.84rem;
-                line-height: 1.6;
-            }
-
-            .outcome-callout {
-                padding: 0.8rem 0.9rem;
-                font-size: 0.79rem;
-                line-height: 1.55;
-                border-radius: 6px;
-                margin-top: 0.85rem;
-            }
-
-            .tech-tags {
-                gap: 6px;
-                margin-top: 0.75rem;
-            }
-
-            .tech-tag {
-                font-size: 0.72rem;
-                padding: 3px 9px;
-                /* nowrap is safe at 375, but a longer label must wrap rather
-                   than push the page sideways. */
-                white-space: normal;
-                overflow-wrap: anywhere;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .tab-btn {
-                font-size: 0.72rem;
-                padding: 5px 4px;
-            }
-
-            .stat-value {
-                font-size: 0.98rem;
-            }
-
-            .tech-tag {
-                font-size: 0.68rem;
-            }
+        .ad-entry + .ad-entry { margin-top: 2.5rem; padding-top: 2.5rem; border-top: 1px dashed var(--line); }
+        .ad-entry h3 { margin-bottom: 0.5rem; }
+        .ad-entry .dim { max-width: 62ch; }
+        .ad-table-wrap { overflow-x: auto; }
+        .ad-table-wrap .table { min-width: 0; }
+        .table tr.ad-win td { color: var(--text); background: var(--accent-soft); }
+        .table tr.ad-win td:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+        .ad-bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--line-2); vertical-align: middle; margin-right: 0.5rem; }
+        .ad-win .ad-bar { background: var(--accent); }
+        .ad-legend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin-top: 0.85rem; font-family: var(--mono); font-size: 0.74rem; color: var(--text-3); }
+        .ad-legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.45rem; vertical-align: -1px; border: 1px solid var(--line-2); background: var(--surface-2); }
+        .ad-legend .me::before { border-color: var(--accent); background: var(--accent-soft); }
+        .ad-legend .ext::before { border-style: dashed; background: none; }
+        .ad-outcome h3 { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.7rem; }
+        .ad-outcome .list > li::before { background: var(--ok); }
+        .ad-outcome.ad-no .list > li::before { background: var(--bad); }
+        @media (max-width: 620px) {
+            .table th, .table td { padding: 0.5rem 0.4rem; }
+            .ad-bar { display: none; }
+            .dg.ad-sm text { font-size: 14px; }
         }
     </style>
 </head>
 <body>
-    <div id="background-container">
-        <div id="stars-container"></div>
-        <div id="nodes-container"></div>
-    </div>
-
-    <header>
-        <nav>
-            <div class="logo">JB</div>
-            <div id="seed-display" class="seed-display">Seed: </div>
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../projects.html" class="active">Projects</a></li>
-                <li><a href="../skills.html">Skills</a></li>
-            </ul>
-        </nav>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html">← Projects</a>
+        <p class="kicker">Course project · Robotics</p>
+        <h1>Autonomous Driving</h1>
+        <p class="lede">A semester team project: a small robot taxi on a Raspberry Pi that drives a miniature city, picks up fares and follows traffic rules. I wrote the navigation and fare logic and built the brake and turn lights.</p>
+        <dl class="facts">
+            <div><dt>Team</dt><dd>4 people</dd></div>
+            <div><dt>Timeline</dt><dd>~12 weeks</dd></div>
+            <div><dt>Platform</dt><dd>Raspberry Pi 4B, PiCar-X</dd></div>
+            <div><dt>My part</dt><dd>Navigation, fare logic, lights</dd></div>
+        </dl>
     </header>
 
-    <main id="content-wrapper">
-        <section class="hero">
-            <h1>Autonomous Driving</h1>
-            <a href="../projects.html" class="deep-dive-btn">← Back to Projects</a>
-        </section>
+    <div class="wrap">
+        <ul class="keypoints" data-reveal>
+            <li>I wrote the route planning (Dijkstra), position tracking between GPS fixes, and a fare picker that ranks rides by profit per minute.</li>
+            <li>GPS fixes arrived up to 4 seconds late, so I estimated position from speed and heading in between.</li>
+            <li>Pathfinding and fare logic worked. Steering drift and vision under motion were still unsolved when the competition was cancelled.</li>
+        </ul>
+    </div>
 
-        <!-- ── Overview ── -->
-        <section class="content-box">
-            <h2>Overview</h2>
-            <p>
-                A semester-long team project to build a fully autonomous robot capable of navigating a miniature city, accepting passenger fares, and obeying traffic rules — all in real time on the constrained hardware of a Raspberry Pi. The robot combined graph-based path planning, computer vision lane tracking, hardware-accelerated object detection, and a live fare-dispatch server to simulate a scaled-down autonomous taxi.
-            </p>
-            <p style="margin-bottom: 0;">
-                Most individual components reached a functional baseline. Pathfinding and fare logic ran correctly, lane following held for ~7 seconds on straight paths, and object detection identified signs at 0.67+ confidence in controlled testing.
-            </p>
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>The system</h2></div>
+        <p class="section-intro">Three layers ran in one loop on the Pi: sensors fed decisions, and decisions drove the motors and lights. My parts are in amber.</p>
+        <figure class="fig">
+            <div class="fig-scroll">
+                <svg class="dg" viewBox="0 0 720 360" role="img" aria-label="System diagram. Perception layer: lane detection, object detection, grayscale sensors, and the competition server for GPS and fares. Decision layer, built by me: position tracking, pathfinding, fare selection. Control layer: PD steering and adaptive speed by teammates, brake and turn lights by me.">
+                    <defs>
+                        <marker id="adsys-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-dim"/></marker>
+                        <marker id="adsys-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fill-accent"/></marker>
+                    </defs>
 
-            <div class="stat-strip">
-                <div class="stat-item">
-                    <span class="stat-value">4</span>
-                    <span class="stat-label">Team Members</span>
+                    <!-- layer labels -->
+                    <text x="0" y="68" class="t-dim">PERCEPTION</text>
+                    <text x="0" y="178" class="t-dim t-accent">DECISION</text>
+                    <text x="0" y="288" class="t-dim">CONTROL</text>
+                    <line class="gridline" x1="0" y1="118" x2="720" y2="118" stroke-dasharray="2 4"/>
+                    <line class="gridline" x1="0" y1="229" x2="720" y2="229" stroke-dasharray="2 4"/>
+
+                    <!-- wires -->
+                    <!-- lane detection to PD steering, down the left gutter -->
+                    <path class="wire flow flow--slow" d="M110 64 H94 V284 H106" marker-end="url(#adsys-arr)"/>
+                    <!-- server to position tracking and fare selection -->
+                    <path class="wire flow flow--slow" d="M655 92 V132 H180 V142" marker-end="url(#adsys-arr)"/>
+                    <path class="wire flow flow--slow" d="M500 132 V142" marker-end="url(#adsys-arr)"/>
+                    <text x="647" y="124" class="t-dim t-end">fares, GPS fixes</text>
+                    <!-- into pathfinding -->
+                    <path class="wire wire--accent flow flow--slow" d="M250 174 H266" marker-end="url(#adsys-arr-a)"/>
+                    <path class="wire wire--accent flow flow--slow" d="M430 174 H414" marker-end="url(#adsys-arr-a)"/>
+                    <!-- pathfinding to control -->
+                    <path class="wire wire--accent flow flow--slow" d="M340 202 V240 M180 240 H500"/>
+                    <path class="wire wire--accent" d="M180 240 V252" marker-end="url(#adsys-arr-a)"/>
+                    <path class="wire wire--accent" d="M340 240 V252" marker-end="url(#adsys-arr-a)"/>
+                    <path class="wire wire--accent" d="M500 240 V252" marker-end="url(#adsys-arr-a)"/>
+                    <text x="348" y="222" class="t-dim t-accent">route, turns</text>
+
+                    <!-- perception: teammates + external -->
+                    <rect class="box" x="110" y="36" width="140" height="56" rx="6"/>
+                    <text x="122" y="60" class="t-strong">Lane detection</text>
+                    <text x="122" y="78" class="t-dim">camera, OpenCV</text>
+                    <rect class="box" x="270" y="36" width="140" height="56" rx="6"/>
+                    <text x="282" y="60" class="t-strong">Object detection</text>
+                    <text x="282" y="78" class="t-dim">Coral Edge TPU</text>
+                    <rect class="box" x="430" y="36" width="140" height="56" rx="6"/>
+                    <text x="442" y="60" class="t-strong">Grayscale sensors</text>
+                    <text x="442" y="78" class="t-dim">course correction</text>
+                    <rect class="box box--ghost" x="592" y="36" width="126" height="56" rx="6"/>
+                    <text x="604" y="60" class="t-strong">Course server</text>
+                    <text x="604" y="78" class="t-dim">GPS, fare list</text>
+
+                    <!-- decision: mine -->
+                    <rect class="box box--accent" x="110" y="146" width="140" height="56" rx="6"/>
+                    <text x="122" y="170" class="t-strong">Position tracking</text>
+                    <text x="122" y="188" class="t-dim">dead reckoning</text>
+                    <rect class="box box--accent" x="270" y="146" width="140" height="56" rx="6"/>
+                    <text x="282" y="170" class="t-strong">Pathfinding</text>
+                    <text x="282" y="188" class="t-dim">Dijkstra, NetworkX</text>
+                    <rect class="box box--accent" x="430" y="146" width="140" height="56" rx="6"/>
+                    <text x="442" y="170" class="t-strong">Fare selection</text>
+                    <text x="442" y="188" class="t-dim">profit per minute</text>
+
+                    <!-- control -->
+                    <rect class="box" x="110" y="256" width="140" height="56" rx="6"/>
+                    <text x="122" y="280" class="t-strong">PD steering</text>
+                    <text x="122" y="298" class="t-dim">lane error to servo</text>
+                    <rect class="box" x="270" y="256" width="140" height="56" rx="6"/>
+                    <text x="282" y="280" class="t-strong">Adaptive speed</text>
+                    <text x="282" y="298" class="t-dim">4 speed zones</text>
+                    <rect class="box box--accent" x="430" y="256" width="140" height="56" rx="6"/>
+                    <text x="442" y="280" class="t-strong">Brake + turn lights</text>
+                    <text x="442" y="298" class="t-dim">LED board on GPIO</text>
+                </svg>
+            </div>
+            <div class="ad-legend"><span class="me">My work</span><span>Teammates</span><span class="ext">Provided by the course</span></div>
+            <figcaption>I also had input on the computer vision choices (Coral TPU, EfficientDet-Lite, Street View training data). Teammates built and ran those parts.</figcaption>
+        </figure>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">02</span><h2>What I built</h2></div>
+
+        <div class="ad-entry">
+            <div class="split split--fig-wide split--center">
+                <div>
+                    <h3>Pathfinding</h3>
+                    <p class="dim">A modified Dijkstra in NetworkX. Each road's weight is its length plus penalties: a road entered after a turn counts double, and roads in risk zones count as longer. The planner prefers straight, safe routes even when they are a bit longer.</p>
+                    <div class="ad-table-wrap mt-2">
+                        <table class="table">
+                            <thead><tr><th>Route</th><th class="num">Length</th><th>Weighting</th><th class="num">Cost</th></tr></thead>
+                            <tbody>
+                                <tr class="ad-win"><td>Across, then down</td><td class="num">7</td><td class="mono small">4 + 3×2</td><td class="num">10</td></tr>
+                                <tr><td>Diagonal</td><td class="num">5</td><td class="mono small">5 + 6 risk</td><td class="num">11</td></tr>
+                                <tr><td>Staircase</td><td class="num">7</td><td class="mono small">2 + 2×2 + 1×2 + 2×2</td><td class="num">12</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value">~12 wk</span>
-                    <span class="stat-label">Timeline</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value">5</span>
-                    <span class="stat-label">Subsystems</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value">RPi 4B</span>
-                    <span class="stat-label">Platform</span>
-                </div>
+                <figure class="fig">
+                    <svg class="dg ad-sm" viewBox="0 0 400 310" role="img" aria-label="Toy road graph from start to goal. The chosen route goes across 4 then down 3 with one turn, cost 10. A diagonal of length 5 passes a risk zone, cost 11. A staircase of length 7 has three turns, cost 12.">
+                        <!-- risk zone on the diagonal -->
+                        <rect x="120" y="109" width="90" height="40" rx="8" transform="rotate(36.87 165 129)" fill="var(--bad-soft)" stroke="var(--bad)" stroke-dasharray="3 4"/>
+                        <text x="192" y="118" class="t-dim t-bad">risk zone +6</text>
+
+                        <!-- alternative routes -->
+                        <path class="wire wire--dim" d="M60 50 L340 260" stroke-width="2"/>
+                        <path class="wire wire--dim" d="M60 50 V190 H200 V260 H340" stroke-width="2"/>
+                        <!-- chosen route -->
+                        <path class="wire wire--accent draw" pathLength="1" d="M60 50 H340 V260" stroke-width="3"/>
+
+                        <!-- edge labels -->
+                        <text x="200" y="38" class="t-mid t-accent">4</text>
+                        <text x="352" y="150" class="t-accent">3 ×2</text>
+                        <text x="104" y="106" class="t-dim">5</text>
+                        <text x="48" y="124" class="t-dim t-end">2</text>
+                        <text x="130" y="208" class="t-dim t-mid">2 ×2</text>
+                        <text x="210" y="230" class="t-dim">1 ×2</text>
+                        <text x="270" y="280" class="t-dim t-mid">2 ×2</text>
+
+                        <!-- nodes -->
+                        <circle cx="60" cy="190" r="4" class="fill-dim"/>
+                        <circle cx="200" cy="190" r="4" class="fill-dim"/>
+                        <circle cx="200" cy="260" r="4" class="fill-dim"/>
+                        <circle cx="340" cy="50" r="4" class="fill-accent"/>
+                        <circle cx="60" cy="50" r="6" class="fill-accent"/>
+                        <circle cx="340" cy="260" r="6" class="fill-accent"/>
+                        <text x="48" y="44" class="t-end">start</text>
+                        <text x="352" y="275">goal</text>
+
+                        <!-- car moving along the chosen route -->
+                        <circle r="7" class="fill-accent ad-car" cx="0" cy="0" opacity="0">
+                            <animateMotion dur="5s" repeatCount="indefinite" path="M60 50 H340 V260" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="linear"/>
+                            <set attributeName="opacity" to="1" begin="0s"/>
+                        </circle>
+                    </svg>
+                    <figcaption>Toy example with made-up lengths. A road entered after a turn counts double; the first leg has no turn.</figcaption>
+                </figure>
             </div>
-        </section>
-
-        <!-- ── My Contributions ── -->
-        <section class="content-box">
-            <div class="contribution-banner">My Contributions</div>
-            <h2>What I Built</h2>
-            <p class="section-intro" style="margin-top: 0.25rem;">
-                My work centred on the systems that determined <em>where</em> the vehicle went and <em>why</em> — the intelligence layer above raw motion. I also built the vehicle's brake and turn lights from scratch.
-            </p>
-
-            <div class="contributions-grid">
-                <div class="contribution-card primary">
-                    <div class="card-label">Primary · Navigation &amp; Routing</div>
-                    <h3>Pathfinding &amp; Position Tracking</h3>
-                    <p class="card-lead">Designed the full route intelligence layer: modified Dijkstra's algorithm with custom edge weights, plus a dead-reckoning position fallback for when GPS was too slow.</p>
-                    <p class="card-detail">
-                        Implemented via NetworkX with edges weighted by distance plus a priority value — risk zone roads were penalised to appear longer, and any branch where the vehicle changed direction had its effective distance doubled, naturally discouraging high-turn routes. The competition's VPFS GPS had up to 4-second latency, so I built a dead-reckoning layer that polled vehicle speed and heading to keep an internal x/y position updated between GPS fixes. Pathfinding always operated against the latest combined estimate.
-                    </p>
-                </div>
-
-                <div class="contribution-card primary">
-                    <div class="card-label">Primary · Fare Logic</div>
-                    <h3>Fare Selection &amp; Dispatch</h3>
-                    <p class="card-lead">Built the engine that picked the most profitable fare — not just the nearest one — by dividing payout by estimated completion time.</p>
-                    <p class="card-detail">
-                        The system polled the competition server for available rides, then estimated total trip time including travel to pickup, the ride itself, and a turn-count penalty. Dividing fare by time gave a profit-per-minute score; the highest-scoring fare was claimed. This made the car actively optimise revenue rather than accepting rides sequentially.
-                    </p>
-                </div>
-
-                <div class="contribution-card primary">
-                    <div class="card-label">Hardware · Physical Build</div>
-                    <h3>Brake &amp; Turn Light Assembly</h3>
-                    <p class="card-lead">Hand-soldered the vehicle's brake and indicator light board onto a 15 × 8 cm protoboard, wired directly to Raspberry Pi GPIO.</p>
-                    <p class="card-detail">
-                        Red and yellow LEDs were wired in series with 100 Ω current-limiting resistors, sized for the 3.3 V digital I/O output. The lights provided real-world signalling behaviour consistent with road traffic norms and were controlled programmatically alongside the navigation system.
-                    </p>
-                </div>
-
-                <div class="contribution-card collaborative">
-                    <div class="card-label">Collaborative · Research</div>
-                    <h3>Computer Vision Direction</h3>
-                    <p class="card-lead">Contributed to technology selection for the CV stack — Coral TPU, EfficientDet-Lite, and Street View dataset strategy.</p>
-                    <p class="card-detail">
-                        While implementation was led by a teammate, I had input on the choice of the Coral Edge TPU for hardware-accelerated inference, the EfficientDet-Lite model for its edge-device speed/accuracy balance, and the approach of sourcing training data from Google Street View imagery of Ontario roads.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ── Full System Breakdown ── -->
-        <section class="content-box">
-            <h2>Full System Breakdown</h2>
-            <p class="section-intro">
-                The remaining subsystems were built by teammates, with varying input from me on research and direction.
-            </p>
-
-            <div class="tabs" role="tablist" aria-label="System subsystems">
-                <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="lane" data-tab="lane">Lane Detection</button>
-                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="object" data-tab="object">Object Detection</button>
-                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="motion" data-tab="motion">Motion Control</button>
-                <button class="tab-btn" role="tab" aria-selected="false" aria-controls="arch" data-tab="arch">Architecture</button>
-            </div>
-
-            <div id="lane" class="tab-content active" role="tabpanel" aria-labelledby="tab-lane">
-                <h3>Lane Detection</h3>
-                <p>
-                    Developed by a teammate, this system used OpenCV's Hough line transform to identify both solid white and dashed yellow lane markings from live camera frames. Each frame was pre-processed through grayscale conversion, Gaussian blur, binary thresholding, and Canny edge detection before a trapezoidal road mask was applied and lane lines were extracted.
-                </p>
-                <p>
-                    A key insight: dotted yellow lines returned four Hough lines per dot (the edges of each rectangular segment), requiring a horizontal-line filter to discard stop-line noise and an outlier filter to consolidate valid lines into a single best-fit lane per side. All parameters were stored as global variables for rapid tuning. The algorithm performed consistently on straight paths; curved roads proved more difficult due to the Hough transform's linear assumptions.
-                </p>
-            </div>
-
-            <div id="object" class="tab-content" role="tabpanel" aria-labelledby="tab-object">
-                <h3>Object Detection</h3>
-                <p>
-                    Led by a teammate, this system ran a retrained EfficientDet-Lite model on a Google Coral Edge TPU — offloading inference from the Raspberry Pi's CPU entirely. The model was fine-tuned using a dataset of rubber ducks and road signs sourced from Google Street View imagery, annotated with bounding boxes via MakeSense.ai and exported in Pascal VOC format.
-                </p>
-                <p>
-                    The deployed model produced real-time bounding box predictions with confidence scores. If confidence fell below 0.67 on a target class, the dataset was expanded and retraining repeated. In practice, the model performed well in static conditions but struggled with motion blur and variable lighting during active driving — a known gap that would have required a larger dataset and more moving-vehicle test sessions to resolve.
-                </p>
-            </div>
-
-            <div id="motion" class="tab-content" role="tabpanel" aria-labelledby="tab-motion">
-                <h3>Motion Control</h3>
-                <p>
-                    A proportional-derivative (PD) controller translated lane detection outputs into steering and speed commands. The proportional component (k<sub>p</sub> = 0.4) produced correction force proportional to lane-centre error; the derivative component (k<sub>d</sub> = 0.15) damped oscillation by tracking the rate of error change, preventing overshoot.
-                </p>
-                <p>
-                    Speed was dynamically scaled across four zones: full speed for straight paths (&lt;5° steering), 80% for gentle curves (5–10°), 60% for moderate curves (10–15°), and 40% for sharp curves (&gt;15°). A recovery behaviour managed lane-loss: short gaps (≤10 frames) held the last known steering at 50% speed with 0.7× damping; prolonged loss (&gt;10 frames) straightened the wheels and crept forward at 30%.
-                </p>
-            </div>
-
-            <div id="arch" class="tab-content" role="tabpanel" aria-labelledby="tab-arch">
-                <h3>System Architecture</h3>
-                <p>
-                    The software ran as a single central loop on the Raspberry Pi, calling modular functions on their respective polling schedules. Lane following ran every frame; VPFS position updates polled several times per second; fare checking on a longer interval.
-                </p>
-                <p>
-                    Three clear layers: a <strong>perception layer</strong> (camera + grayscale sensors), a <strong>decision layer</strong> (pathfinding, fare selection, position tracking), and a <strong>control layer</strong> (PD steering, adaptive speed). Data flowed upward from sensors to decisions, commands downward to actuators. Each subsystem exposed simple interfaces to ease cross-team integration.
-                </p>
-                <p>
-                    The main integration challenge was the simulation-to-real-course transition — physical track noise degraded lane detection, requiring parameter tightening. A steering servo mechanical imperfection caused rightward drift despite neutral commands, a hardware calibration issue rather than a software bug.
-                </p>
-            </div>
-        </section>
-
-        <!-- ── Outcome ── -->
-        <section class="content-box">
-            <h2>Outcome</h2>
-            <p>
-                All individual subsystems reached a functional baseline. The robot course-corrected via grayscale sensors, followed straight paths under camera guidance for ~7 seconds before drift, detected objects at adequate confidence in controlled conditions, and correctly executed pathfinding and fare selection logic.
-            </p>
-            <p>
-                Full integration exposed two main gaps — mechanical steering drift and reduced vision performance under motion — that would have needed further tuning to be competition-ready. The competition was cancelled before those issues were resolved.
-            </p>
-            <div class="outcome-callout">
-                Given the project scope, the team's limited prior experience with computer vision, embedded systems, and machine learning, and the compressed timeline alongside other coursework, the result reflects a meaningful technical achievement. The architecture was sound; remaining deficits were tuning problems, not design failures.
-            </div>
-        </section>
-
-        <!-- ── Technologies ── -->
-        <section class="content-box">
-            <h2>Technologies</h2>
-            <div class="tech-tags" role="list">
-                <span class="tech-tag" role="listitem">Python</span>
-                <span class="tech-tag" role="listitem">NetworkX</span>
-                <span class="tech-tag" role="listitem">Dijkstra's Algorithm</span>
-                <span class="tech-tag" role="listitem">Dead Reckoning</span>
-                <span class="tech-tag" role="listitem">REST API</span>
-                <span class="tech-tag" role="listitem">OpenCV · Hough Transform</span>
-                <span class="tech-tag" role="listitem">EfficientDet-Lite · TF Lite</span>
-                <span class="tech-tag" role="listitem">Coral Edge TPU</span>
-                <span class="tech-tag" role="listitem">Raspberry Pi 4B · PiCar-X</span>
-                <span class="tech-tag" role="listitem">PD Control</span>
-                <span class="tech-tag" role="listitem">GPIO · Hardware Soldering</span>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        function openTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('active');
-                el.setAttribute('aria-selected', 'false');
-            });
-            const panel = document.getElementById(tabId);
-            if (panel) panel.classList.add('active');
-            const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-            if (btn) {
-                btn.classList.add('active');
-                btn.setAttribute('aria-selected', 'true');
-            }
-        }
-
-        // Arrow-key keyboard navigation for tabs
-        document.querySelector('.tabs').addEventListener('keydown', function (e) {
-            const tabs = Array.from(this.querySelectorAll('.tab-btn'));
-            const current = tabs.findIndex(t => t.classList.contains('active'));
-            let next = -1;
-            if (e.key === 'ArrowRight') next = (current + 1) % tabs.length;
-            if (e.key === 'ArrowLeft')  next = (current - 1 + tabs.length) % tabs.length;
-            if (next !== -1) {
-                tabs[next].focus();
-                openTab(tabs[next].dataset.tab);
-                e.preventDefault();
-            }
-        });
-
-        // Wire up tab buttons via data-tab (no inline onclick)
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => openTab(btn.dataset.tab));
-        });
-    </script>
-    <footer id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-field">
-                <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
-                <span class="footer-label">stars</span>
-            </div>
-            <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
-                <span class="footer-label">nodes</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
-            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                new sky
-            </button>
         </div>
-    </footer>
 
-    <script src="../script.js"></script>
+        <div class="ad-entry">
+            <div class="split split--fig-wide split--center">
+                <div>
+                    <h3>Position between GPS fixes</h3>
+                    <p class="dim">The course GPS (VPFS) could be up to 4 seconds behind. I kept an internal x/y position and advanced it from the car's speed and heading between fixes.</p>
+                    <p class="mono small muted mt-1">x += v · cos θ · Δt<br>y += v · sin θ · Δt</p>
+                </div>
+                <figure class="fig">
+                    <svg class="dg ad-sm" viewBox="0 0 420 240" role="img" aria-label="A curved road. The last GPS fix sits well behind the car because it is up to 4 seconds old. A trail of amber estimates, each from speed and heading, carries the position forward to where the car actually is.">
+                        <!-- road -->
+                        <path d="M30 200 C150 200 250 60 390 60" fill="none" stroke="var(--surface-2)" stroke-width="22" stroke-linecap="round"/>
+                        <path d="M30 200 C150 200 250 60 390 60" class="wire wire--dim" stroke-dasharray="6 8"/>
+
+                        <!-- estimate steps -->
+                        <circle class="fill-accent pop" style="--d:1" cx="161.4" cy="154.7" r="3.5"/>
+                        <circle class="fill-accent pop" style="--d:2" cx="188.7" cy="138.4" r="3.5"/>
+                        <circle class="fill-accent pop" style="--d:3" cx="216.4" cy="121.6" r="3.5"/>
+                        <circle class="fill-accent pop" style="--d:4" cx="244.4" cy="105.3" r="3.5"/>
+                        <circle class="fill-accent pop" style="--d:5" cx="273.2" cy="90.2" r="3.5"/>
+                        <circle class="fill-accent pop" style="--d:6" cx="302.8" cy="77.3" r="3.5"/>
+
+                        <!-- last GPS fix -->
+                        <rect x="127" y="163" width="14" height="14" rx="2" class="fill-cool"/>
+                        <text x="122" y="214" class="t-cool">last GPS fix</text>
+                        <text x="122" y="230" class="t-dim">up to 4 s old</text>
+
+                        <!-- car now -->
+                        <rect x="323" y="58" width="22" height="13" rx="3" class="fill-accent" transform="rotate(-17 334 64)"/>
+                        <text x="334" y="40" class="t-mid">car now</text>
+
+                        <text x="236" y="152" class="t-dim t-accent">estimate from</text>
+                        <text x="236" y="167" class="t-dim t-accent">speed + heading</text>
+
+                        <!-- moving estimate -->
+                        <circle r="5" class="fill-accent ad-car" opacity="0">
+                            <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.8;1" calcMode="linear" path="M134.2 169.8 L143.7 164.7 L153.3 159.4 L162.8 153.9 L172.3 148.3 L181.9 142.5 L191.5 136.7 L201.1 130.8 L210.8 125.0 L220.5 119.1 L230.3 113.3 L240.2 107.7 L250.1 102.1 L260.2 96.8 L270.3 91.7 L280.5 86.8 L290.8 82.2 L301.3 77.9 L311.8 74.0 L322.5 70.5 L333.4 67.5"/>
+                            <set attributeName="opacity" to="1" begin="0s"/>
+                        </circle>
+                    </svg>
+                    <figcaption>Illustrative. Each amber step is one update from speed and heading.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="ad-entry">
+            <h3>Fare selection</h3>
+            <p class="dim">The car polled the course server for open rides. For each one I estimated the total time: driving to the pickup, the ride itself, and a penalty for turns. The car claimed the ride with the highest fare per minute, which is often not the nearest one.</p>
+            <div class="ad-table-wrap mt-2">
+                <table class="table">
+                    <thead><tr><th>Ride</th><th class="num">To pickup</th><th class="num">Ride</th><th class="num">Turns</th><th class="num">Total</th><th class="num">Fare</th><th>Per min</th></tr></thead>
+                    <tbody>
+                        <tr><td>A (nearest)</td><td class="num">1</td><td class="num">3</td><td class="num">1</td><td class="num">5</td><td class="num">10</td><td class="nowrap"><span class="ad-bar" style="width:40px"></span>2.0</td></tr>
+                        <tr class="ad-win"><td>B (claimed)</td><td class="num">3</td><td class="num">6</td><td class="num">1</td><td class="num">10</td><td class="num">30</td><td class="nowrap"><span class="ad-bar" style="width:60px"></span>3.0</td></tr>
+                        <tr><td>C</td><td class="num">2</td><td class="num">8</td><td class="num">2</td><td class="num">12</td><td class="num">24</td><td class="nowrap"><span class="ad-bar" style="width:40px"></span>2.0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mono small muted mt-1">Example numbers. Times in minutes.</p>
+        </div>
+
+        <div class="ad-entry">
+            <h3>Brake and turn lights</h3>
+            <p class="dim">I hand-soldered the light board on a 15&nbsp;×&nbsp;8&nbsp;cm protoboard: red and yellow LEDs, each with a 100&nbsp;Ω resistor sized for the Pi's 3.3&nbsp;V GPIO. The code drove them alongside the navigation logic, so the car signalled its turns and stops.</p>
+        </div>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">03</span><h2>The rest of the system</h2></div>
+        <p class="section-intro">Built by my teammates.</p>
+        <div class="grid grid-3">
+            <div class="card">
+                <p class="card-kicker">Teammate</p>
+                <h3>Lane detection</h3>
+                <p>OpenCV on live camera frames, using a Hough line transform to find white and dashed yellow lane lines. Reliable on straights, harder on curves.</p>
+            </div>
+            <div class="card">
+                <p class="card-kicker">Teammate</p>
+                <h3>Object detection</h3>
+                <p>A retrained EfficientDet-Lite model on a Coral Edge TPU, trained on road signs and rubber ducks. Good when still, weaker with motion blur.</p>
+            </div>
+            <div class="card">
+                <p class="card-kicker">Teammate</p>
+                <h3>Motion control</h3>
+                <p>A PD controller turned lane error into steering. Speed dropped in steps as the steering angle grew.</p>
+            </div>
+        </div>
+        <details class="more">
+            <summary>More detail</summary>
+            <div class="more-body">
+                <h4>Lane detection</h4>
+                <p>Each frame went through grayscale, Gaussian blur, binary threshold and Canny edge detection, then a trapezoid road mask before the Hough transform. Each yellow dash returned four lines (its edges), so a horizontal-line filter dropped stop-line noise and an outlier filter merged what was left into one line per side. Curves were hard because the Hough transform looks for straight lines.</p>
+                <h4>Object detection</h4>
+                <p>Training images came from Google Street View shots of Ontario roads plus rubber ducks, labelled with bounding boxes in MakeSense.ai and exported as Pascal VOC. If confidence on a class stayed under 0.67, the team added data and retrained. Running on the TPU kept inference off the Pi's CPU.</p>
+                <h4>Motion control</h4>
+                <p>Gains were kp = 0.4 and kd = 0.15. Speed was 100% under 5° of steering, 80% at 5–10°, 60% at 10–15° and 40% above 15°. If the lane was lost for 10 frames or fewer, the car held its last steering at 50% speed with 0.7× damping. Past 10 frames it straightened the wheels and crept forward at 30%.</p>
+                <h4>Architecture</h4>
+                <p>One central loop called each module on its own schedule: lane following every frame, GPS several times a second, fare checks less often. Each subsystem had a simple interface so the team could integrate separately built parts.</p>
+            </div>
+        </details>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">04</span><h2>Outcome</h2></div>
+        <div class="grid grid-2">
+            <div class="card ad-outcome">
+                <h3>Worked</h3>
+                <ul class="list">
+                    <li>Pathfinding and fare selection ran correctly.</li>
+                    <li>Lane following held for about 7 seconds on straight roads before drifting.</li>
+                    <li>Object detection reached 0.67+ confidence in controlled tests.</li>
+                    <li>The car course-corrected using the grayscale sensors.</li>
+                </ul>
+            </div>
+            <div class="card ad-outcome ad-no">
+                <h3>Did not</h3>
+                <ul class="list">
+                    <li>The steering servo pulled right even with a neutral command, a mechanical calibration problem.</li>
+                    <li>Vision got worse while moving: motion blur and changing light, and track noise once off the simulator.</li>
+                    <li>The competition was cancelled before we fixed these.</li>
+                </ul>
+            </div>
+        </div>
+
+        <ul class="tags mt-3">
+            <li>Python</li>
+            <li>NetworkX</li>
+            <li>Dijkstra</li>
+            <li>Dead reckoning</li>
+            <li>REST API</li>
+            <li>OpenCV</li>
+            <li>EfficientDet-Lite</li>
+            <li>TF Lite</li>
+            <li>Coral Edge TPU</li>
+            <li>Raspberry Pi 4B</li>
+            <li>PiCar-X</li>
+            <li>PD control</li>
+            <li>GPIO</li>
+            <li>Soldering</li>
+        </ul>
+    </section>
+</main>
+<script>
+    // SMIL motion ignores prefers-reduced-motion, so remove it and keep the still diagram.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.ad-car').forEach(function (el) { el.remove(); });
+    }
+</script>
 </body>
 </html>
