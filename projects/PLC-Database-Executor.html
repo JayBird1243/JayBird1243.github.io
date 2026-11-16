@@ -1,148 +1,294 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="../" data-page="projects">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PLC Database Executor | Jack Buhr</title>
-    <meta name="description" content="Ground-up TwinCAT 3 Structured Text application that turns live PLC data into validated SQL transactions, with a role-aware Beckhoff HMI for operators.">
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="automation.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="description" content="A hand-written TwinCAT 3 Structured Text program that turns live PLC data into validated SQL transactions, with a role-aware TwinCAT HMI for operators.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="../assets/site.css">
+    <script src="../assets/site.js" defer></script>
+    <style>
+        /* Automation set: identical block on all four co-op pages */
+        .sub-h { font-family: var(--mono); font-size: 0.72rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin: 0 0 0.9rem; }
+        .fig-gap { margin-top: 1.5rem; }
+        .dg .st .box, .dg .st text, .dg .ed, .dg .pipe, .dg .slot, .dg .row { transition: fill 0.35s ease, stroke 0.35s ease, opacity 0.35s ease; }
+        .dg .st.is-on .box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+        .dg .st.is-on .t-strong { fill: var(--accent); }
+        .dg .st--ok.is-on .box { fill: var(--ok-soft); stroke: var(--ok); }
+        .dg .st--ok.is-on .t-strong { fill: var(--ok); }
+        .dg .st--bad.is-on .box { fill: var(--bad-soft); stroke: var(--bad); }
+        .dg .st--bad.is-on .t-strong { fill: var(--bad); }
+        .dg .ed.is-on { stroke: var(--accent); }
+        .dg .dash { stroke-dasharray: 4 4; }
+        .dg .t-up { letter-spacing: 0.08em; }
+        .dg .slot { fill: var(--bg-2); stroke: var(--line-2); }
+        .dg .slot.is-full { fill: var(--accent); stroke: var(--accent); }
+        .dg .pipe { fill: none; stroke: var(--line-2); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+        .dg .is-act .pipe { stroke: var(--accent); }
+        .dg .is-good .pipe { stroke: var(--ok); }
+        .dg .is-cold .pipe { stroke: var(--cool); }
+        .dg .duct { fill: var(--bg-2); stroke: var(--line-2); }
+        .scroll-hint { display: none; font-family: var(--mono); font-size: 0.72rem; color: var(--text-3); margin: -0.4rem 0 0.6rem; }
+        @media (max-width: 680px) { .scroll-hint { display: block; } }
+    </style>
 </head>
 <body>
-    <div id="background-container">
-        <div id="stars-container"></div>
-        <div id="nodes-container"></div>
-    </div>
-
-    <header>
-        <nav>
-            <div class="logo">JB</div>
-            <div id="seed-display" class="seed-display">Seed: </div>
-            <ul>
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="../projects.html" class="active">Projects</a></li>
-                <li><a href="../skills.html">Skills</a></li>
-            </ul>
-        </nav>
+<main>
+    <header class="page-head wrap">
+        <a class="back" href="../projects.html#automation">← Projects</a>
+        <p class="kicker">Industrial automation · Co-op · 01 / 04</p>
+        <h1>PLC Database Executor</h1>
+        <p class="lede">A TwinCAT 3 Structured Text program, added to the existing production line code, that turns live PLC data into validated SQL transactions. A role-aware TwinCAT HMI lets operators see every result and recover from failures.</p>
+        <dl class="facts">
+            <div><dt>Role</dt><dd>Wrote the PLC program and HMI controls</dd></div>
+            <div><dt>Controller</dt><dd>Beckhoff CX51xx · TwinCAT 3</dd></div>
+            <div><dt>Integration</dt><dd>XML payloads → SQL stored procedures</dd></div>
+            <div><dt>HMI</dt><dd>TwinCAT HMI, role-based access</dd></div>
+        </dl>
     </header>
 
-    <main id="content-wrapper" class="auto-page">
-        <section class="hero">
-            <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · Co-op <span class="idx">01 / 04</span></div>
-            <h1 class="auto-title">PLC Database Executor</h1>
-            <p class="auto-deck">A TwinCAT 3 Structured Text application incorporated into the existing production line program: it turns live PLC data into validated SQL transactions, and a role-aware Beckhoff HMI lets operators see and recover from every result.</p>
-            <ul class="auto-facts" aria-label="At a glance">
-                <li><span class="k">Controller</span><span class="v">Beckhoff CX51xx · TwinCAT 3</span></li>
-                <li><span class="k">Language</span><span class="v">Structured Text (IEC 61131-3)</span></li>
-                <li><span class="k">Integration</span><span class="v">XML payloads → SQL stored procedures</span></li>
-                <li><span class="k">HMI</span><span class="v">TwinCAT HMI · role-based access</span></li>
-            </ul>
-            <a href="../projects.html#automation" class="deep-dive-btn">&larr; All automation work</a>
-        </section>
-
-        <ul class="auto-highlights" aria-label="Highlights">
-            <li><span class="n">01</span><strong>Wrote the entire PLC program from scratch</strong> — payload builder, transaction handler, response validation and error routing, all hand-written Structured Text.</li>
-            <li><span class="n">02</span><strong>CASE-based state machines throughout,</strong> Faults are located by reading the current sequencer step on the HMI, identifying the erroring step before opening the live sequence.</li>
-            <li><span class="n">03</span><strong>Operator & Engineer elevation segregration.</strong> Custom HMI controls expose DB status, error codes and raw responses; retries and manual stored-procedure calls sit behind an elevated login.</li>
+    <div class="wrap">
+        <ul class="keypoints" data-reveal>
+            <li>I wrote the PLC program from scratch in Structured Text: payload builder, transaction handler, response validation and error routing.</li>
+            <li>Every block is a CASE state machine and the HMI shows the current step, so a fault can be traced before anyone opens the code.</li>
+            <li>Operators see database status, error codes and raw responses. Retries and manual stored-procedure calls need an elevated login.</li>
         </ul>
+    </div>
 
-        <article class="auto-body">
-            <section class="auto-panel">
-                <h2>Problem <span class="tag">context</span></h2>
-                <p>The production database already existed — schema, stored procedures, and the expected XML message structure. The line was being newly comissioned, and data needed to be reliably collected, stored, and analyzed. Operators needed HMI visualization with obvious error codes and easy-to-handle-failures.</p>
-            </section>
+    <div class="wrap" style="margin-top:2.75rem">
+        <figure class="fig">
+            <div class="fig-title">One database transaction, as a state machine</div>
+            <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
+            <div class="fig-scroll">
+                <svg class="dg" id="pde-sm" viewBox="0 0 720 360" role="img" aria-label="State machine for one database transaction. Idle waits for a trigger, Build XML maps PLC variables, Send calls the stored procedure, Wait holds for the reply with a timeout, Validate parses and confirms it, and Done records the result before returning to Idle. A timeout or a bad response goes to Fault, which raises a typed error code and the raw response to the HMI. From Fault, only an engineer login can retry, which re-enters at Send. An HMI bar at the bottom shows the current step, database status, error code and access level.">
+                    <defs>
+                        <marker id="pde-sm-arr" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="fill-dim"/></marker>
+                        <marker id="pde-sm-arr-a" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="fill-accent"/></marker>
+                    </defs>
 
-            <div class="auto-grid-2">
-                <section class="auto-panel">
-                    <h2>PLC program <span class="tag">TwinCAT 3 · ST</span></h2>
-                    <ol class="auto-steps">
-                        <li><strong>Payload Crafting.</strong> Triggered by the main sequence, PLC variables are mapped into the exact XML structure the stored procedures expect, including string assembly and type formatting in ST.</li>
-                        <li><strong>Send and wait.</strong> Issue the insert, hold on the response with a timeout, and block the machine when db confirmation is necessary.</li>
-                        <li><strong>Validate.</strong> Parse the response, confirm success, and record the result against the transaction.</li>
-                        <li><strong>Route errors.</strong> Failures raise typed error codes to the HMI with the raw database response attached, indicating the next steps for the operator.</li>
-                    </ol>
-                </section>
+                    <!-- edges -->
+                    <path class="wire ed" data-e="idle-build" d="M140,64 H190" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="build-send" d="M310,64 H360" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="send-wait" d="M420,88 V190" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="wait-validate" d="M360,214 H310" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="validate-done" d="M190,214 H140" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="done-idle" d="M80,190 V88" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="wait-fault" d="M480,214 H580" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="validate-fault" d="M250,238 V268 H610 V238" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="fault-retry" d="M640,190 V88" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire ed" data-e="retry-send" d="M580,64 H480" marker-end="url(#pde-sm-arr)"/>
+                    <path class="wire wire--bad" d="M670,238 V300" marker-end="url(#pde-sm-arr)"/>
 
-                <section class="auto-panel">
-                    <h2>Operator HMI <span class="tag">TwinCAT HMI</span></h2>
-                    <ul>
-                        <li><strong>Custom user controls</strong> for connection status, last transaction, active error code and response text — built as reusable modular components.</li>
-                        <li><strong>Elevation-aware:</strong> operators get read-only visibility; an elevated login unlocks retry-message and run-stored-procedure actions.</li>
-                        <li><strong>Safety-aware colour.</strong> Red and yellow were left to the E-stop and safety monitor so nothing on screen competes with a real alarm.</li>
-                        <li><strong>Monitor-proof palette.</strong> Status colours use only fully saturated channel values (255 / 0) so they render the same on mismatched shop-floor monitors for consistent visibility.</li>
-                    </ul>
-                </section>
+                    <!-- edge labels -->
+                    <text class="t-dim t-mid" x="165" y="56">start</text>
+                    <text class="t-dim t-mid" x="335" y="56">XML</text>
+                    <text class="t-dim" x="428" y="143">insert</text>
+                    <text class="t-dim t-mid" x="335" y="206">reply</text>
+                    <text class="t-dim t-mid" x="165" y="206">ok</text>
+                    <text class="t-dim" x="88" y="143">next</text>
+                    <text class="t-dim t-mid" x="530" y="206">timeout</text>
+                    <text class="t-dim" x="258" y="259">bad response</text>
+                    <text class="t-dim t-mid" x="530" y="56">re-send</text>
+                    <text class="t-dim" x="648" y="138">engineer</text>
+                    <text class="t-dim" x="648" y="152">login</text>
+                    <text class="t-dim t-end" x="662" y="290">error code + raw response</text>
+
+                    <!-- states -->
+                    <g class="st" data-s="idle"><rect class="box" x="20" y="40" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="80" y="61">IDLE</text><text class="t-dim t-mid" x="80" y="77">wait for trigger</text></g>
+                    <g class="st" data-s="build"><rect class="box" x="190" y="40" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="250" y="61">BUILD XML</text><text class="t-dim t-mid" x="250" y="77">map PLC vars</text></g>
+                    <g class="st" data-s="send"><rect class="box" x="360" y="40" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="420" y="61">SEND</text><text class="t-dim t-mid" x="420" y="77">call stored proc</text></g>
+                    <g class="st is-on" data-s="wait"><rect class="box" x="360" y="190" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="420" y="211">WAIT</text><text class="t-dim t-mid" x="420" y="227">with timeout</text></g>
+                    <g class="st" data-s="validate"><rect class="box" x="190" y="190" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="250" y="211">VALIDATE</text><text class="t-dim t-mid" x="250" y="227">parse + confirm</text></g>
+                    <g class="st st--ok" data-s="done"><rect class="box" x="20" y="190" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="80" y="211">DONE</text><text class="t-dim t-mid" x="80" y="227">result recorded</text></g>
+                    <g class="st st--bad" data-s="fault"><rect class="box" x="580" y="190" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="640" y="211">FAULT</text><text class="t-dim t-mid" x="640" y="227">typed error code</text></g>
+                    <g class="st" data-s="retry"><rect class="box box--ghost" x="580" y="40" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="640" y="61">RETRY</text><text class="t-dim t-mid" x="640" y="77">elevated only</text></g>
+
+                    <!-- HMI readout -->
+                    <rect class="box" x="20" y="300" width="680" height="52" rx="6"/>
+                    <text class="t-strong" x="36" y="324">TwinCAT HMI</text>
+                    <text class="t-dim" x="36" y="341">operator view</text>
+                    <text class="t-dim t-up" x="190" y="320">STEP</text>
+                    <text class="t-accent" x="190" y="340" id="pde-hmi-step">WAIT</text>
+                    <text class="t-dim t-up" x="330" y="320">DB STATUS</text>
+                    <text x="330" y="340" id="pde-hmi-db">waiting for reply</text>
+                    <text class="t-dim t-up" x="490" y="320">ERROR</text>
+                    <text x="490" y="340" id="pde-hmi-err">none</text>
+                    <text class="t-dim t-up" x="600" y="320">ACCESS</text>
+                    <text x="600" y="340" id="pde-hmi-acc">operator</text>
+                </svg>
             </div>
+            <figcaption>Simplified. Each block is a CASE step, and the HMI shows which one is active. A timeout or a bad response goes to FAULT, which raises a typed error code with the raw database response. Only an engineer login can retry.</figcaption>
+        </figure>
+    </div>
 
-            <section class="auto-panel">
-                <h2>Architecture decisions <span class="tag">how it's built</span></h2>
-                <ul>
-                    <li><strong>Smart-machine boundaries.</strong> Each subsystem runs as its own program and coordinates with its neighbours through handshake bits, rather than one monolithic codebase, allowing for independent development and maintenance, and greater modularity.</li>
-                    <li><strong>State machines as the debugging tool.</strong> Every function block is a CASE step machine with explicit idle, busy, done and fault states. The current step is always visible, and faults are easily identified by reading the current sequencer step on the HMI.</li>
-                    <li><strong>Modularity and comments as deliverables.</strong> Written to be maintained by the next engineer or technician.</li>
+    <section class="section wrap" style="margin-top:2.75rem">
+        <div class="section-head"><span class="num">01</span><h2>Problem</h2></div>
+        <p class="dim" style="max-width:68ch">The production database already existed: schema, stored procedures and the expected XML message structure. The line was being commissioned, and its data had to be stored reliably. Operators needed clear error codes on the HMI and failures that were easy to recover from.</p>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">02</span><h2>What I built</h2></div>
+        <div class="grid grid-2" style="gap:2rem">
+            <div>
+                <h3 class="sub-h">PLC program · TwinCAT 3, ST</h3>
+                <ol class="steps">
+                    <li>The main sequence triggers a transaction. PLC variables are mapped into the exact XML structure the stored procedures expect, with string assembly and type formatting done in ST.</li>
+                    <li>The insert is sent and the program waits for the response, with a timeout. The machine is held when it needs database confirmation to continue.</li>
+                    <li>The response is parsed, checked for success and recorded against the transaction.</li>
+                    <li>Failures raise typed error codes to the HMI with the raw database response attached.</li>
+                </ol>
+            </div>
+            <div>
+                <h3 class="sub-h">Operator HMI · TwinCAT HMI</h3>
+                <ul class="list">
+                    <li>Custom user controls for connection status, last transaction, active error code and response text, built as reusable modules.</li>
+                    <li>Operators get read-only status. An elevated login can retry a message or run a stored procedure by hand.</li>
+                    <li>Red and yellow are reserved for the E-stop and safety monitor, so nothing on screen competes with a real alarm.</li>
+                    <li>Status colours use only 255 or 0 channel values, so they look the same on mismatched shop-floor monitors.</li>
                 </ul>
-            </section>
-
-            <div class="auto-grid-2">
-                <section class="auto-panel">
-                    <h2>What I took from it <span class="tag">practice</span></h2>
-                    <p>This was a year of working alongside senior technicians, professional engineers and system integrators. Maintainability, modularity, smart-machine boundaries and keeping each machine responsible for itself were the key takeaways. All of my code was hand-written and referenced against Beckhoff InfoSys — no AI-assisted code generation.</p>
-                </section>
-
-                <section class="auto-panel">
-                    <h2>Stack <span class="tag">tools</span></h2>
-                    <ul class="auto-stack">
-                        <li>Beckhoff CX51xx</li>
-                        <li>TwinCAT 3</li>
-                        <li>Structured Text</li>
-                        <li>TwinCAT HMI</li>
-                        <li>SQL stored procedures</li>
-                        <li>XML</li>
-                        <li>State machines</li>
-                        <li>Beckhoff InfoSys</li>
-                    </ul>
-                </section>
             </div>
-        </article>
-
-        <aside class="auto-nda">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span>Screenshots, tag names and schema details are withheld under my employer's confidentiality agreement. I'm glad to walk through the architecture in conversation.</span>
-        </aside>
-
-        <nav class="auto-casenav" aria-label="Other automation case studies">
-            <a href="Servo-Control-Cabinet.html" class="prev"><span class="dir">&larr; Previous</span><span class="name">Servo Control Cabinet</span></a>
-            <a href="Material-Tracking-HMI.html" class="next"><span class="dir">Next &rarr;</span><span class="name">Material Loss Tracking</span></a>
-        </nav>
-    </main>
-
-    <footer id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-field">
-                <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
-                <span class="footer-label">stars</span>
-            </div>
-            <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
-                <span class="footer-label">nodes</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
-            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                new sky
-            </button>
         </div>
-    </footer>
 
-    <script src="../script.js"></script>
+        <figure class="fig fig-gap">
+            <div class="fig-title">Data path</div>
+            <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
+            <div class="fig-scroll">
+                <svg class="dg" viewBox="0 0 720 130" role="img" aria-label="Data path: PLC variables are built into an XML payload in Structured Text, sent to an existing SQL stored procedure, and the response is parsed in the PLC and shown as status on the HMI.">
+                    <defs>
+                        <marker id="pde-dp-arr" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="fill-dim"/></marker>
+                    </defs>
+                    <path class="wire flow flow--slow" d="M120,54 H150" marker-end="url(#pde-dp-arr)"/>
+                    <path class="wire flow flow--slow" d="M270,54 H300" marker-end="url(#pde-dp-arr)"/>
+                    <path class="wire flow flow--slow" d="M420,54 H450" marker-end="url(#pde-dp-arr)"/>
+                    <path class="wire flow flow--slow" d="M570,54 H600" marker-end="url(#pde-dp-arr)"/>
+
+                    <rect class="box" x="0" y="30" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="60" y="51">PLC variables</text><text class="t-dim t-mid" x="60" y="67">live process data</text>
+                    <rect class="box" x="150" y="30" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="210" y="51">XML payload</text><text class="t-dim t-mid" x="210" y="67">built in ST</text>
+                    <rect class="box box--cool" x="300" y="30" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="360" y="51">Stored proc</text><text class="t-dim t-mid" x="360" y="67">SQL, existing</text>
+                    <rect class="box" x="450" y="30" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="510" y="51">Response</text><text class="t-dim t-mid" x="510" y="67">parsed in ST</text>
+                    <rect class="box" x="600" y="30" width="120" height="48" rx="6"/><text class="t-strong t-mid" x="660" y="51">HMI status</text><text class="t-dim t-mid" x="660" y="67">code + raw text</text>
+
+                    <path class="wire wire--accent" d="M2,94 V100 H268 V94"/>
+                    <text class="t-dim t-mid" x="135" y="118">my Structured Text</text>
+                    <path class="wire wire--cool" d="M302,94 V100 H418 V94"/>
+                    <text class="t-dim t-mid" x="360" y="118">existing database</text>
+                    <path class="wire wire--accent" d="M452,94 V100 H718 V94"/>
+                    <text class="t-dim t-mid" x="585" y="118">my ST + HMI controls</text>
+                </svg>
+            </div>
+            <figcaption>Amber brackets mark my code. The schema, stored procedures and XML structure were already defined.</figcaption>
+        </figure>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">03</span><h2>Design decisions</h2></div>
+        <ul class="list" style="max-width:72ch">
+            <li>Each subsystem runs as its own program and coordinates with its neighbours through handshake bits, so each can be developed and maintained on its own.</li>
+            <li>Every function block is a CASE state machine with explicit idle, busy, done and fault states, and the current step is always visible on the HMI.</li>
+            <li>Modular code and comments were part of the deliverable, so the next engineer or technician can maintain it.</li>
+        </ul>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">04</span><h2>What I took from it</h2></div>
+        <p class="dim" style="max-width:68ch">I worked alongside senior technicians, professional engineers and system integrators. The main lessons were maintainability, modularity and keeping each machine responsible for itself. All of my code was hand-written and checked against Beckhoff InfoSys, with no AI-assisted code generation.</p>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head"><span class="num">05</span><h2>Stack</h2></div>
+        <ul class="tags">
+            <li>Beckhoff CX51xx</li>
+            <li>TwinCAT 3</li>
+            <li>Structured Text</li>
+            <li>TwinCAT HMI</li>
+            <li>SQL stored procedures</li>
+            <li>XML</li>
+            <li>State machines</li>
+            <li>Beckhoff InfoSys</li>
+        </ul>
+    </section>
+
+    <div class="wrap">
+        <p class="note note--quiet">Screenshots, tag names and schema details are withheld under my employer's confidentiality agreement. I'm glad to walk through the architecture in conversation.</p>
+        <nav class="pager" aria-label="Automation projects">
+            <a href="Servo-Control-Cabinet.html"><span>← Previous</span>Servo Control Cabinet</a>
+            <a href="Material-Tracking-HMI.html"><span>Next →</span>Material Loss Tracking</a>
+        </nav>
+    </div>
+</main>
+
+<script>
+(function () {
+    var svg = document.getElementById('pde-sm');
+    if (!svg) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
+
+    var states = {}, edges = {};
+    svg.querySelectorAll('.st').forEach(function (g) { states[g.getAttribute('data-s')] = g; });
+    svg.querySelectorAll('.ed').forEach(function (p) { edges[p.getAttribute('data-e')] = p; });
+    var hmi = {
+        step: document.getElementById('pde-hmi-step'),
+        db: document.getElementById('pde-hmi-db'),
+        err: document.getElementById('pde-hmi-err'),
+        acc: document.getElementById('pde-hmi-acc')
+    };
+
+    // [state, db status, error, access, dwell ms]
+    var seq = [
+        ['idle', 'idle', 'none', 'operator', 1400],
+        ['build', 'building payload', 'none', 'operator', 1200],
+        ['send', 'sending', 'none', 'operator', 1100],
+        ['wait', 'waiting for reply', 'none', 'operator', 1400],
+        ['validate', 'checking reply', 'none', 'operator', 1100],
+        ['done', 'confirmed', 'none', 'operator', 1500],
+        ['idle', 'idle', 'none', 'operator', 1200],
+        ['build', 'building payload', 'none', 'operator', 1100],
+        ['send', 'sending', 'none', 'operator', 1100],
+        ['wait', 'waiting for reply', 'none', 'operator', 2000],
+        ['fault', 'no reply', 'TIMEOUT', 'operator', 2400],
+        ['retry', 'no reply', 'TIMEOUT', 'engineer', 1600],
+        ['send', 'sending', 'none', 'engineer', 1100],
+        ['wait', 'waiting for reply', 'none', 'engineer', 1300],
+        ['validate', 'checking reply', 'none', 'engineer', 1100],
+        ['done', 'confirmed', 'none', 'engineer', 1600]
+    ];
+    var i = 0, prev = 'wait', timer = null;
+
+    function setEdge(key) {
+        Object.keys(edges).forEach(function (k) {
+            var on = k === key;
+            edges[k].classList.toggle('is-on', on);
+            edges[k].setAttribute('marker-end', on ? 'url(#pde-sm-arr-a)' : 'url(#pde-sm-arr)');
+        });
+    }
+    function show(s) {
+        Object.keys(states).forEach(function (k) { states[k].classList.toggle('is-on', k === s[0]); });
+        setEdge(prev + '-' + s[0]);
+        hmi.step.textContent = s[0].toUpperCase();
+        hmi.db.textContent = s[1];
+        hmi.err.textContent = s[2];
+        hmi.err.setAttribute('class', s[2] === 'none' ? '' : 't-bad');
+        hmi.acc.textContent = s[3];
+        hmi.acc.setAttribute('class', s[3] === 'engineer' ? 't-accent' : '');
+        prev = s[0];
+    }
+    function tick() {
+        var s = seq[i];
+        show(s);
+        i = (i + 1) % seq.length;
+        timer = setTimeout(tick, s[4]);
+    }
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (e.isIntersecting && !timer) { prev = 'done'; i = 0; tick(); }
+            else if (!e.isIntersecting && timer) { clearTimeout(timer); timer = null; }
+        });
+    }, { threshold: 0.3 });
+    io.observe(svg);
+})();
+</script>
 </body>
 </html>

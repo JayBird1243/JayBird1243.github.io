@@ -1,72 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root="" data-page="home">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jack Buhr | Electrical Engineering Portfolio</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jack Buhr | Electrical Engineering, Automation &amp; Controls</title>
+    <meta name="description" content="Jack Buhr is a final-year Electrical Engineering student at Queen's University with 16 months of co-op in PLC, HMI and controls work on a production line.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="assets/site.css">
+    <script src="assets/site.js" defer></script>
+    <style>
+        .hero { position: relative; }
+        .hero-inner {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: clamp(1.5rem, 5vw, 4rem);
+            align-items: center;
+            padding-block: clamp(3rem, 9vw, 6.5rem) clamp(2.5rem, 6vw, 4rem);
+        }
+        .hero h1 { font-size: clamp(2.6rem, 7vw, 4.2rem); }
+        .hero .lede { color: var(--text); max-width: 58ch; }
+        .hero .lede .dim { color: var(--text-2); }
+        .hero .btn-row { margin-top: 1.75rem; }
+        .hero-photo {
+            width: clamp(120px, 16vw, 176px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--line-2);
+            box-shadow: 0 0 0 6px rgba(12, 15, 20, 0.6);
+        }
+        @media (max-width: 620px) {
+            .hero-inner { grid-template-columns: minmax(0, 1fr); }
+            .hero-photo { order: -1; width: 96px; }
+        }
+
+        /* The automation stack: one row per layer, wires between rows. */
+        .stack { display: grid; gap: 0; }
+        .layer {
+            display: grid;
+            grid-template-columns: 9.5rem minmax(0, 1fr) minmax(0, 1fr);
+            gap: 1rem 1.5rem;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+        }
+        .layer-name { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+        .layer-what { color: var(--text); font-size: 0.97rem; line-height: 1.45; }
+        .layer-what span { display: block; color: var(--text-3); font-family: var(--mono); font-size: 0.74rem; margin-top: 0.15rem; }
+        .layer-links { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.93rem; }
+        .layer-links a::after { content: ' →'; color: var(--text-3); }
+        .wirebus { display: flex; justify-content: center; gap: 2.5rem; height: 30px; }
+        .wirebus svg { height: 30px; width: 140px; overflow: visible; }
+        .wirebus text { font-family: var(--mono); font-size: 10px; fill: var(--text-3); }
+        @media (max-width: 760px) {
+            .layer { grid-template-columns: minmax(0, 1fr); gap: 0.4rem; }
+        }
+
+        .contact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+        .contact-grid a.card .where { display: block; color: var(--text); font-size: 1rem; word-break: break-word; }
+        @media (max-width: 760px) { .contact-grid { grid-template-columns: minmax(0, 1fr); } }
+    </style>
 </head>
 <body>
-    <div id="background-container">
-        <div id="stars-container"></div>
-        <div id="nodes-container"></div>
-    </div>
-
-    <header>
-        <nav>
-            <div class="logo">JB</div>
-            <ul>
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="projects.html">Projects</a></li>
-                <li><a href="skills.html">Skills</a></li>
-            </ul>
-            <div id="seed-display" class="seed-display">Seed: </div>
-        </nav>
-    </header>
-
-    <main id="content-wrapper">
-        <section class="hero">
-            <div class="hero-content">
-                <div class="hero-text">
+<main>
+    <section class="hero">
+        <div class="wrap">
+            <div class="hero-inner">
+                <div>
+                    <p class="kicker">Electrical engineering · Automation &amp; controls</p>
                     <h1>Jack Buhr</h1>
-                    <p class="subtitle">Electrical Engineering Student &middot; Automation &amp; Controls</p>
+                    <p class="lede">
+                        I'm a final-year Electrical Engineering student at Queen's University.
+                        I spent sixteen months on co-op at cellcentric, the Daimler Truck and Volvo Group fuel-cell venture,
+                        writing PLC and HMI software for production lines and building the control cabinets that run them.
+                    </p>
+                    <div class="btn-row">
+                        <a class="btn" href="projects.html">See my work</a>
+                        <a class="btn btn--ghost" href="#contact">Get in touch</a>
+                    </div>
                 </div>
-                <div class="hero-image-container">
-                    <img src="Images/1720469597486.jpg" alt="A picture of Jack Buhr" class="profile-picture">
-                </div>
+                <img class="hero-photo" src="assets/img/profile.jpg" alt="Portrait of Jack Buhr" width="176" height="176">
             </div>
-            <p class="blurb">
-                I'm a final-year Electrical Engineering student at Queen's University. I spent twelve months on co-op with Cellcentric GmbH &amp; Co. KG, the Daimler Truck / Volvo Group fuel-cell venture, writing PLC and HMI software for production lines &mdash; Beckhoff TwinCAT Structured Text, TwinCAT HMI, and Ignition on Siemens hardware &mdash; and building the control cabinets that run them. This portfolio collects that work alongside my own projects.
-            </p>
-            <a href="projects.html#automation" class="deep-dive-btn">See the automation work &rarr;</a>
-        </section>
-
-    </main>
-
-    <footer id="site-footer">
-        <div class="footer-inner">
-            <div class="footer-field">
-                <span class="footer-label">seed</span>
-                <span id="footer-seed-val" class="footer-mono">—</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-field">
-                <span id="footer-stars-count" class="footer-num">—</span>
-                <span class="footer-label">stars</span>
-            </div>
-            <div class="footer-field">
-                <span id="footer-nodes-count" class="footer-num">—</span>
-                <span class="footer-label">nodes</span>
-            </div>
-            <div class="footer-vr" aria-hidden="true"></div>
-            <div class="footer-size-bars" id="footer-size-bars" aria-label="Star size distribution"></div>
-            <button id="reroll-btn" class="footer-reroll-btn" aria-label="Generate new sky">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                new sky
-            </button>
         </div>
-    </footer>
+    </section>
 
-    <script src="script.js"></script>
+    <section class="section wrap">
+        <dl class="stats" data-reveal>
+            <div class="stat stat--accent">
+                <dd class="stat-num mt-0" style="margin:0"><span data-count="16">16</span> months</dd>
+                <dt class="stat-label">Co-op in production automation</dt>
+            </div>
+            <div class="stat">
+                <dd class="stat-num" style="margin:0"><span data-count="4">4</span> projects</dd>
+                <dt class="stat-label">PLC, HMI and panel work on a live line</dt>
+            </div>
+            <div class="stat">
+                <dd class="stat-num" style="margin:0">2026</dd>
+                <dt class="stat-label">Co-founded Alpine Charge, kiosks now operating</dt>
+            </div>
+        </dl>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head">
+            <span class="num">01</span>
+            <h2>Where I've worked in the automation stack</h2>
+        </div>
+        <p class="section-intro">
+            On co-op I worked at every level of a production line, from the operator's screen down to the wiring.
+            Each layer below links to the project where I did it.
+        </p>
+
+        <div class="stack" data-reveal>
+            <div class="layer">
+                <div class="layer-name">Operator</div>
+                <div class="layer-what">HMI screens people use on shift<span>TwinCAT HMI · Ignition</span></div>
+                <div class="layer-links">
+                    <a href="projects/Material-Tracking-HMI.html">Material Loss Tracking</a>
+                    <a href="projects/Ignition-Temperature-HMI.html">Line Temperature HMI</a>
+                </div>
+            </div>
+            <div class="wirebus" aria-hidden="true">
+                <svg class="dg" viewBox="0 0 140 30">
+                    <path class="wire wire--accent flow flow--slow flow--rev" d="M40 0 V30"/>
+                    <path class="wire flow flow--slow" d="M100 0 V30"/>
+                    <text x="48" y="19">status</text>
+                    <text x="108" y="19">commands</text>
+                </svg>
+            </div>
+            <div class="layer">
+                <div class="layer-name">Controller</div>
+                <div class="layer-what">PLC programs written as state machines<span>TwinCAT 3 Structured Text · Beckhoff CX · Siemens S7-300</span></div>
+                <div class="layer-links">
+                    <a href="projects/PLC-Database-Executor.html">PLC Database Executor</a>
+                </div>
+            </div>
+            <div class="wirebus" aria-hidden="true">
+                <svg class="dg" viewBox="0 0 140 30">
+                    <path class="wire wire--accent flow flow--slow flow--rev" d="M40 0 V30"/>
+                    <path class="wire flow flow--slow" d="M100 0 V30"/>
+                    <text x="48" y="19">results</text>
+                    <text x="108" y="19">XML</text>
+                </svg>
+            </div>
+            <div class="layer">
+                <div class="layer-name">Data</div>
+                <div class="layer-what">Production database transactions<span>SQL stored procedures · XML payloads</span></div>
+                <div class="layer-links">
+                    <a href="projects/PLC-Database-Executor.html">PLC Database Executor</a>
+                    <a href="projects/Material-Tracking-HMI.html">Material Loss Tracking</a>
+                </div>
+            </div>
+            <div class="wirebus" aria-hidden="true" style="justify-content:flex-start;padding-left:calc(50% - 70px)">
+                <svg class="dg" viewBox="0 0 140 30">
+                    <path class="wire wire--dim" d="M70 0 V30" stroke-dasharray="2 5"/>
+                </svg>
+            </div>
+            <div class="layer">
+                <div class="layer-name">Field</div>
+                <div class="layer-what">Cabinet build, wiring and commissioning<span>Servo drive · electrical drawings · PID tuning</span></div>
+                <div class="layer-links">
+                    <a href="projects/Servo-Control-Cabinet.html">Servo Control Cabinet</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head">
+            <span class="num">02</span>
+            <h2>Selected work</h2>
+            <a class="aside" href="projects.html">All projects →</a>
+        </div>
+        <div class="grid grid-2">
+            <a class="card" href="projects/PLC-Database-Executor.html" data-reveal>
+                <div class="card-kicker"><span>Co-op · PLC + HMI</span><span class="arrow" aria-hidden="true">→</span></div>
+                <h3>PLC Database Executor</h3>
+                <p>A Structured Text program that turns live PLC data into SQL transactions and checks every response, with an HMI that lets operators see and retry failures.</p>
+                <ul class="tags"><li>TwinCAT 3</li><li>Structured Text</li><li>SQL</li></ul>
+            </a>
+            <a class="card" href="projects/Material-Tracking-HMI.html" data-reveal style="--d:1">
+                <div class="card-kicker"><span>Co-op · HMI + SQL</span><span class="arrow" aria-hidden="true">→</span></div>
+                <h3>Material Loss Tracking</h3>
+                <p>A station-side tool that recorded where and why material was being lost. I built the HMI and database layer and trained the operators.</p>
+                <ul class="tags"><li>TwinCAT HMI</li><li>Stored procedures</li><li>Training</li></ul>
+            </a>
+            <a class="card" href="projects/Alpine-Charge.html" data-reveal>
+                <div class="card-kicker"><span>Startup · Co-founder</span><span class="arrow" aria-hidden="true">→</span></div>
+                <h3>Alpine Charge</h3>
+                <p>Self-serve phone charger kiosks at trailheads. We signed a municipal contract with the Village of Lions Bay and the kiosks are operating.</p>
+                <ul class="tags"><li>Hardware</li><li>Municipal contract</li><li>IoT</li></ul>
+            </a>
+            <a class="card" href="projects/Daemon-Data.html" data-reveal style="--d:1">
+                <div class="card-kicker"><span>Solo build · Cloud</span><span class="arrow" aria-hidden="true">→</span></div>
+                <h3>Daemon Data</h3>
+                <p>A Reddit monitoring platform on Firebase and Google Cloud: shared scraping, user-built LLM prompts and a visual alert builder you can try in the browser.</p>
+                <ul class="tags"><li>Firestore</li><li>Cloud Functions</li><li>LLM APIs</li></ul>
+            </a>
+        </div>
+    </section>
+
+    <section class="section wrap">
+        <div class="section-head">
+            <span class="num">03</span>
+            <h2>Background</h2>
+        </div>
+        <div class="grid grid-3">
+            <div class="card" data-reveal>
+                <div class="card-kicker"><span>Education</span></div>
+                <h3>Queen's University</h3>
+                <p>BASc, Electrical Engineering. Final year.</p>
+            </div>
+            <div class="card" data-reveal style="--d:1">
+                <div class="card-kicker"><span>Experience</span></div>
+                <h3>cellcentric</h3>
+                <p>Sixteen months of co-op on fuel-cell production lines: PLC and HMI software, SQL integration, panel building.</p>
+            </div>
+            <div class="card" data-reveal style="--d:2">
+                <div class="card-kicker"><span>Tools I use most</span></div>
+                <h3>TwinCAT 3, Ignition, Python</h3>
+                <p>Plus Siemens S7, SQL, C/C++ and Firebase. <a href="skills.html">Full skills list →</a></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section wrap" id="contact">
+        <div class="section-head">
+            <span class="num">04</span>
+            <h2>Contact</h2>
+        </div>
+        <p class="section-intro">I'm happy to walk through any of this work in more detail.</p>
+        <div class="contact-grid">
+            <a class="card" href="mailto:jack.buhr@gmail.com">
+                <div class="card-kicker"><span>Email</span><span class="arrow" aria-hidden="true">→</span></div>
+                <span class="where">jack.buhr@gmail.com</span>
+            </a>
+            <a class="card" href="https://www.linkedin.com/in/jack-buhr-346a20215/" target="_blank" rel="noopener">
+                <div class="card-kicker"><span>LinkedIn</span><span class="arrow" aria-hidden="true">→</span></div>
+                <span class="where">linkedin.com/in/jack-buhr-346a20215</span>
+            </a>
+            <a class="card" href="https://github.com/JayBird1243" target="_blank" rel="noopener">
+                <div class="card-kicker"><span>GitHub</span><span class="arrow" aria-hidden="true">→</span></div>
+                <span class="where">github.com/JayBird1243</span>
+            </a>
+        </div>
+    </section>
+</main>
+
 </body>
 </html>
