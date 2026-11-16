@@ -960,10 +960,8 @@
         Sky.site = site;
 
         draw();
-        // The animation is on unless the visitor turned it off, or asked
-        // their system for less motion and has not turned it on.
-        var wanted = store(ANIM);
-        if (wanted === '1' || (wanted !== '0' && !reduced)) site.play(true);
+        // The animation is on unless the visitor turned it off this visit.
+        if (store(ANIM) !== '0') site.play(true);
 
         // Redraw when the width changes. Height changes are ignored so the
         // mobile URL bar sliding away does not reshuffle the stars.
