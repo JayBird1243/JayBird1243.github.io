@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Line Temperature HMI | Jack Buhr</title>
-    <meta name="description" content="Ignition SCADA screen for a GWK water temperature-control unit fed from a Siemens S7-300: live piping mimic, sequencer state, trends and manual heating control.">
+    <meta name="description" content="Ignition SCADA screen for a GWK water temperature-control unit fed from a Siemens S7-300: live piping mimic, temperatures, trends and manual heating control.">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="automation.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@
         <section class="hero">
             <div class="auto-kicker"><span class="lamp" aria-hidden="true"></span>Industrial Automation · Co-op <span class="idx">03 / 04</span></div>
             <h1 class="auto-title">Line Temperature HMI</h1>
-            <p class="auto-deck">An Ignition screen that gives operators a live picture of a GWK water temperature-control unit — process temperatures, sequencer step and a colour-coded piping mimic — with data pulled from a Siemens S7-300.</p>
+            <p class="auto-deck">An Ignition screen that gives operators a live picture of a GWK water temperature-control unit — process temperatures, trends and a colour-coded piping mimic — with data pulled from a Siemens S7-300.</p>
             <ul class="auto-facts" aria-label="At a glance">
                 <li><span class="k">SCADA</span><span class="v">Inductive Automation Ignition</span></li>
                 <li><span class="k">PLC</span><span class="v">Siemens S7-300 (existing program)</span></li>
@@ -44,24 +44,23 @@
         </section>
 
         <ul class="auto-highlights" aria-label="Highlights">
-            <li><span class="n">01</span><strong>Machine state at a glance.</strong> A piping mimic whose lines recolour with live state, so an operator reads where the unit is in its program without reading the sequencer.</li>
-            <li><span class="n">02</span><strong>Trends beside the numbers.</strong> Temperature-over-time charts next to the sequencer step list, for easy temperature validation.</li>
+            <li><span class="n">01</span><strong>Machine state at a glance.</strong> A piping mimic whose lines recolour with live state, so an operator reads what the unit is doing at a glance.</li>
+            <li><span class="n">02</span><strong>Trends beside the numbers.</strong> Temperature-over-time charts next to the live values, for easy temperature validation.</li>
             <li><span class="n">03</span><strong>Siemens-to-Ignition integration.</strong> I linked the S7-300 tags into Ignition for data acquisition; the PLC program itself was existing and not mine.</li>
         </ul>
 
         <article class="auto-body">
             <section class="auto-panel">
                 <h2>Problem <span class="tag">context</span></h2>
-                <p>The GWK unit was set up with obsolete monitors. I was tasked with programming a new HMI to replace them, and integrate with the existing PLC program.</p>
+                <p>One of the existing HMIs broke. I was tasked with programming a new HMI to replace it, and integrate with the existing PLC program.</p>
             </section>
 
             <div class="auto-grid-2">
                 <section class="auto-panel">
                     <h2>What I built <span class="tag">Ignition</span></h2>
                     <ol class="auto-steps">
-                        <li><strong>Tag integration.</strong> Connected Ignition to the S7-300 and mapped the temperature, state and sequencer tags the screen needed.</li>
+                        <li><strong>Tag integration.</strong> Connected Ignition to the S7-300 and mapped the temperature and state tags the screen needed.</li>
                         <li><strong>Piping mimic.</strong> A schematic of the unit with pipe segments bound to live tags, recolouring with system state.</li>
-                        <li><strong>Sequencer display.</strong> Current step and step list for easy program validation.</li>
                         <li><strong>Trends.</strong> Real-time temperature-over-time charts for spotting drift and confirming setpoint response.</li>
                         <li><strong>Manual heating control.</strong> Available for setup and maintenance when needed, behind a confirmation.</li>
                     </ol>

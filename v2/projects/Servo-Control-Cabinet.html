@@ -40,10 +40,10 @@
         <a class="back" href="../projects.html#automation">← Projects</a>
         <p class="kicker">Industrial automation · Co-op · 04 / 04</p>
         <h1>Servo Control Cabinet</h1>
-        <p class="lede">A servo control cabinet rebuilt from the electrical drawings, with wiring, labelling and Panduit routing to a standard a technician can troubleshoot without me. I then installed it in its machine and helped the integrators tune the servo loops.</p>
+        <p class="lede">A servo control cabinet rebuilt from the electrical drawings, wired and labelled so a technician can troubleshoot it without me. I then installed it in its machine and helped the integrators tune the servo.</p>
         <dl class="facts">
             <div><dt>Scope</dt><dd>Full cabinet rebuild from drawings</dd></div>
-            <div><dt>Standard</dt><dd>Labelled conductors, Panduit duct routing</dd></div>
+            <div><dt>Power</dt><dd>240 VAC in, stepped down to 120 VAC and 24 VDC</dd></div>
             <div><dt>Commissioning</dt><dd>Installation, power-up and I/O checks</dd></div>
             <div><dt>Tuning</dt><dd>Servo PID calibration with the integrators</dd></div>
         </dl>
@@ -51,18 +51,18 @@
 
     <div class="wrap">
         <ul class="keypoints" data-reveal>
-            <li><strong>Built the panel end to end.</strong> Backplane layout, power and signal wiring, terminations and labelling, all from the electrical drawings.</li>
-            <li><strong>Installed and checked it.</strong> Fitted it to the machine and worked through power-up checks and I/O verification before handing it to production.</li>
-            <li><strong>Helped tune the loops.</strong> Worked with the integrators to calibrate the servo PID parameters.</li>
+            <li>I built the panel from the electrical drawings: backplane layout, power and signal wiring, terminations and labelling.</li>
+            <li>I installed it in its machine and ran power-up and I/O checks before handing it to production.</li>
+            <li>I helped the integrators calibrate the servo PID parameters.</li>
         </ul>
     </div>
 
     <div class="wrap" style="margin-top:2.75rem">
         <figure class="fig">
-            <div class="fig-title">Backplane layout: power and signal kept apart</div>
+            <div class="fig-title">Backplane layout and power distribution</div>
             <p class="scroll-hint" aria-hidden="true">Scroll sideways for the full diagram →</p>
             <div class="fig-scroll">
-                <svg class="dg" viewBox="0 0 720 420" role="img" aria-label="Schematic cabinet backplane. Servo drives sit in the middle. Signal runs leave the top of each drive into a top duct and a right-hand vertical duct, ending at signal terminals on the right. Power enters at the bottom left through a left vertical duct into the main switch, then the breakers, and a power duct under the drives carries drive supply and motor cables to the motor terminals at the bottom right. A 24 volt power supply sits beside the breakers. Every conductor carries a label matching the drawing.">
+                <svg class="dg" viewBox="0 0 720 420" role="img" aria-label="Schematic cabinet backplane. 240 volt AC enters at the bottom left through the main switch and breakers. It feeds the servo drive directly, and a transformer that steps it down to 120 volt AC. The 120 volts feeds a 24 volt DC power supply, which powers the I/O. The motor cable runs from the drive through the power duct to the motor terminals. Signal runs from the drive and the I/O use a separate top duct to reach the signal terminals on the right. Every conductor carries a label matching the drawing.">
                     <rect class="box" x="10" y="10" width="480" height="400" rx="6"/>
                     <rect x="24" y="24" width="452" height="372" rx="4" style="fill:var(--bg-2);stroke:var(--line)"/>
                     <rect class="duct" x="36" y="36" width="410" height="18"/>
@@ -76,12 +76,15 @@
                     <rect class="box" x="60" y="80" width="70" height="150" rx="6"/>
                     <rect class="duct" x="72" y="92" width="46" height="16" rx="2"/>
                     <text class="t-strong t-mid" x="95" y="152">Servo</text><text class="t-dim t-mid" x="95" y="168">drive</text>
-                    <rect class="box" x="150" y="80" width="70" height="150" rx="6"/>
-                    <rect class="duct" x="162" y="92" width="46" height="16" rx="2"/>
-                    <text class="t-strong t-mid" x="185" y="152">Servo</text><text class="t-dim t-mid" x="185" y="168">drive</text>
-                    <rect class="box" x="240" y="80" width="70" height="150" rx="6"/>
-                    <rect class="duct" x="252" y="92" width="46" height="16" rx="2"/>
-                    <text class="t-strong t-mid" x="275" y="152">Servo</text><text class="t-dim t-mid" x="275" y="168">drive</text>
+                    <rect class="box" x="166" y="150" width="66" height="80" rx="6"/><text class="t-strong t-mid" x="199" y="187">24 V DC</text><text class="t-dim t-mid" x="199" y="203">PSU</text>
+                    <rect class="box" x="260" y="110" width="80" height="120" rx="6"/>
+                    <rect class="duct" x="270" y="120" width="8" height="26" rx="1"/>
+                    <rect class="duct" x="280" y="120" width="8" height="26" rx="1"/>
+                    <rect class="duct" x="290" y="120" width="8" height="26" rx="1"/>
+                    <rect class="duct" x="300" y="120" width="8" height="26" rx="1"/>
+                    <rect class="duct" x="310" y="120" width="8" height="26" rx="1"/>
+                    <rect class="duct" x="320" y="120" width="8" height="26" rx="1"/>
+                    <text class="t-strong t-mid" x="300" y="182">I/O</text><text class="t-dim t-mid" x="300" y="198">on 24 V DC</text>
                     <rect class="box" x="380" y="80" width="56" height="8" rx="1"/>
                     <rect class="box" x="380" y="90" width="56" height="8" rx="1"/>
                     <rect class="box" x="380" y="100" width="56" height="8" rx="1"/>
@@ -105,8 +108,8 @@
                     <rect class="duct" x="206" y="298" width="18" height="44" rx="2"/><rect class="fill-dim" x="211" y="314" width="8" height="12" rx="1"/>
                     <rect class="duct" x="232" y="298" width="18" height="44" rx="2"/><rect class="fill-dim" x="237" y="314" width="8" height="12" rx="1"/>
                     <text class="t-dim t-mid" x="201" y="366">breakers</text>
-                    <rect class="box" x="272" y="290" width="58" height="60" rx="6"/><text class="t-strong t-mid" x="301" y="317">24 V</text><text class="t-dim t-mid" x="301" y="333">PSU</text>
-                    <rect class="box" x="352" y="300" width="8" height="40" rx="1"/>
+                    <rect class="box" x="272" y="290" width="66" height="60" rx="6"/><text class="t-strong t-mid" x="305" y="317">240/120</text><text class="t-dim t-mid" x="305" y="333">V AC</text>
+                    <text class="t-dim t-mid" x="305" y="366">transformer</text>
                     <rect class="box" x="362" y="300" width="8" height="40" rx="1"/>
                     <rect class="box" x="372" y="300" width="8" height="40" rx="1"/>
                     <rect class="box" x="382" y="300" width="8" height="40" rx="1"/>
@@ -115,51 +118,48 @@
                     <rect class="box" x="412" y="300" width="8" height="40" rx="1"/>
                     <rect class="box" x="422" y="300" width="8" height="40" rx="1"/>
                     <rect class="box" x="432" y="300" width="8" height="40" rx="1"/>
-                    <text class="t-dim" x="362" y="292">motor terminals</text>
+                    <text class="t-dim" x="378" y="292">motor terminals</text>
                     <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:0" d="M45,420 V320 H70"/>
                     <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:1" d="M130,320 H146"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:2" d="M216,290 V255"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:3" d="M95,230 V255 H275 V230"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:4" d="M185,230 V255"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:2" d="M115,230 V263 H356 V300"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:3" d="M205,230 V263"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:4" d="M295,230 V263"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:5" d="M370,340 V420"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:6" d="M395,340 V420"/>
-                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:7" d="M420,340 V420"/>
+                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:2" d="M163,290 V264 H95 V230"/>
+                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:2" d="M256,320 H272"/>
+                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:3" d="M305,290 V264 H199 V230"/>
+                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:4" d="M232,190 H260"/>
+                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:4" d="M115,230 V254 H366 V300"/>
+                    <path class="wire wire--accent draw" pathLength="1" style="stroke-width:2;--d:5" d="M366,340 V420"/>
+                    <text class="t-accent pop" style="--d:1" x="62" y="388">240 V AC in</text>
+                    <text class="t-accent t-end pop" style="--d:3" x="157" y="284">240 V AC</text>
+                    <text class="t-accent t-end pop" style="--d:4" x="299" y="284">120 V AC</text>
                     <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:1" d="M95,80 V45 H455 V190"/>
-                    <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:2" d="M185,80 V45"/>
-                    <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:3" d="M275,80 V45"/>
+                    <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:2" d="M300,110 V45"/>
                     <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:4" d="M455,110 H436"/>
                     <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:5" d="M455,150 H436"/>
                     <path class="wire wire--cool draw" pathLength="1" style="stroke-width:2;--d:6" d="M455,190 H436"/>
                     <rect class="pop" x="90" y="61" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
-                    <rect class="pop" x="180" y="61" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
-                    <rect class="pop" x="270" y="61" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
-                    <rect class="pop" x="365" y="376" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
-                    <rect class="pop" x="390" y="376" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
-                    <rect class="pop" x="415" y="376" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
-                    <rect class="pop" x="40" y="392" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
+                    <rect class="pop" x="295" y="61" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
+                    <rect class="pop" x="361" y="376" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
+                    <rect class="pop" x="40" y="389" width="10" height="6" rx="1" style="fill:var(--text-2)"/>
                     <path class="wire wire--cool" d="M500,36 H506 V240 H500"/><path class="wire wire--accent" d="M500,250 H506 V384 H500"/>
                     <path class="wire wire--cool" style="stroke-width:2" d="M520,116 H544"/><text class="t-strong" x="552" y="121">Signal side</text>
                     <text class="t-dim" x="520" y="144">low-level signal runs</text><text class="t-dim" x="520" y="160">in their own duct</text>
-                    <path class="wire wire--accent" style="stroke-width:2" d="M520,286 H544"/><text class="t-strong" x="552" y="291">Power side</text>
-                    <text class="t-dim" x="520" y="314">supply, breakers and</text><text class="t-dim" x="520" y="330">motor cables</text>
+                    <path class="wire wire--accent" style="stroke-width:2" d="M520,272 H544"/><text class="t-strong" x="552" y="277">Power side</text>
+                    <text class="t-dim" x="520" y="298">240 V AC to the drive</text><text class="t-dim" x="520" y="314">120 V AC to the PSU</text><text class="t-dim" x="520" y="330">24 V DC to the I/O</text>
                     <rect class="duct" x="520" y="358" width="36" height="14"/><path class="wire wire--dim" style="stroke-width:3;stroke-dasharray:1.5 5.5;stroke-linecap:butt" d="M522,359.5 H554 M522,370.5 H554"/><text class="t-dim" x="566" y="369">Panduit duct</text>
                     <rect x="533" y="389" width="10" height="6" rx="1" style="fill:var(--text-2)"/><text class="t-dim" x="566" y="396">labelled to drawing</text>
                 </svg>
             </div>
-            <figcaption>Schematic of the kind of layout I built, not the real panel. Component count and positions are illustrative. Power runs and low-level signal runs use separate ducts, and every conductor and terminal is labelled to the drawing.</figcaption>
+            <figcaption>Schematic, not the real panel. Positions are illustrative. 240 VAC feeds the servo drive and a transformer, the transformer's 120 VAC feeds a 24 VDC supply, and the 24 VDC powers the I/O. Power and signal runs use separate ducts.</figcaption>
         </figure>
     </div>
 
     <section class="section wrap" style="margin-top:2.75rem">
         <div class="section-head"><span class="num">01</span><h2>What I built</h2></div>
         <ol class="steps" style="max-width:72ch">
-            <li><strong>Read and plan.</strong> Laid out the backplane from the electrical drawings: drives, power distribution, terminals and duct.</li>
-            <li><strong>Wire.</strong> Power, motor and signal wiring, with power runs kept apart from low-level signal runs.</li>
-            <li><strong>Label everything.</strong> Every conductor and terminal labelled to the drawing, for easy troubleshooting.</li>
-            <li><strong>Route with Panduit.</strong> Clean duct routing, so the cabinet can be serviced and extended without pulling it apart.</li>
+            <li>Laid out the backplane from the electrical drawings: servo drive, transformer, 24 VDC supply, I/O, terminals and duct.</li>
+            <li>Wired the power side. The 240 VAC input feeds the servo drive directly and a transformer that steps it down to 120 VAC. The 120 VAC runs a 24 VDC power supply, which powers the I/O.</li>
+            <li>Wired the motor and signal runs, with power kept apart from low-level signals.</li>
+            <li>Labelled every conductor and terminal to the drawing.</li>
+            <li>Routed everything in Panduit duct, so the cabinet can be serviced without pulling it apart.</li>
         </ol>
     </section>
 
@@ -167,9 +167,9 @@
         <div class="section-head"><span class="num">02</span><h2>Commissioning</h2></div>
         <div class="split split--center">
             <ul class="list">
-                <li><strong>Installed</strong> the finished panel in its machine.</li>
-                <li><strong>Power-up and I/O checks</strong> against the drawings before any motion.</li>
-                <li><strong>PID calibration</strong> on the servo axes with the integrators. We adjusted response, overshoot and settling until the motion matched the requirement.</li>
+                <li>Installed the finished panel in its machine.</li>
+                <li>Ran power-up and I/O checks against the drawings before any motion.</li>
+                <li>Calibrated the servo PID with the integrators, adjusting response, overshoot and settling until the motion matched the requirement.</li>
             </ul>
             <figure class="fig">
                 <div class="fig-title">Step response, before and after tuning</div>
@@ -204,7 +204,8 @@
         <ul class="tags">
             <li>Panel building</li>
             <li>Electrical drawings</li>
-            <li>Servo drives</li>
+            <li>Servo drive</li>
+            <li>Power distribution</li>
             <li>Panduit routing</li>
             <li>Wire labelling</li>
             <li>PID tuning</li>

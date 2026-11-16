@@ -50,15 +50,15 @@
 
     <div class="wrap">
         <ul class="keypoints" data-reveal>
-            <li><strong>I built where the car went and why.</strong> Route planning with Dijkstra, position tracking between GPS fixes, and a fare picker that ranks rides by profit per minute.</li>
-            <li><strong>Position data was slow.</strong> GPS fixes arrived up to 4 seconds late, so I estimated position from speed and heading in between.</li>
-            <li><strong>Parts worked, integration did not finish.</strong> Pathfinding and fare logic ran correctly. Steering drift and vision under motion were still open when the competition was cancelled.</li>
+            <li>I wrote the route planning (Dijkstra), position tracking between GPS fixes, and a fare picker that ranks rides by profit per minute.</li>
+            <li>GPS fixes arrived up to 4 seconds late, so I estimated position from speed and heading in between.</li>
+            <li>Pathfinding and fare logic worked. Steering drift and vision under motion were still unsolved when the competition was cancelled.</li>
         </ul>
     </div>
 
     <section class="section wrap" style="margin-top:2.75rem">
         <div class="section-head"><span class="num">01</span><h2>The system</h2></div>
-        <p class="section-intro">Three layers ran in one loop on the Pi. Sensors fed decisions, decisions sent commands to the motors and lights. My parts are in amber.</p>
+        <p class="section-intro">Three layers ran in one loop on the Pi: sensors fed decisions, and decisions drove the motors and lights. My parts are in amber.</p>
         <figure class="fig">
             <div class="fig-scroll">
                 <svg class="dg" viewBox="0 0 720 360" role="img" aria-label="System diagram. Perception layer: lane detection, object detection, grayscale sensors, and the competition server for GPS and fares. Decision layer, built by me: position tracking, pathfinding, fare selection. Control layer: PD steering and adaptive speed by teammates, brake and turn lights by me.">
@@ -140,7 +140,7 @@
             <div class="split split--fig-wide split--center">
                 <div>
                     <h3>Pathfinding</h3>
-                    <p class="dim">A modified Dijkstra in NetworkX. Each road's weight is its length plus penalties. Any road where the car changes direction counts double, and roads in risk zones are made to look longer. The planner then prefers straight, safe routes even when they are a bit longer.</p>
+                    <p class="dim">A modified Dijkstra in NetworkX. Each road's weight is its length plus penalties: a road entered after a turn counts double, and roads in risk zones count as longer. The planner prefers straight, safe routes even when they are a bit longer.</p>
                     <div class="ad-table-wrap mt-2">
                         <table class="table">
                             <thead><tr><th>Route</th><th class="num">Length</th><th>Weighting</th><th class="num">Cost</th></tr></thead>
@@ -198,7 +198,7 @@
             <div class="split split--fig-wide split--center">
                 <div>
                     <h3>Position between GPS fixes</h3>
-                    <p class="dim">The course GPS (VPFS) could be up to 4 seconds behind. I kept an internal x/y position and advanced it from the car's speed and heading between fixes. Pathfinding always used the latest combined estimate.</p>
+                    <p class="dim">The course GPS (VPFS) could be up to 4 seconds behind. I kept an internal x/y position and advanced it from the car's speed and heading between fixes.</p>
                     <p class="mono small muted mt-1">x += v · cos θ · Δt<br>y += v · sin θ · Δt</p>
                 </div>
                 <figure class="fig">
@@ -240,7 +240,7 @@
 
         <div class="ad-entry">
             <h3>Fare selection</h3>
-            <p class="dim">The car polled the course server for open rides. For each one I estimated the total time: driving to the pickup, the ride itself, and a penalty for turns. Fare divided by that time gives profit per minute, and the car claimed the highest score. The nearest ride is often not the best one.</p>
+            <p class="dim">The car polled the course server for open rides. For each one I estimated the total time: driving to the pickup, the ride itself, and a penalty for turns. The car claimed the ride with the highest fare per minute, which is often not the nearest one.</p>
             <div class="ad-table-wrap mt-2">
                 <table class="table">
                     <thead><tr><th>Ride</th><th class="num">To pickup</th><th class="num">Ride</th><th class="num">Turns</th><th class="num">Total</th><th class="num">Fare</th><th>Per min</th></tr></thead>

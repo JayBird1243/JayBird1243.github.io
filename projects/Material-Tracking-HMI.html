@@ -46,7 +46,7 @@
         <ul class="auto-highlights" aria-label="Highlights">
             <li><span class="n">01</span><strong>Full-stack ownership.</strong> Designed the HMI, wrote the stored procedures, networked the panel to the main line PLC, and trained the operators who use it.</li>
             <li><span class="n">02</span><strong>Turned "material is going missing" into data.</strong> Every loss is now logged with a reason, at the station where it happened, and is queryable by engineering.</li>
-            <li><span class="n">03</span><strong>Resilient by design.</strong> Database messaging queues and retries so a slow network never loses a report or freezes the screen.</li>
+            <li><span class="n">03</span><strong>Low-friction reporting.</strong> Logging a loss takes two taps from a fixed list of reasons.</li>
         </ul>
 
         <article class="auto-body">
@@ -62,7 +62,7 @@
                         <li><strong>Reporting HMI.</strong> A low-friction flow: pick the loss reason in two taps. If reporting is cumbersome, operators stop reporting, and the data is worthless.</li>
                         <li><strong>Database layer.</strong> Corresponded with IT to create new SQL stored procedures for inserts and reporting, structured so engineering can query losses by station, reason and shift.</li>
                         <li><strong>PLC networking.</strong> Connected the HMI to the main line controller for station and context data; configured the network path between panel and PLC.</li>
-                        <li><strong>Resilient messaging.</strong> Queue-and-retry logic around every database send so the screen stays responsive and no report is dropped.</li>
+                        <li><strong>Database messaging.</strong> A send that times out or is not acknowledged raises an error.</li>
                         <li><strong>Training.</strong> I ran planned and ran the operator training sessions to get them acquainted with the tool.</li>
                     </ol>
                 </section>
@@ -79,7 +79,7 @@
 
             <section class="auto-panel">
                 <h2>Outcome <span class="tag">result</span></h2>
-                <p>Engineering was able to identify the most common reasons for material loss, and improve the process to reduce losses. Material loss was reduced by 30% post optimization.</p>
+                <p>Engineering was able to identify the most common reasons for material loss, and improve the process to reduce losses.</p>
             </section>
 
             <div class="auto-grid-2">

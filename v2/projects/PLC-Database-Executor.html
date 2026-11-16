@@ -51,9 +51,9 @@
 
     <div class="wrap">
         <ul class="keypoints" data-reveal>
-            <li><strong>Wrote the PLC program from scratch.</strong> Payload builder, transaction handler, response validation and error routing, all hand-written Structured Text.</li>
-            <li><strong>CASE-based state machines throughout.</strong> The current step shows on the HMI, so a fault can be traced to the step it stopped on before anyone opens the live code.</li>
-            <li><strong>Operator and engineer access kept separate.</strong> Operators see database status, error codes and raw responses. Retries and manual stored-procedure calls need an elevated login.</li>
+            <li>I wrote the PLC program from scratch in Structured Text: payload builder, transaction handler, response validation and error routing.</li>
+            <li>Every block is a CASE state machine and the HMI shows the current step, so a fault can be traced before anyone opens the code.</li>
+            <li>Operators see database status, error codes and raw responses. Retries and manual stored-procedure calls need an elevated login.</li>
         </ul>
     </div>
 
@@ -119,13 +119,13 @@
                     <text x="600" y="340" id="pde-hmi-acc">operator</text>
                 </svg>
             </div>
-            <figcaption>Simplified. Each block is a CASE step, and the HMI always shows which one is active. A timeout or a bad response drops to FAULT, which raises a typed error code with the raw database response. Only an engineer login can retry, and the retry re-enters at SEND.</figcaption>
+            <figcaption>Simplified. Each block is a CASE step, and the HMI shows which one is active. A timeout or a bad response goes to FAULT, which raises a typed error code with the raw database response. Only an engineer login can retry.</figcaption>
         </figure>
     </div>
 
     <section class="section wrap" style="margin-top:2.75rem">
         <div class="section-head"><span class="num">01</span><h2>Problem</h2></div>
-        <p class="dim" style="max-width:68ch">The production database already existed: schema, stored procedures and the expected XML message structure. The line was being newly commissioned, and its data had to be collected and stored reliably for analysis. Operators needed clear error codes on the HMI and failures that were easy to recover from.</p>
+        <p class="dim" style="max-width:68ch">The production database already existed: schema, stored procedures and the expected XML message structure. The line was being commissioned, and its data had to be stored reliably. Operators needed clear error codes on the HMI and failures that were easy to recover from.</p>
     </section>
 
     <section class="section wrap">
@@ -134,19 +134,19 @@
             <div>
                 <h3 class="sub-h">PLC program · TwinCAT 3, ST</h3>
                 <ol class="steps">
-                    <li><strong>Build the payload.</strong> Triggered by the main sequence. PLC variables are mapped into the exact XML structure the stored procedures expect, with string assembly and type formatting done in ST.</li>
-                    <li><strong>Send and wait.</strong> Issue the insert and wait for the response with a timeout. The machine is held when it needs database confirmation to continue.</li>
-                    <li><strong>Validate.</strong> Parse the response, confirm success and record the result against the transaction.</li>
-                    <li><strong>Route errors.</strong> Failures raise typed error codes to the HMI with the raw database response attached, so the operator knows the next step.</li>
+                    <li>The main sequence triggers a transaction. PLC variables are mapped into the exact XML structure the stored procedures expect, with string assembly and type formatting done in ST.</li>
+                    <li>The insert is sent and the program waits for the response, with a timeout. The machine is held when it needs database confirmation to continue.</li>
+                    <li>The response is parsed, checked for success and recorded against the transaction.</li>
+                    <li>Failures raise typed error codes to the HMI with the raw database response attached.</li>
                 </ol>
             </div>
             <div>
                 <h3 class="sub-h">Operator HMI · TwinCAT HMI</h3>
                 <ul class="list">
-                    <li><strong>Custom user controls</strong> for connection status, last transaction, active error code and response text, built as reusable modules.</li>
-                    <li><strong>Access by role.</strong> Operators get read-only status. An elevated login unlocks retrying a message and running a stored procedure by hand.</li>
-                    <li><strong>Colour kept for safety.</strong> Red and yellow are reserved for the E-stop and safety monitor, so nothing on screen competes with a real alarm.</li>
-                    <li><strong>Fully saturated colours.</strong> Status colours use only 255 or 0 channel values, so they look the same on the mismatched monitors on the shop floor.</li>
+                    <li>Custom user controls for connection status, last transaction, active error code and response text, built as reusable modules.</li>
+                    <li>Operators get read-only status. An elevated login can retry a message or run a stored procedure by hand.</li>
+                    <li>Red and yellow are reserved for the E-stop and safety monitor, so nothing on screen competes with a real alarm.</li>
+                    <li>Status colours use only 255 or 0 channel values, so they look the same on mismatched shop-floor monitors.</li>
                 </ul>
             </div>
         </div>
@@ -185,15 +185,15 @@
     <section class="section wrap">
         <div class="section-head"><span class="num">03</span><h2>Design decisions</h2></div>
         <ul class="list" style="max-width:72ch">
-            <li><strong>Smart-machine boundaries.</strong> Each subsystem runs as its own program and coordinates with its neighbours through handshake bits, so each can be developed and maintained on its own.</li>
-            <li><strong>State machines for debugging.</strong> Every function block is a CASE step machine with explicit idle, busy, done and fault states. The current step is always visible on the HMI.</li>
-            <li><strong>Written for the next person.</strong> I treated modular code and comments as part of the deliverable, so the next engineer or technician can maintain it.</li>
+            <li>Each subsystem runs as its own program and coordinates with its neighbours through handshake bits, so each can be developed and maintained on its own.</li>
+            <li>Every function block is a CASE state machine with explicit idle, busy, done and fault states, and the current step is always visible on the HMI.</li>
+            <li>Modular code and comments were part of the deliverable, so the next engineer or technician can maintain it.</li>
         </ul>
     </section>
 
     <section class="section wrap">
         <div class="section-head"><span class="num">04</span><h2>What I took from it</h2></div>
-        <p class="dim" style="max-width:68ch">I spent the year working alongside senior technicians, professional engineers and system integrators. The main lessons were maintainability, modularity and keeping each machine responsible for itself. All of my code was hand-written and checked against Beckhoff InfoSys, with no AI-assisted code generation.</p>
+        <p class="dim" style="max-width:68ch">I worked alongside senior technicians, professional engineers and system integrators. The main lessons were maintainability, modularity and keeping each machine responsible for itself. All of my code was hand-written and checked against Beckhoff InfoSys, with no AI-assisted code generation.</p>
     </section>
 
     <section class="section wrap">

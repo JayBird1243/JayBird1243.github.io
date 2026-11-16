@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Daemon Data | Jack Buhr</title>
-    <meta name="description" content="A Reddit monitoring platform I built alone on Firebase and Google Cloud: shared scraping, a leased pool of Reddit accounts, user-built LLM prompts and a visual alert rule graph.">
+    <meta name="description" content="A Reddit monitoring platform I built alone on Firebase and Google Cloud: shared scraping, a leased pool of scraping accounts, user-built LLM prompts and a visual alert rule graph.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230c0f14'/%3E%3Crect x='9' y='9' width='14' height='14' rx='3' fill='%23f0b246'/%3E%3C/svg%3E">
     <script>document.documentElement.classList.add('js')</script>
     <link rel="stylesheet" href="../assets/site.css">
@@ -74,7 +74,7 @@
             <img src="../assets/img/daemon-logo.png" alt="Daemon Data logo, a small cartoon devil peeking over a curve" width="64" height="64">
             <h1>Daemon Data</h1>
         </div>
-        <p class="lede">A Reddit monitoring platform I built on my own on Firebase and Google Cloud. Users pick subreddits to watch and write LLM prompts that score each post. A rule graph they draw decides when to send them an alert.</p>
+        <p class="lede">A Reddit monitoring platform I built on my own on Firebase and Google Cloud. Users pick subreddits to watch, write LLM prompts that score each post, and draw a rule graph that decides when to alert them.</p>
         <dl class="facts">
             <div><dt>Role</dt><dd>Solo build</dd></div>
             <div><dt>Platform</dt><dd>Firebase, Google Cloud</dd></div>
@@ -82,32 +82,32 @@
             <div><dt>LLMs</dt><dd>OpenAI, Anthropic, Gemini</dd></div>
         </dl>
         <div class="try">
-            <p><strong>Try it</strong>Two parts of the real interface run here as sandboxes, so you can use them yourself.</p>
+            <p><strong>Try it</strong>Two parts of the real interface run here as sandboxes.</p>
             <div>
                 <div class="btn-row">
                     <a class="btn" href="daemon-notification-sandbox.html">Try the notification builder →</a>
                     <a class="btn btn--ghost" href="daemon-prompt-sandbox.html">Try the prompt builder →</a>
                 </div>
-                <span class="try-note">Runs in your browser. Nothing is saved.</span>
+                <span class="try-note">Demo runs in your browser.</span>
             </div>
         </div>
     </header>
 
     <div class="wrap">
         <ul class="keypoints" data-reveal>
-            <li><strong>Each subreddit is scraped once.</strong> Every user's request for the same subreddit merges into one schedule, so overlapping users share one scrape.</li>
-            <li><strong>Reddit accounts are a leased pool.</strong> One account tops out near 100 posts a minute. I lease accounts through Firestore transactions and cool them down when they get rate limited.</li>
-            <li><strong>Users build their own logic.</strong> Typed LLM prompts and a drawn boolean graph run on a metered queue, with billing per prompt that survives retries.</li>
+            <li>Each subreddit is scraped once, however many users are watching it.</li>
+            <li>Data scraping accounts are a leased pool, handed out through Firestore transactions and cooled down when they get rate limited.</li>
+            <li>Users write their own LLM prompts and draw their own alert rules. Both run on a metered queue, billed per prompt.</li>
         </ul>
     </div>
 
     <!-- 01 Pipeline -->
     <section class="section wrap" style="margin-top:2.75rem">
         <div class="section-head"><span class="num">01</span><h2>How it works</h2></div>
-        <p class="section-intro">Each stage runs asynchronously. The scrape side stays under Reddit's rate limit and the LLM side stays under each user's concurrency cap. Work over either limit waits in a queue.</p>
+        <p class="section-intro">Each stage runs asynchronously. Scraping stays under Reddit's rate limit and LLM calls stay under each user's concurrency cap. Anything over either limit waits in a queue.</p>
 
         <figure class="fig">
-            <svg class="dg pipe-h" viewBox="0 30 984 184" role="img" aria-label="Pipeline: workflows feed schedulers, which use leased Reddit accounts to scrape into Firestore. LLM workers analyse posts and write results back. The notification graph evaluates the results and sends an alert.">
+            <svg class="dg pipe-h" viewBox="0 30 984 184" role="img" aria-label="Pipeline: workflows feed schedulers, which use leased scraping accounts to scrape into Firestore. LLM workers analyse posts and write results back. The notification graph evaluates the results and sends an alert.">
                 <defs>
                     <marker id="ddPipeArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-accent"/></marker>
                     <marker id="ddPipeArrowDim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="fill-dim"/></marker>
@@ -140,7 +140,7 @@
                 <text x="204" y="125" class="t-dim t-mid">subreddit</text>
 
                 <text x="340" y="90" class="t-strong t-mid">Bot pool</text>
-                <text x="340" y="110" class="t-dim t-mid">leased Reddit</text>
+                <text x="340" y="110" class="t-dim t-mid">leased scraping</text>
                 <text x="340" y="125" class="t-dim t-mid">accounts</text>
 
                 <text x="474" y="90" class="t-strong t-mid">Firestore</text>
@@ -241,7 +241,7 @@
                 <!-- results written back -->
                 <path d="M336 340 H350 V264 H340" class="wire wire--dim flow flow--slow" marker-end="url(#ddPipeVArrowDim)"/>
             </svg>
-            <figcaption>The pipeline. Results from the LLM workers are written back to Firestore per user (dashed line) before the notification graph reads them.</figcaption>
+            <figcaption>LLM results are written back to Firestore per user (dashed line) before the notification graph reads them.</figcaption>
         </figure>
 
         <div class="split split--fig-wide split--center mt-3">
@@ -261,15 +261,15 @@
         <div class="section-head"><span class="num">02</span><h2>Shared scrape layer</h2></div>
         <div class="split">
             <div>
-                <p>Many users can watch the same subreddit with different settings. When a workflow is saved, its settings merge into one scheduler document per subreddit that keeps the fastest interval, the largest post count and the widest age window anyone asked for. One scrape then covers everyone.</p>
-                <p>Posts are stored once and shared. Each user only owns a small record of which posts matched their workflows and what their prompts returned.</p>
+                <p>Many users can watch the same subreddit with different settings. Each subreddit has one scheduler document that keeps the fastest interval, the largest post count and the widest age window anyone asked for, so one scrape covers everyone.</p>
+                <p>Posts are stored once and shared. Each user owns only a small record of which posts matched their workflows and what their prompts returned.</p>
                 <details class="more">
                     <summary>More detail</summary>
                     <div class="more-body">
                         <ul class="list">
-                            <li>Leaving is the harder case. Stopping or expiring a workflow runs a cleanup task that removes that user and recomputes the plan from whoever is left, so one heavy user leaving does not keep everyone on their schedule.</li>
+                            <li>When a workflow stops or expires, a cleanup task removes that user and recomputes the plan from whoever is left.</li>
                             <li>When the merged plan changes, the Cloud Scheduler job is recreated with the new payload.</li>
-                            <li>Scrapes write three ways: full post updates, light batched time-series points for upvotes and comments (with first and second derivatives), and AI queue entries only when the workflow, flair, prompts and credit balance allow it.</li>
+                            <li>A scrape writes full post updates, batched time-series points for upvotes and comments (with first and second derivatives), and AI queue entries when the workflow, flair, prompts and credit balance allow it.</li>
                             <li>Reddit listings come in pages of 100, so the post-count control moves in steps of 100, from 100 to 1000.</li>
                         </ul>
                     </div>
@@ -337,22 +337,22 @@
         <div class="section-head"><span class="num">03</span><h2>Bot leasing</h2></div>
         <div class="split">
             <div>
-                <p>One Reddit account can pull about 100 posts a minute, and that limit caps the whole system more than compute does. So each account is a Firestore document with an <code>available_at</code> time.</p>
-                <p>A worker picks a candidate, then a transaction re-reads <code>available_at</code> and writes the lease only if the account is still free. Two scrapes starting in the same second never share an account. How the lease ends depends on how the scrape went.</p>
+                <p>One scraping account can pull about 100 posts a minute, which limits the system more than compute does. Each account is a Firestore document with an <code>available_at</code> time.</p>
+                <p>A worker picks a candidate, then a transaction re-reads <code>available_at</code> and writes the lease only if the account is still free, so two scrapes never share an account.</p>
                 <details class="more">
                     <summary>More detail</summary>
                     <div class="more-body">
                         <ul class="list">
-                            <li><strong>Success:</strong> <code>available_at</code> goes back to now and the account rejoins the pool.</li>
-                            <li><strong>Rate limited:</strong> <code>available_at</code> is pushed into the future and the lease is kept, so the account cools down instead of going straight to the next worker.</li>
-                            <li><strong>Auth failure or repeated 403:</strong> a long lockout, so the system stops retrying a dead login or a private subreddit every cycle.</li>
+                            <li>On success, <code>available_at</code> goes back to now and the account rejoins the pool.</li>
+                            <li>On a rate limit, <code>available_at</code> is pushed into the future and the lease is kept, so the account cools down.</li>
+                            <li>On an auth failure or repeated 403, the account is locked out for a long time.</li>
                         </ul>
-                        <p>Advanced scraping spreads a user's subreddit list over time and a chosen number of accounts using Cloud Tasks. When no account is free, the task reschedules for the earliest recovery time plus jitter, so waiting tasks do not all wake at once. The system stays under Reddit's rate limit and queues the overflow.</p>
+                        <p>Advanced scraping spreads a user's subreddit list over time and a chosen number of accounts using Cloud Tasks. When no account is free, the task reschedules for the earliest recovery time plus jitter.</p>
                     </div>
                 </details>
             </div>
             <figure class="fig" id="leaseFig">
-                <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Four Reddit accounts on a timeline of available_at. Leasing pushes an account's time forward. On success it returns to now, on a rate limit it is pushed into a cooldown, and on an auth failure it is locked out for a long time.">
+                <svg class="dg" viewBox="0 0 400 262" role="img" aria-label="Four scraping accounts on a timeline of available_at. Leasing pushes an account's time forward. On success it returns to now, on a rate limit it is pushed into a cooldown, and on an auth failure it is locked out for a long time.">
                     <text x="0" y="16" class="msg" id="leaseMsg">How each lease ended</text>
 
                     <!-- time regions -->
@@ -408,14 +408,14 @@
         <div class="section-head"><span class="num">04</span><h2>Notification graph</h2></div>
         <div class="split">
             <div>
-                <p>Users connect metrics, analysis results, constants, arithmetic and comparisons into a graph with one output node. The backend walks backward from the output, evaluates only the nodes that reach it, and returns one boolean. Half-built branches left on the canvas are never evaluated.</p>
+                <p>Users connect metrics, analysis results, constants, arithmetic and comparisons into a graph with one output node. The backend walks backward from the output, evaluates only the nodes that reach it, and returns one boolean.</p>
                 <a class="btn" href="daemon-notification-sandbox.html">Try the notification builder →</a>
-                <span class="try-note">Sandbox of the real builder. Nothing is saved.</span>
+                <span class="try-note">Sandbox of the real builder.</span>
                 <details class="more">
                     <summary>More detail</summary>
                     <div class="more-body">
-                        <p><strong>Two modes.</strong> Single-post mode fires as soon as one post meets the condition. Time-horizon mode groups values into half-hour buckets, keeps rolling sums over the chosen window, and only evaluates once there is enough history. A debounce stops the same signal from alerting over and over.</p>
-                        <p><strong>Firing once.</strong> A batch can only be evaluated after every post in it has finished analysis, and several workers can finish at almost the same moment. The first worker to see the batch fully drained claims a transaction-backed lock and publishes the evaluation message. The others see the claim and stop. Delivery is idempotent, so a redelivered Pub/Sub message does not send a second alert.</p>
+                        <p>In single-post mode, an alert fires as soon as one post meets the condition. In time-horizon mode, values are summed in half-hour buckets over the chosen window, and the rule is evaluated once there is enough history. A debounce stops repeat alerts for the same signal.</p>
+                        <p>A batch is evaluated only after every post in it has finished analysis. Several workers can finish at once, so the first to see the batch drained takes a transactional lock and publishes the evaluation message. Delivery is idempotent, so a redelivered Pub/Sub message does not send a second alert.</p>
                     </div>
                 </details>
             </div>
@@ -470,7 +470,7 @@
                     <text x="236" y="249" class="t-dim">not connected</text>
                     <text x="236" y="264" class="t-dim">to output: skipped</text>
                 </svg>
-                <figcaption>Evaluation starts at the output and walks back along its inputs (amber). The dashed branch never reaches the output, so it costs nothing.</figcaption>
+                <figcaption>Evaluation starts at the output and walks back along its inputs (amber). The dashed branch never reaches the output, so it is skipped.</figcaption>
             </figure>
         </div>
     </section>
@@ -480,16 +480,16 @@
         <div class="section-head"><span class="num">05</span><h2>Prompt builder</h2></div>
         <div class="split">
             <div>
-                <p>A prompt is an ordered stack of blocks plus a response type: bounded number, unbounded number, single choice, multiple choice or free text. The builder compiles the stack into the text the model receives, and the same response type tells the worker how to parse the reply. Changing the bounds changes both in one edit, so they cannot drift apart.</p>
+                <p>A prompt is an ordered stack of blocks plus a response type: bounded number, unbounded number, single choice, multiple choice or free text. The response type writes the instructions the model receives and also tells the worker how to parse the reply, so the two cannot drift apart.</p>
                 <a class="btn" href="daemon-prompt-sandbox.html">Try the prompt builder →</a>
-                <span class="try-note">Sandbox of the real builder. Nothing is saved.</span>
+                <span class="try-note">Sandbox of the real builder.</span>
                 <details class="more">
                     <summary>More detail</summary>
                     <div class="more-body">
                         <ul class="list">
-                            <li>The response type supplies the header and footer around everything else. Between them go instructions, post title and body placeholders such as <code>{POST_TITLE}</code>, a metadata block and up to five few-shot examples.</li>
-                            <li>The builder checks each example's expected answer against the bounds or option list and will not compile until it fits, because the model copies bad examples.</li>
-                            <li>Each result is stored per prompt with the provider, model, timing, token counts, credits charged, parsed value and the bounds used. Reanalysis can overwrite a bad result without refetching the post.</li>
+                            <li>The response type supplies the header and footer. Between them go instructions, post placeholders such as <code>{POST_TITLE}</code>, a metadata block and up to five few-shot examples.</li>
+                            <li>The builder checks each example's expected answer against the bounds or option list and will not compile until it fits.</li>
+                            <li>Each result is stored per prompt with the provider, model, timing, token counts, credits charged, parsed value and bounds used, so a bad result can be reanalysed without refetching the post.</li>
                         </ul>
                     </div>
                 </details>
@@ -531,7 +531,7 @@
                     <path d="M190 262 H305 V210" class="wire flow" marker-end="url(#ddPromptArrowDim)"/>
                     <text x="248" y="254" class="t-mid">reply: 7</text>
                 </svg>
-                <figcaption>Amber parts come from the response type. One definition writes the instructions and checks the answer. Example prompt is illustrative.</figcaption>
+                <figcaption>Amber parts come from the response type. The example prompt is illustrative.</figcaption>
             </figure>
         </div>
     </section>
@@ -541,14 +541,14 @@
         <div class="section-head"><span class="num">06</span><h2>Metered LLM queue</h2></div>
         <div class="split">
             <div>
-                <p>Scraping never calls a model. It writes queue documents and sends one kickoff message per batch. A dispatcher creates Cloud Tasks only up to the user's concurrency cap, and each worker queues the next item when it finishes. The queue stays busy without going over the limit, whether the burst is ten posts or a thousand.</p>
+                <p>Scraping never calls a model. It writes queue documents and sends one kickoff message per batch. A dispatcher creates Cloud Tasks only up to the user's concurrency cap, and each worker queues the next item when it finishes.</p>
                 <details class="more">
                     <summary>More detail</summary>
                     <div class="more-body">
                         <ul class="list">
                             <li>The worker picks OpenAI, Anthropic or Gemini from the model ID. API keys stay in Secret Manager and never reach the browser.</li>
-                            <li>Tokens convert to credits through a pricing table and are deducted in a transaction. Billing is tracked per prompt, not per post, so a task that retries after finishing three of five prompts is not charged twice for those three.</li>
-                            <li>Credits are checked twice: before tasks are created and again inside the worker before more model calls. Checking only at dispatch would let a long batch overspend.</li>
+                            <li>Tokens convert to credits through a pricing table and are deducted in a transaction. Billing is tracked per prompt, so a task that retries after finishing three of five prompts is not charged twice for those three.</li>
+                            <li>Credits are checked before tasks are created and again inside the worker, so a long batch cannot overspend.</li>
                         </ul>
                     </div>
                 </details>
@@ -601,11 +601,11 @@
         <div class="grid grid-2">
             <div class="card mini" data-reveal>
                 <h3>Two sign-in providers, one account</h3>
-                <p>Google through Firebase Auth, and Discord through a custom OAuth exchange that mints a Firebase token. A Discord login with an existing email links to that account instead of making a duplicate.</p>
+                <p>Google through Firebase Auth, and Discord through a custom OAuth exchange that mints a Firebase token. A Discord login with an existing email links to that account.</p>
             </div>
             <div class="card mini" data-reveal style="--d:1">
                 <h3>Firestore rules as the client boundary</h3>
-                <p>The browser can read credits, subscription state and protected profile fields but cannot write them. Only the server can, so limits cannot be edited from a console.</p>
+                <p>The browser can read credits, subscription state and protected profile fields but cannot write them. Only the server can.</p>
             </div>
             <div class="card mini" data-reveal style="--d:2">
                 <h3>Stripe reconciliation</h3>
@@ -613,7 +613,7 @@
             </div>
             <div class="card mini" data-reveal style="--d:3">
                 <h3>Heartbeats instead of hot writes</h3>
-                <p>Scrape runs report progress through a periodic heartbeat document instead of a write per post. The dashboard stays live without one heavily contended document.</p>
+                <p>Scrape runs report progress through a periodic heartbeat document instead of a write per post.</p>
             </div>
         </div>
 

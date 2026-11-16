@@ -38,7 +38,7 @@
                 <li><span class="k">Scope</span><span class="v">Full cabinet rebuild</span></li>
                 <li><span class="k">Standard</span><span class="v">Labelled conductors · Panduit duct routing</span></li>
                 <li><span class="k">Commissioning</span><span class="v">Installation + I/O checks</span></li>
-                <li><span class="k">Tuning</span><span class="v">PID calibration on servo axes</span></li>
+                <li><span class="k">Tuning</span><span class="v">PID calibration on the servo</span></li>
             </ul>
             <a href="../projects.html#automation" class="deep-dive-btn">&larr; All automation work</a>
         </section>
@@ -54,8 +54,8 @@
                 <section class="auto-panel">
                     <h2>Build <span class="tag">cabinet</span></h2>
                     <ol class="auto-steps">
-                        <li><strong>Read and plan.</strong> Worked from the electrical drawings to lay out the backplane: drives, power distribution, terminals and duct.</li>
-                        <li><strong>Wire.</strong> Power, motor and signal wiring, with separation between power and low-level signal runs.</li>
+                        <li><strong>Read and plan.</strong> Worked from the electrical drawings to lay out the backplane: servo drive, transformer, 24 VDC supply, I/O, terminals and duct.</li>
+                        <li><strong>Wire.</strong> The 240 VAC input feeds the servo drive directly and a transformer that steps it down to 120 VAC. The 120 VAC runs a 24 VDC power supply, which powers the I/O. Motor and signal wiring, with separation between power and low-level signal runs.</li>
                         <li><strong>Label everything.</strong> Every conductor and terminal labelled to the drawing for easy troubleshooting.</li>
                         <li><strong>Route with Panduit.</strong> Clean duct routing so the cabinet can be serviced and extended without pulling it apart.</li>
                     </ol>
@@ -66,7 +66,7 @@
                     <ul>
                         <li><strong>Installation</strong> of the finished panel in its designated machine.</li>
                         <li><strong>Power-up sequence and I/O verification</strong> against the drawings before any motion.</li>
-                        <li><strong>PID calibration</strong> on the servo axes alongside the integrator: response, overshoot and settling, adjusted until the motion profile matched the requirement.</li>
+                        <li><strong>PID calibration</strong> on the servo alongside the integrator: response, overshoot and settling, adjusted until the motion profile matched the requirement.</li>
                     </ul>
                 </section>
             </div>
@@ -82,7 +82,7 @@
                     <ul class="auto-stack">
                         <li>Panel building</li>
                         <li>Electrical drawings</li>
-                        <li>Servo drives</li>
+                        <li>Servo drive</li>
                         <li>Panduit routing</li>
                         <li>Wire labelling</li>
                         <li>PID tuning</li>

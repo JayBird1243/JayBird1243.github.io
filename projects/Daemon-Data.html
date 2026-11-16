@@ -700,7 +700,7 @@
                         <div class="section-label">Bot leasing</div>
                     </div>
                     <div>
-                        <h2>Reddit accounts as a transactionally leased resource pool.</h2>
+                        <h2>Data scraping accounts as a transactionally leased resource pool.</h2>
                         <p>A single Reddit account tops out near 100 posts per minute. That ceiling, not compute, is the real constraint on the whole system, so accounts are modelled as leasable resources rather than configuration.</p>
                         <p>Each account is a Firestore document with an <code>available_at</code> timestamp. A worker samples the pool, picks a candidate, then opens a transaction that re-reads <code>available_at</code> and writes the lease only if the account is still free. Two scrapes starting in the same second cannot land on the same account.</p>
 
