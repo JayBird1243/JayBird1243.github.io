@@ -147,7 +147,7 @@
                         <line class="axis" x1="30" y1="140" x2="392" y2="140"/>
                         <g id="hist-bars"></g>
                     </svg>
-                    <p class="hist-cap">Sizes 1 to 5 are normal with mean 2, rounded down, so everything under 2 lands in size 1 (about half the stars). Sizes 6 to 10 are rare and drawn in colour. This preview and the page background show the same big stars. A smaller canvas just shows fewer of the ordinary ones.</p>
+                    <p class="hist-cap">Sizes 1 to 5 are normal with mean 2, rounded down, so everything under 2 lands in size 1 (about half the stars). Sizes 6 to 10 are rare and drawn in colour. This preview and the page background show the same seed and the same big stars. A smaller canvas just shows fewer of the ordinary ones.</p>
                 </div>
             </div>
         </figure>
@@ -204,7 +204,7 @@
                     <text class="t-dim t-mid" x="357" y="190">Nebula colours read digit pairs from every slice except the star slice</text>
                 </svg>
             </div>
-            <figcaption>The current seed, split the way <code>Sky.render</code> splits it. Change the seed above and this updates.</figcaption>
+            <figcaption>The current seed, split the way <code>Sky.render</code> splits it. It updates as the seed changes.</figcaption>
         </figure>
 
         <div class="hw">
@@ -343,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var bars = document.getElementById('hist-bars');
     var digits = document.getElementById('slice-digits');
     var seed = null;
+    var view = null;      // this box's share of the background animation
 
     // ── Histogram: build bars once, then update heights ──
     var BASE = 140, TOP = 22, X0 = 34, BAND = 35.8, BW = 22;
@@ -381,16 +382,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── Seed slice diagram ──
+    var digitEls = [];
+    for (var di = 0; di < 32; di++) {
+        var slice = Math.floor(di / 8);
+        var dt = document.createElementNS(SVGNS, 'text');
+        dt.setAttribute('class', 'digit t-mid' + (slice === 3 ? ' digit--off' : ''));
+        dt.setAttribute('x', 34 + slice * 166 + (di % 8) * 18.5 + 9.25);
+        dt.setAttribute('y', 42);
+        digits.appendChild(dt);
+        digitEls.push(dt);
+    }
     function drawDigits(sd) {
-        digits.textContent = '';
         for (var i = 0; i < 32; i++) {
-            var slice = Math.floor(i / 8);
-            var t = document.createElementNS(SVGNS, 'text');
-            t.setAttribute('class', 'digit t-mid' + (slice === 3 ? ' digit--off' : ''));
-            t.setAttribute('x', 34 + slice * 166 + (i % 8) * 18.5 + 9.25);
-            t.setAttribute('y', 42);
-            t.textContent = sd[i];
-            digits.appendChild(t);
+            if (digitEls[i].textContent !== sd[i]) digitEls[i].textContent = sd[i];
         }
     }
 
@@ -405,12 +409,24 @@ document.addEventListener('DOMContentLoaded', function () {
         drawHist(stats.sizes);
     }
 
+    function setHash() {
+        if (keepHash) { keepHash = false; return; }
+        try { history.replaceState(null, '', '#' + seed); } catch (e) { /* file:// */ }
+    }
+
     // Draw into the hidden canvas, then cross-fade to it.
     function draw(newSeed, fade) {
         seed = newSeed.toLowerCase();
         input.value = seed;
         input.setAttribute('aria-invalid', 'false');
         drawDigits(seed);
+        if (Sky.site && Sky.site.animating) {
+            // The animation is drawing this box. Hand it the seed and the
+            // stars fade over to it here and in the background.
+            Sky.site.set(seed);
+            if (view && view.model) show(view.model);
+            return;
+        }
         var stats;
         if (fade) {
             var back = 1 - front;
@@ -425,8 +441,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         show(stats);
         if (Sky.site) Sky.site.set(seed);   // the page background follows the demo
-        if (keepHash) { keepHash = false; return; }
-        try { history.replaceState(null, '', '#' + seed); } catch (e) { /* file:// */ }
+        setHash();
     }
 
     document.getElementById('seed-form').addEventListener('submit', function (e) {
@@ -452,7 +467,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var t = null;
     window.addEventListener('resize', function () {
         clearTimeout(t);
-        t = setTimeout(function () { show(Sky.render(canvases[front], seed, opts(canvases[front]))); }, 150);
+        t = setTimeout(function () {
+            if (Sky.site && Sky.site.animating) return;   // the animation redraws this box itself
+            show(Sky.render(canvases[front], seed, opts(canvases[front])));
+        }, 150);
     });
 
     // Odds table, filled from the same constants the renderer uses.
@@ -473,13 +491,27 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-speed]').forEach(function (el) { el.appendChild(Sky.speedSlider()); });
     document.querySelectorAll('[data-anim-switch]').forEach(function (b) { Sky.bindPlay(b); });
 
-    // The background can change without the demo: the menu bar's New sky,
-    // or the animation stopping on a seed. The demo follows.
+    // This box shows whatever the background shows. While the animation
+    // runs it draws here too, and the seed, numbers and chart keep up.
+    var lastShown = 0;
+    document.addEventListener('sky:tick', function () {
+        seed = Sky.site.seed;
+        if (document.activeElement !== input) input.value = seed;
+        // A seed in the address bar would be out of date one step later.
+        if (Sky.isSeed(location.hash.slice(1))) {
+            try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* file:// */ }
+        }
+        var now = Date.now();
+        if (now - lastShown < 150) return;      // the chart does not need every step
+        lastShown = now;
+        drawDigits(seed);
+        if (view && view.model) show(view.model);
+    });
+    // A still sky changed from outside (New sky in the menu bar), or the
+    // animation stopped on a seed.
     document.addEventListener('sky:change', function (e) {
-        if (!e.detail || e.detail.seed === seed) return;
-        draw(e.detail.seed, true);
-        msg.textContent = Sky.site.playing ? 'New seed.' : 'This is the seed the background is showing.';
-        msg.classList.remove('is-bad');
+        if (!e.detail) return;
+        draw(e.detail.seed, e.detail.seed !== seed);
     });
 
     // ── Animation view ──
@@ -563,6 +595,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var target = fromHash && !Sky.isSeed(fromHash) ? document.getElementById(fromHash) : null;
     var keepHash = !!target;
     draw(Sky.isSeed(fromHash) ? fromHash : (Sky.site ? Sky.site.seed : Sky.randomSeed()), false);
+    if (Sky.site && Sky.site.attach) {
+        view = Sky.site.attach({ canvas: function () { return canvases[front]; }, options: opts });
+    }
 
     if (target) setTimeout(function () { target.scrollIntoView(); }, 60);
 });

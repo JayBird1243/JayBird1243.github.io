@@ -459,6 +459,218 @@
     })();
     window.Sky = Sky;
 
+    // ── Animated view of a sky ─────────────────────────────────────
+    // Draws one canvas while the seed keeps changing: stars fade out and
+    // flare in, nebula blobs glide. The site background uses one, and the
+    // Starry Sky demo box attaches another, so both show the same thing.
+    //   var view = Sky.animator(getCanvas, getOptions)
+    //   view.begin(seed)                  take the canvas over
+    //   view.retarget(seed, snap, ms)     aim at a new seed; ms = nebula glide time
+    //   view.step(dt)                     advance and repaint
+    //   view.hurry(ms)                    finish the nebula's move within ms
+    //   view.end(seed)                    exact still picture; returns its stats
+    //   view.model                        what the current seed decides for this canvas
+    var FADE_MS = 1400;
+    var NEB_MAX_PX = 1.6e6;    // the nebula layer is never bigger than this
+    Sky.animator = function (getCanvas, getOptions) {
+        // While it runs, the nebula is on its own canvas underneath and the
+        // main canvas holds only stars. That way a frame only has to touch
+        // the few stars that are fading.
+        var neb = document.createElement('canvas');
+        neb.setAttribute('aria-hidden', 'true');
+        neb.style.cssText = 'position:absolute;left:0;top:0;z-index:-1;display:none;opacity:1;max-width:none';
+        var nctx = neb.getContext('2d');
+        var canvas = null, ctx = null, opts = null;
+        var w = 1, h = 1, dpr = 1;
+        var live = new Map();      // star key -> { st, a, to, e }
+        var blobs = [];            // { from, to, v }: x, y, r, red, green, blue, alpha
+        var glide = { t: 1, dur: 1 };
+        var nebKey = '';
+        var nebPaint = 0;
+        var redrawAll = true;
+        var view = { model: null, active: false };
+
+        function rgb(k) {
+            var hh = (((k.h % 360) + 360) % 360) / 30, sat = k.s / 100, l = k.l / 100;
+            var amp = sat * Math.min(l, 1 - l);
+            function f(n) { var t = (n + hh) % 12; return 255 * (l - amp * Math.max(-1, Math.min(t - 3, 9 - t, 1))); }
+            return [f(0), f(8), f(4)];
+        }
+        function values(node) {
+            var c = rgb(node.color);
+            return [node.x, node.y, node.r, c[0], c[1], c[2], node.color.a];
+        }
+        // How far a star's pixels reach from its centre, flare included.
+        function flareR(st) { return Math.max(4, st.r * 5); }
+        function extent(st) { return Math.max(st.r * (st.s >= 8 ? 7 : st.s >= 6 ? 4.5 : 1), flareR(st)) + 2; }
+
+        function paintNebula() {
+            nctx.setTransform(neb.width / w, 0, 0, neb.height / h, 0, 0);
+            nctx.clearRect(0, 0, w, h);
+            blobs.forEach(function (b) {
+                var v = b.v;
+                if (v[6] < 0.002) return;
+                var g = nctx.createRadialGradient(v[0], v[1], 0, v[0], v[1], v[2]);
+                g.addColorStop(0, 'rgba(' + Math.round(v[3]) + ',' + Math.round(v[4]) + ',' + Math.round(v[5]) + ',' + v[6].toFixed(3) + ')');
+                g.addColorStop(1, 'rgba(0,0,0,0)');
+                nctx.fillStyle = g;
+                nctx.fillRect(0, 0, w, h);
+            });
+        }
+
+        function star(item) {
+            var st = item.st;
+            if (item.a <= 0) return;
+            if (item.to === 1 && item.a < 1) {
+                // A star that is arriving flares, so the swap is easy to spot.
+                var fr = flareR(st);
+                var g = ctx.createRadialGradient(st.x, st.y, 0, st.x, st.y, fr);
+                g.addColorStop(0, st.c);
+                g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.globalAlpha = 0.6 * Math.sin(Math.PI * item.a);
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(st.x, st.y, fr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            Sky.drawStar(ctx, st.x, st.y, st.s, st.r, st.c, item.a);
+        }
+
+        // Redraw the stars. `moving` are the ones whose opacity changed.
+        function paintStars(moving) {
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            if (redrawAll || moving.length > 80) {
+                redrawAll = false;
+                ctx.clearRect(0, 0, w, h);
+                live.forEach(star);
+                ctx.globalAlpha = 1;
+                return;
+            }
+            moving.forEach(function (item) {
+                // A box around the star, on whole device pixels so the clip
+                // leaves no seam.
+                var st = item.st, e = item.e;
+                var x0 = Math.floor((st.x - e) * dpr) / dpr, y0 = Math.floor((st.y - e) * dpr) / dpr;
+                var x1 = Math.ceil((st.x + e) * dpr) / dpr, y1 = Math.ceil((st.y + e) * dpr) / dpr;
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x0, y0, x1 - x0, y1 - y0);
+                ctx.clip();
+                ctx.clearRect(x0, y0, x1 - x0, y1 - y0);
+                // Put back every star that reaches into the box.
+                live.forEach(function (other) {
+                    var o = other.st, oe = other.e;
+                    if (o.x + oe < x0 || o.x - oe > x1 || o.y + oe < y0 || o.y - oe > y1) return;
+                    star(other);
+                });
+                ctx.restore();
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        // Returns true if the nebula digits changed.
+        view.retarget = function (seed, snap, glideMs) {
+            var m = Sky.model(seed, w, h, opts);
+            view.model = m;
+            var want = new Map();
+            m.list.forEach(function (st) { want.set(st.x + '|' + st.y + '|' + st.s, st); });
+            if (snap) { live.clear(); redrawAll = true; }
+            live.forEach(function (item, key) { item.to = want.has(key) ? 1 : 0; });
+            want.forEach(function (st, key) {
+                if (!live.has(key)) live.set(key, { st: st, a: snap ? 1 : 0, to: 1, e: extent(st) });
+            });
+
+            var key = seed.substr(0, 8) + seed.substr(24);
+            if (!snap && key === nebKey) return false;
+            nebKey = key;
+            if (snap) blobs = [];
+            var n = Math.max(blobs.length, m.nebula.length);
+            for (var i = 0; i < n; i++) {
+                var to = i < m.nebula.length ? values(m.nebula[i]) : null;
+                if (!blobs[i]) {
+                    var start = to.slice();
+                    if (!snap) start[6] = 0;               // new blob fades in where it belongs
+                    blobs[i] = { from: start, to: to, v: start.slice() };
+                } else {
+                    blobs[i].from = blobs[i].v.slice();
+                    if (to) blobs[i].to = to;
+                    else { blobs[i].to = blobs[i].to.slice(); blobs[i].to[6] = 0; }   // blob the new seed lacks
+                }
+            }
+            glide.t = snap ? 1 : 0;
+            glide.dur = glideMs || 1500;
+            return !snap;
+        };
+
+        view.begin = function (seed) {
+            canvas = getCanvas();
+            ctx = canvas.getContext('2d');
+            opts = getOptions(canvas);
+            var stats = Sky.render(canvas, seed, opts);   // sizes the canvas
+            w = stats.width;
+            h = stats.height;
+            dpr = canvas.width / w;
+            var q = Math.min(1, Math.sqrt(NEB_MAX_PX / (w * h)));
+            neb.width = Math.max(2, Math.round(w * q));
+            neb.height = Math.max(2, Math.round(h * q));
+            neb.style.width = w + 'px';
+            neb.style.height = h + 'px';
+            neb.style.display = 'block';
+            if (neb.nextSibling !== canvas) canvas.parentNode.insertBefore(neb, canvas);
+            canvas.parentNode.style.isolation = 'isolate';   // keeps the layer above the parent's background
+            view.active = true;
+            view.retarget(seed, true);
+            paintNebula();
+            paintStars([]);
+            return stats;
+        };
+
+        view.step = function (dt) {
+            var fade = dt / FADE_MS;
+            var moving = [];
+            var gone = [];
+            live.forEach(function (item, key) {
+                if (item.a === item.to) return;
+                if (item.a < item.to) item.a = Math.min(1, item.a + fade);
+                else item.a = Math.max(0, item.a - fade);
+                moving.push(item);
+                if (item.to === 0 && item.a === 0) gone.push(key);
+            });
+            paintStars(moving);
+            gone.forEach(function (key) { live.delete(key); });
+
+            // The nebula sets off the moment its digits change and slows
+            // down as it gets to the new layout.
+            if (glide.t < 1) {
+                glide.t = Math.min(1, glide.t + dt / glide.dur);
+                var e = 1 - Math.pow(1 - glide.t, 2.2);
+                blobs.forEach(function (b) {
+                    for (var j = 0; j < 7; j++) b.v[j] = b.from[j] + (b.to[j] - b.from[j]) * e;
+                });
+                if (glide.t === 1) {
+                    while (blobs.length && blobs[blobs.length - 1].to[6] === 0) blobs.pop();
+                }
+                nebPaint += dt;
+                if (nebPaint >= (glide.dur < 4000 ? 33 : 66) || glide.t === 1) { nebPaint = 0; paintNebula(); }
+            }
+        };
+
+        view.hurry = function (ms) {
+            if (glide.t >= 1) return;
+            blobs.forEach(function (b) { b.from = b.v.slice(); });
+            glide.t = 0;
+            glide.dur = ms;
+        };
+
+        view.end = function (seed) {
+            view.active = false;
+            neb.style.display = 'none';
+            return Sky.render(canvas, seed, opts);
+        };
+
+        return view;
+    };
+
     // ── Site-wide sky ──────────────────────────────────────────────
     // One fixed sky behind every page. The seed is kept for the visit
     // (sessionStorage), so the same sky follows you from page to page.
@@ -499,9 +711,9 @@
         // speed: seed changes per second while the animation runs
         var MIN_SPEED = 0.25, MAX_SPEED = 20;
         var speed = parseFloat(store(SPEED));
-        if (!(speed >= MIN_SPEED && speed <= MAX_SPEED)) speed = 4;
+        if (!(speed >= MIN_SPEED && speed <= MAX_SPEED)) speed = 5;
 
-        var site = { seed: seed, stats: null, playing: false, speed: speed, minSpeed: MIN_SPEED, maxSpeed: MAX_SPEED };
+        var site = { seed: seed, stats: null, playing: false, animating: false, speed: speed, minSpeed: MIN_SPEED, maxSpeed: MAX_SPEED };
 
         function draw(keepNote) {
             site.stats = Sky.render(canvas, site.seed, OPTS);
@@ -608,14 +820,18 @@
         // too, and the blobs glide to the new layout. Every step is a real seed. Stopping settles on the exact
         // sky of the seed it stopped at.
         //   Sky.site.play()   Sky.site.stop()   Sky.site.playing
+        //   Sky.site.animating  (true until it has settled after a stop)
         //   Sky.site.setSpeed(seedsPerSecond)   Sky.site.nebulaEvery() -> ms
+        //   Sky.site.attach({ canvas, options }) -> view on another canvas
         // Events on document: 'sky:tick' (seed changed), 'sky:nebula'
         // (nebula digits changed), 'sky:state' (started or stopped),
         // 'sky:speed'.
-        var FADE_MS = 1400, SETTLE_MS = 1600;
+        var SETTLE_MS = FADE_MS + 200;
         var NEB_STEPS = 36, NEB_MIN_MS = 2000, NEB_MAX_MS = 20000;
-        var NEB_MAX_PX = 1.6e6;    // the nebula layer is never bigger than this
+        var NEB_AT = 'sky-neb-at';
         var anim = { on: false, running: false, raf: 0 };
+        var views = [Sky.animator(function () { return canvas; }, function () { return OPTS; })];
+        var last = 0, stepAcc = 0, nebElapsed = 0, settle = 0;
 
         site.nebulaEvery = function () {
             return Math.max(NEB_MIN_MS, Math.min(NEB_MAX_MS, (NEB_STEPS / site.speed) * 1000));
@@ -628,259 +844,112 @@
             emit('sky:speed', { speed: v });
         };
 
-        (function () {
-            var ctx = canvas.getContext('2d');
-            // While it runs, the nebula is on its own canvas underneath and
-            // the main canvas holds only stars. That way a frame only has to
-            // touch the few stars that are fading.
-            var neb = document.createElement('canvas');
-            neb.style.cssText = 'position:absolute;left:0;top:0;z-index:-1;display:none';
-            wrap.insertBefore(neb, canvas);
-            var nctx = neb.getContext('2d');
-            var w = 1, h = 1, dpr = 1;
-            var live = new Map();      // star key -> { st, a, to, e }
-            var blobs = [];            // { from, to, v }: x, y, r, red, green, blue, alpha
-            var glide = { t: 1, dur: 1 };
-            var nebKey = '';
-            var last = 0, stepAcc = 0, nebElapsed = 0, nebPaint = 0, settle = 0;
-            var redrawAll = true;
+        // Another canvas that should show the same animation, such as the
+        // demo box on the Starry Sky page.
+        //   spec.canvas()         -> the canvas to draw on
+        //   spec.options(canvas)  -> render options for it
+        site.attach = function (spec) {
+            var view = Sky.animator(spec.canvas, spec.options);
+            views.push(view);
+            if (anim.on) view.begin(site.seed);
+            return view;
+        };
 
-            function rgb(k) {
-                var hh = (((k.h % 360) + 360) % 360) / 30, sat = k.s / 100, l = k.l / 100;
-                var amp = sat * Math.min(l, 1 - l);
-                function f(n) { var t = (n + hh) % 12; return 255 * (l - amp * Math.max(-1, Math.min(t - 3, 9 - t, 1))); }
-                return [f(0), f(8), f(4)];
+        // Aim every view at the current seed.
+        function retarget(glideMs) {
+            var nebulaChanged = false;
+            views.forEach(function (view, i) {
+                var changed = view.retarget(site.seed, false, glideMs);
+                if (i === 0) nebulaChanged = changed;
+            });
+            var m = views[0].model;
+            if (ring && !m.big.some(function (b) { return starKey(b) === ringKey; })) {
+                ring.parentNode.removeChild(ring); ring = null; ringKey = null;
             }
-            function values(node) {
-                var c = rgb(node.color);
-                return [node.x, node.y, node.r, c[0], c[1], c[2], node.color.a];
-            }
-            // How far a star's pixels reach from its centre, flare included.
-            function flareR(st) { return Math.max(4, st.r * 5); }
-            function extent(st) { return Math.max(st.r * (st.s >= 8 ? 7 : st.s >= 6 ? 4.5 : 1), flareR(st)) + 2; }
+            queueRare(m.big);
+            store(KEY, site.seed);
+            if (nebulaChanged) emit('sky:nebula', { seed: site.seed });
+            emit('sky:tick', { seed: site.seed });
+        }
 
-            // Point the picture at the current seed. `snap` skips the fades;
-            // `glideMs` is how long the nebula takes if its digits changed.
-            anim.retarget = function (snap, glideMs) {
-                var m = Sky.model(site.seed, w, h, OPTS);
-                var want = new Map();
-                m.list.forEach(function (st) { want.set(st.x + '|' + st.y + '|' + st.s, st); });
-                if (snap) { live.clear(); redrawAll = true; }
-                live.forEach(function (item, key) { item.to = want.has(key) ? 1 : 0; });
-                want.forEach(function (st, key) {
-                    if (!live.has(key)) live.set(key, { st: st, a: snap ? 1 : 0, to: 1, e: extent(st) });
-                });
-
-                var key = site.seed.substr(0, 8) + site.seed.substr(24);
-                if (snap || key !== nebKey) {
-                    nebKey = key;
-                    if (snap) blobs = [];
-                    var n = Math.max(blobs.length, m.nebula.length);
-                    for (var i = 0; i < n; i++) {
-                        var to = i < m.nebula.length ? values(m.nebula[i]) : null;
-                        if (!blobs[i]) {
-                            var start = to.slice();
-                            if (!snap) start[6] = 0;               // new blob fades in where it belongs
-                            blobs[i] = { from: start, to: to, v: start.slice() };
-                        } else {
-                            blobs[i].from = blobs[i].v.slice();
-                            if (to) blobs[i].to = to;
-                            else { blobs[i].to = blobs[i].to.slice(); blobs[i].to[6] = 0; }   // blob the new seed lacks
-                        }
-                    }
-                    glide.t = snap ? 1 : 0;
-                    glide.dur = glideMs || 1500;
-                    if (!snap) emit('sky:nebula', { seed: site.seed });
+        function frame(now) {
+            var dt = Math.min(100, Math.max(0, now - last));
+            last = now;
+            if (anim.running) {
+                var changed = false, glideMs = 0;
+                stepAcc += (dt * site.speed) / 1000;
+                var steps = Math.floor(stepAcc);
+                if (steps > 0) { stepAcc -= steps; site.seed = Sky.shiftStars(site.seed, steps); changed = true; }
+                nebElapsed += dt;
+                var every = site.nebulaEvery();
+                if (nebElapsed >= every) {
+                    nebElapsed = 0;
+                    store(NEB_AT, String(Date.now()));
+                    site.seed = Sky.newNebula(site.seed);
+                    changed = true;
+                    glideMs = every;
                 }
-
-                if (ring && !want.has(ringKey)) { ring.parentNode.removeChild(ring); ring = null; ringKey = null; }
-                site.big = m.big;
-                queueRare(m.big);
-                store(KEY, site.seed);
-                emit('sky:tick', { seed: site.seed });
-            };
-
-            anim.fit = function () {
-                w = site.stats.width;
-                h = site.stats.height;
-                dpr = canvas.width / w;
-                var q = Math.min(1, Math.sqrt(NEB_MAX_PX / (w * h)));
-                neb.width = Math.max(2, Math.round(w * q));
-                neb.height = Math.max(2, Math.round(h * q));
-                neb.style.width = w + 'px';
-                neb.style.height = h + 'px';
-                neb.style.display = 'block';
-            };
-
-            function paintNebula() {
-                nctx.setTransform(neb.width / w, 0, 0, neb.height / h, 0, 0);
-                nctx.clearRect(0, 0, w, h);
-                blobs.forEach(function (b) {
-                    var v = b.v;
-                    if (v[6] < 0.002) return;
-                    var g = nctx.createRadialGradient(v[0], v[1], 0, v[0], v[1], v[2]);
-                    g.addColorStop(0, 'rgba(' + Math.round(v[3]) + ',' + Math.round(v[4]) + ',' + Math.round(v[5]) + ',' + v[6].toFixed(3) + ')');
-                    g.addColorStop(1, 'rgba(0,0,0,0)');
-                    nctx.fillStyle = g;
-                    nctx.fillRect(0, 0, w, h);
-                });
-            }
-
-            function star(item) {
-                var st = item.st;
-                if (item.a <= 0) return;
-                if (item.to === 1 && item.a < 1) {
-                    // A star that is arriving flares, so the swap is easy to spot.
-                    var fr = flareR(st);
-                    var g = ctx.createRadialGradient(st.x, st.y, 0, st.x, st.y, fr);
-                    g.addColorStop(0, st.c);
-                    g.addColorStop(1, 'rgba(255,255,255,0)');
-                    ctx.globalAlpha = 0.6 * Math.sin(Math.PI * item.a);
-                    ctx.fillStyle = g;
-                    ctx.beginPath();
-                    ctx.arc(st.x, st.y, fr, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                Sky.drawStar(ctx, st.x, st.y, st.s, st.r, st.c, item.a);
-            }
-
-            // Redraw the stars. `moving` are the ones whose opacity changed.
-            function paintStars(moving) {
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-                if (redrawAll || moving.length > 80) {
-                    redrawAll = false;
-                    ctx.clearRect(0, 0, w, h);
-                    live.forEach(star);
-                    ctx.globalAlpha = 1;
+                if (changed) retarget(glideMs);
+            } else {
+                settle -= dt;
+                if (settle <= 0) {
+                    anim.on = false;
+                    site.animating = false;
+                    views.forEach(function (view) { view.end(site.seed); });
+                    draw(true);               // exact sky for the seed it stopped on
                     return;
                 }
-                moving.forEach(function (item) {
-                    // A box around the star, on whole device pixels so the
-                    // clip leaves no seam.
-                    var st = item.st, e = item.e;
-                    var x0 = Math.floor((st.x - e) * dpr) / dpr, y0 = Math.floor((st.y - e) * dpr) / dpr;
-                    var x1 = Math.ceil((st.x + e) * dpr) / dpr, y1 = Math.ceil((st.y + e) * dpr) / dpr;
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.rect(x0, y0, x1 - x0, y1 - y0);
-                    ctx.clip();
-                    ctx.clearRect(x0, y0, x1 - x0, y1 - y0);
-                    // Put back every star that reaches into the box.
-                    live.forEach(function (other) {
-                        var o = other.st, oe = other.e;
-                        if (o.x + oe < x0 || o.x - oe > x1 || o.y + oe < y0 || o.y - oe > y1) return;
-                        star(other);
-                    });
-                    ctx.restore();
-                });
-                ctx.globalAlpha = 1;
             }
+            views.forEach(function (view) { view.step(dt); });
+            anim.raf = requestAnimationFrame(frame);
+        }
 
-            function finish() {
-                anim.on = false;
-                draw(true);                   // exact sky for the seed it stopped on
-                neb.style.display = 'none';
-            }
-
-            function frame(now) {
-                var dt = Math.min(100, Math.max(0, now - last));
-                last = now;
-                if (anim.running) {
-                    var changed = false, glideMs = 0;
-                    stepAcc += (dt * site.speed) / 1000;
-                    var steps = Math.floor(stepAcc);
-                    if (steps > 0) { stepAcc -= steps; site.seed = Sky.shiftStars(site.seed, steps); changed = true; }
-                    nebElapsed += dt;
-                    var every = site.nebulaEvery();
-                    if (nebElapsed >= every) { nebElapsed = 0; site.seed = Sky.newNebula(site.seed); changed = true; glideMs = every; }
-                    if (changed) anim.retarget(false, glideMs);
-                } else {
-                    settle -= dt;
-                    if (settle <= 0) { finish(); return; }
-                }
-
-                var fade = dt / FADE_MS;
-                var moving = [];
-                var gone = [];
-                live.forEach(function (item, key) {
-                    if (item.a === item.to) return;
-                    if (item.a < item.to) item.a = Math.min(1, item.a + fade);
-                    else item.a = Math.max(0, item.a - fade);
-                    moving.push(item);
-                    if (item.to === 0 && item.a === 0) gone.push(key);
-                });
-                paintStars(moving);
-                gone.forEach(function (key) { live.delete(key); });
-
-                // The nebula sets off the moment its digits change and
-                // slows down as it gets to the new layout.
-                if (glide.t < 1) {
-                    glide.t = Math.min(1, glide.t + dt / glide.dur);
-                    var e = 1 - Math.pow(1 - glide.t, 2.2);
-                    blobs.forEach(function (b) {
-                        for (var j = 0; j < 7; j++) b.v[j] = b.from[j] + (b.to[j] - b.from[j]) * e;
-                    });
-                    if (glide.t === 1) {
-                        while (blobs.length && blobs[blobs.length - 1].to[6] === 0) blobs.pop();
-                    }
-                    nebPaint += dt;
-                    if (nebPaint >= (glide.dur < 4000 ? 33 : 66) || glide.t === 1) { nebPaint = 0; paintNebula(); }
-                }
-
-                anim.raf = requestAnimationFrame(frame);
-            }
-
-            // `resume` is a page picking up an animation that was already on.
-            site.play = function (resume) {
-                if (anim.running || !site.stats) return;
-                anim.running = true;
-                site.playing = true;
-                store(ANIM, '1');
-                emit('sky:state', { playing: true });
-                if (anim.on) return;               // was settling: carry on from here
+        // `resume` is a page picking up an animation that was already on.
+        site.play = function (resume) {
+            if (anim.running || !site.stats) return;
+            anim.running = true;
+            site.playing = true;
+            store(ANIM, '1');
+            if (!anim.on) {
                 anim.on = true;
+                site.animating = true;
                 wrap.classList.add('is-on');
-                anim.fit();
-                anim.retarget(true);
-                paintNebula();
-                paintStars([]);
+                views.forEach(function (view) { view.begin(site.seed); });
                 stepAcc = 0;
-                // Pressing play changes the nebula almost at once.
-                nebElapsed = resume ? 0 : site.nebulaEvery() - 300;
-                nebPaint = 0;
+                // Pressing play changes the nebula almost at once. A page
+                // that is carrying on waits out the rest of the interval.
+                var every = site.nebulaEvery();
+                var since = Date.now() - (parseInt(store(NEB_AT), 10) || 0);
+                nebElapsed = resume ? Math.max(0, Math.min(every - 300, since)) : every - 300;
                 last = performance.now();
                 anim.raf = requestAnimationFrame(frame);
-            };
-            site.stop = function () {
-                if (!anim.running) return;
-                anim.running = false;
-                site.playing = false;
-                store(ANIM, '0');
-                settle = SETTLE_MS;
-                // Finish the nebula's move in the time the stars need.
-                if (glide.t < 1) {
-                    blobs.forEach(function (b) { b.from = b.v.slice(); });
-                    glide.t = 0;
-                    glide.dur = SETTLE_MS - 300;
-                }
-                emit('sky:state', { playing: false });
-            };
-            site.toggle = function () { if (site.playing) site.stop(); else site.play(); };
-            anim.resize = function () {
-                site.stats = Sky.render(canvas, site.seed, OPTS);
-                anim.fit();
-                anim.retarget(true);
-                paintNebula();
-                paintStars([]);
-            };
-        })();
+            }
+            emit('sky:state', { playing: true });
+        };
+        site.stop = function () {
+            if (!anim.running) return;
+            anim.running = false;
+            site.playing = false;
+            store(ANIM, '0');
+            settle = SETTLE_MS;
+            // Finish the nebula's move in the time the stars need.
+            views.forEach(function (view) { view.hurry(SETTLE_MS - 300); });
+            emit('sky:state', { playing: false });
+        };
+        site.toggle = function () { if (site.playing) site.stop(); else site.play(); };
+        anim.resize = function () {
+            views.forEach(function (view, i) {
+                var stats = view.begin(site.seed);
+                if (i === 0) site.stats = stats;
+            });
+        };
 
         site.set = function (next) {
             if (!Sky.isSeed(next)) return false;
             next = next.toLowerCase();
             if (next === site.seed && site.stats) return true;
             site.seed = next;
-            if (anim.on) { anim.retarget(false, 1500); return true; }
+            if (anim.on) { retarget(1500); return true; }
             clearRare();
             if (reduced) { draw(); return true; }
             wrap.classList.remove('is-on');
@@ -891,7 +960,10 @@
         Sky.site = site;
 
         draw();
-        if (store(ANIM) === '1') site.play(true);
+        // The animation is on unless the visitor turned it off, or asked
+        // their system for less motion and has not turned it on.
+        var wanted = store(ANIM);
+        if (wanted === '1' || (wanted !== '0' && !reduced)) site.play(true);
 
         // Redraw when the width changes. Height changes are ignored so the
         // mobile URL bar sliding away does not reshuffle the stars.
